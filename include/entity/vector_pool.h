@@ -77,6 +77,11 @@ class VectorPool {
              (container_->GetElement(index_)->unique_id == unique_id_);
     }
 
+    // operator bool provides an alternate way to perform the IsValid check.
+    // This is similar to most smart pointer types which supply an operator bool
+    // as syntactic sugar to check if they are nullptrs.
+    operator bool() const { return IsValid(); }
+
     // Member access operator.  Returns a pointer to the data the
     // VectorPoolReference is referring to, allowing you to use
     // VectorPoolReferences like pointers, syntactically.
