@@ -169,7 +169,7 @@ class Component : public ComponentInterface {
         ComponentIdLookup<ComponentDataType>::kComponentId));
   }
 
-  // Virtual methods we inherrited from component_interface:
+  // Virtual methods we inherited from component_interface:
 
   // Override this with any code that we want to execute when the component
   // is added to the entity manager.  (i. e. once, at the beginning of the

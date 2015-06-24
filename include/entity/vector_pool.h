@@ -304,6 +304,9 @@ class VectorPool {
   // Frees up an element.  Removes it from the list of active elements, and
   // adds it to the front of the inactive list.
   void FreeElement(size_t index) {
+    // Explicitly call the destructor for T, because we allocated it in-place
+    // using placement-new.
+    elements_[index].data.~T();
     RemoveFromList(index);
     AddToListFront(index, kFirstFree);
     elements_[index].unique_id = kInvalidId;
