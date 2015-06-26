@@ -65,7 +65,6 @@ class Component : public ComponentInterface {
     entity->SetComponentDataIndex(GetComponentId(), index);
     ComponentData* component_data = component_data_.GetElementData(index);
     component_data->entity = entity;
-    new (&(component_data->data)) T();
     InitEntity(entity);
     return &(component_data->data);
   }
@@ -216,16 +215,6 @@ class Component : public ComponentInterface {
   void RemoveEntityInternal(EntityRef& entity) {
     // Allow components to handle any per-entity cleanup that it needs to do.
     CleanupEntity(entity);
-
-    // Manually call the destructor on the data, since it is not actually being
-    // freed, just returned to the pool.
-    const size_t data_index = GetComponentDataIndex(entity);
-    ComponentData* component_data = component_data_.GetElementData(data_index);
-    component_data->data.~T();
-
-    // Add a reference destructor is empty and the line above is implicitly
-    // removed.
-    (void)component_data;
   }
 
  protected:
