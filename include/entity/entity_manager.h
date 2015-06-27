@@ -160,6 +160,10 @@ class EntityManager {
   // update routines.
   void AddEntityToComponent(EntityRef entity, ComponentId component_id);
 
+  // Delete all the entities we have marked for deletion.
+  // Don't call this during any type of entity update!
+  void DeleteMarkedEntities();
+
  private:
   // Does all the real work of registering a component, aside from template fun.
   // In particular, verifies that the requested ID isn't already in use,
@@ -183,8 +187,6 @@ class EntityManager {
   const void* GetComponentDataAsVoid(EntityRef entity,
                                      ComponentId component_id) const;
 
-  // Delete all the entities we have marked for deletion.
-  void DeleteMarkedEntities();
   // Storage of all the entities currently tracked by the entitymanager
   EntityStorageContainer entities_;
 
