@@ -25,6 +25,7 @@ set(tmp_dir ${CMAKE_CURRENT_BINARY_DIR}/obj)
 
 # entity source files.
 set(entity_SRCS
+    include/entity/component.h
     include/entity/component_id_lookup.h
     include/entity/component_interface.h
     include/entity/entity_common.h
