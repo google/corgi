@@ -83,10 +83,10 @@ class Component : public ComponentInterface {
   // Same as RemoveEntity() above, but returns an iterator to the entity after
   // the one we've just removed.
   virtual EntityIterator RemoveEntity(EntityIterator iter) {
-    RemoveEntityInternal(iter->entity);
-    auto new_iter = component_data_.FreeElement(iter);
-    iter->entity->SetComponentDataIndex(GetComponentId(),
-                                        kUnusedComponentIndex);
+    EntityRef entity = iter->entity;
+    RemoveEntityInternal(entity);
+    EntityIterator new_iter = component_data_.FreeElement(iter);
+    entity->SetComponentDataIndex(GetComponentId(), kUnusedComponentIndex);
     return new_iter;
   }
 

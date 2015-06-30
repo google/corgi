@@ -16,6 +16,7 @@
 #define VECTOR_POOL_H
 
 #include <stddef.h>
+#include <stdio.h>
 #include <vector>
 #include <assert.h>
 
@@ -309,12 +310,14 @@ class VectorPool {
   // Frees up an element.  Removes it from the list of active elements, and
   // adds it to the front of the inactive list.
   void FreeElement(size_t index) {
-    // Explicitly call the destructor for T, because we allocated it in-place
-    // using placement-new.
-    elements_[index].data.~T();
+    assert(elements_[index].unique_id != kInvalidId);
+    // Don't call the destructor directly - instead, assign over it.
+    // This ensures that data will always contain an object that is safe to
+    // destruct.
+    elements_[index].data = T();
+    elements_[index].unique_id = kInvalidId;
     RemoveFromList(index);
     AddToListFront(index, kFirstFree);
-    elements_[index].unique_id = kInvalidId;
     active_count_--;
   }
 
