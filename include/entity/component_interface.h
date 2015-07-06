@@ -80,11 +80,6 @@ class ComponentInterface {
   // If you don't support this functionality, return nullptr here.
   virtual RawDataUniquePtr ExportRawData(EntityRef& entity) const = 0;
 
-  // Similar to export, but populate the data into an existing buffer using
-  // a helper object that you provide. You are responsible for deciding
-  // what goes in here. Return nullptr if you don't support this.
-  virtual void* PopulateRawData(EntityRef& entity, void* helper) const = 0;
-
   // Called just before removal from the entitymanager.
   virtual void Cleanup() = 0;
 

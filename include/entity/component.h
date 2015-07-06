@@ -184,13 +184,6 @@ class Component : public ComponentInterface {
     return nullptr;
   }
 
-  // By default, components don't support populating their raw data into a
-  // buffer. If you do support it, override this to populate raw data via the
-  // method of your choosing.
-  virtual void* PopulateRawData(EntityRef& /*unused*/, void* /*unused*/) const {
-    return nullptr;
-  }
-
   // Override this with code that executes when this component is removed from
   // the entity manager.  (i. e. usually when the game/state is over and
   // everythingis shutting down.)
