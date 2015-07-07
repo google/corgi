@@ -90,6 +90,10 @@ class ComponentInterface {
   // contact for components that need to talk to other things.)
   // (Normally assigned by entitymanager)
   virtual void SetEntityManager(EntityManager* entity_manager) = 0;
+
+  // Sets the component ID for the data type. Only EntityManager should be
+  // calling this.
+  virtual void SetComponentIdOnDataType(ComponentId id) = 0;
 };
 
 }  // entity

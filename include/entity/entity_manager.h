@@ -47,7 +47,7 @@ class EntityManager {
   template <typename T>
   T* GetComponentData(const EntityRef& entity) {
     return static_cast<T*>(
-        GetComponentDataAsVoid(entity, ComponentIdLookup<T>::kComponentId));
+        GetComponentDataAsVoid(entity, ComponentIdLookup<T>::component_id));
   }
 
   // Helper function for marshalling data from a component.
@@ -55,14 +55,14 @@ class EntityManager {
   template <typename T>
   const T* GetComponentData(const EntityRef& entity) const {
     return static_cast<const T*>(
-        GetComponentDataAsVoid(entity, ComponentIdLookup<T>::kComponentId));
+        GetComponentDataAsVoid(entity, ComponentIdLookup<T>::component_id));
   }
 
   // Helper function for getting a particular component, given its datatype.
   // Asserts if it doesn't exist.
   template <typename T>
   T* GetComponent() {
-    ComponentId id = ComponentIdLookup<T>::kComponentId;
+    ComponentId id = ComponentIdLookup<T>::component_id;
     assert(id != kInvalidComponent);
     assert(id < kMaxComponentCount);
     return static_cast<T*>(components_[id]);
@@ -72,7 +72,7 @@ class EntityManager {
   // Asserts if it doesn't exist.
   template <typename T>
   const T* GetComponent() const {
-    ComponentId id = ComponentIdLookup<T>::kComponentId;
+    ComponentId id = ComponentIdLookup<T>::component_id;
     assert(id != kInvalidComponent);
     assert(id < kMaxComponentCount);
     return static_cast<const T*>(components_[id]);
@@ -82,7 +82,7 @@ class EntityManager {
   // Asserts if the component doesn't exist.
   template <typename T>
   void AddEntityToComponent(EntityRef entity) {
-    ComponentId id = ComponentIdLookup<T>::kComponentId;
+    ComponentId id = ComponentIdLookup<T>::component_id;
     assert(id != kInvalidComponent);
     assert(id < kMaxComponentCount);
     AddEntityToComponent(entity, id);
@@ -99,6 +99,12 @@ class EntityManager {
   inline const ComponentInterface* GetComponent(ComponentId id) const {
     assert(id < kMaxComponentCount);
     return components_[id];
+  }
+
+  // Helper function to get the component ID for a given component.
+  template <typename T>
+  ComponentId GetComponentId() {
+    return ComponentIdLookup<T>::component_id;
   }
 
   // Allocates a new entity, which is registered with no components.
@@ -119,10 +125,13 @@ class EntityManager {
   // Adds a new component to the entity manager. The component must inherit from
   // ComponentInterface.
   template <typename T>
-  void RegisterComponent(T* new_component) {
+  ComponentId RegisterComponent(T* new_component) {
     static_assert(std::is_base_of<ComponentInterface, T>::value,
                   "'new_component' must inherit from ComponentInterface");
-    RegisterComponentHelper(new_component, ComponentIdLookup<T>::kComponentId);
+    ComponentId component_id = ++max_component_id_;
+    ComponentIdLookup<T>::component_id = component_id;
+    RegisterComponentHelper(new_component, component_id);
+    return component_id;
   }
 
   // Removes all components from an entity, causing any associated components
@@ -170,7 +179,7 @@ class EntityManager {
   // puts a pointer to the new component in our components_ array, and
   // sets starting variables and preforms initialization on the component.
   void RegisterComponentHelper(ComponentInterface* new_component,
-                               ComponentId id);
+                               ComponentId component_id);
 
   // Given a component ID and an entity, returns all data associated
   // with that entity from the given component.  Will assert if the inputs
@@ -198,6 +207,8 @@ class EntityManager {
   // Factory used for spawning new entities from data.  Provided by the
   // calling program.
   EntityFactoryInterface* entity_factory_;
+
+  ComponentId max_component_id_;
 };
 
 class EntityFactoryInterface {

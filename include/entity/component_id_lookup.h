@@ -33,23 +33,36 @@ struct ComponentIdLookup {};
 // ComponentType is the name of the component class.
 // DataType is the name of the struct that holds the component data.  (i. e. the
 // type that the component was specialized for.)
-// Id is the unique identifier that is associated with the component.
-#define FPL_ENTITY_REGISTER_COMPONENT(ComponentType, DataType, Id) \
-  FPL_ENTITY_REGISTER_COMPONENT_ID(ComponentType, Id)              \
-  FPL_ENTITY_REGISTER_COMPONENT_ID(DataType, Id)
+#define FPL_ENTITY_REGISTER_COMPONENT(ComponentType, DataType) \
+  FPL_ENTITY_REGISTER_COMPONENT_ID_LOOKUP(ComponentType)       \
+  FPL_ENTITY_REGISTER_COMPONENT_ID_LOOKUP(DataType)
+
+#define FPL_ENTITY_DEFINE_COMPONENT(ComponentType, DataType) \
+  FPL_ENTITY_DEFINE_COMPONENT_ID_LOOKUP(ComponentType)       \
+  FPL_ENTITY_DEFINE_COMPONENT_ID_LOOKUP(DataType)
 
 // This macro handles the lower level job of generating code to associate data
-// with a type.  It is usually invoked by FPL_REGISTER_COMPONENT, rather than
-// invoking it directly.  (Since registration of a component requires multiple
-// datatype/ID registrations.)
-#define FPL_ENTITY_REGISTER_COMPONENT_ID(DataType, Id) \
-  namespace fpl {                                      \
-  namespace entity {                                   \
-  template <>                                          \
-  struct ComponentIdLookup<DataType> {                 \
-    static const int kComponentId = Id;                \
-  };                                                   \
-  }                                                    \
+// with a type.  It is usually invoked by FPL_ENTITY_REGISTER_COMPONENT, rather
+// than invoking it directly.  (Since registration of a component requires
+// multiple datatype/ID registrations.)
+#define FPL_ENTITY_REGISTER_COMPONENT_ID_LOOKUP(DataType) \
+  namespace fpl {                                         \
+  namespace entity {                                      \
+  template <>                                             \
+  struct ComponentIdLookup<DataType> {                    \
+    static int component_id;                              \
+  };                                                      \
+  }                                                       \
+  }
+
+// This macro handles defining the storage location for the component ID for
+// a given data type. It should be placed at the top of the .cpp file for that
+// component, after the includes but before the namespaces.
+#define FPL_ENTITY_DEFINE_COMPONENT_ID_LOOKUP(DataType)              \
+  namespace fpl {                                                    \
+  namespace entity {                                                 \
+  int ComponentIdLookup<DataType>::component_id = kInvalidComponent; \
+  }                                                                  \
   }
 
 }  // entity

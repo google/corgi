@@ -165,7 +165,7 @@ class Component : public ComponentInterface {
   template <typename ComponentDataType>
   ComponentDataType* GetComponent() {
     return static_cast<ComponentDataType*>(entity_manager_->GetComponent(
-        ComponentIdLookup<ComponentDataType>::kComponentId));
+        ComponentIdLookup<ComponentDataType>::component_id));
   }
 
   // Virtual methods we inherited from component_interface:
@@ -201,7 +201,13 @@ class Component : public ComponentInterface {
 
   // Returns the ID of this component.
   static ComponentId GetComponentId() {
-    return ComponentIdLookup<T>::kComponentId;
+    return ComponentIdLookup<T>::component_id;
+  }
+
+  // Called by the entity manager; sets the component ID on the data type.
+  // The entity manager handles setting the component ID on the component type.
+  virtual void SetComponentIdOnDataType(ComponentId id) {
+    ComponentIdLookup<T>::component_id = id;
   }
 
  private:

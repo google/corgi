@@ -30,15 +30,15 @@ namespace entity {
 // Pick an index type based on the max number of components.
 #if kMaxComponentCount <= 0xff
 typedef uint8_t ComponentId;
-const ComponentId kInvalidComponent = 0xff;
 #elif kMaxComponentCount <= 0xffff
 typedef uint16_t ComponentId;
-const ComponentId kInvalidComponent = 0xffff;
 #else
 // if you hit this one, you are probably doing something really odd.
 typedef uint32_t ComponentId;
-const ComponentId kInvalidComponent = 0xffffffffL;
 #endif
+
+// Component IDs start at 1.
+const ComponentId kInvalidComponent = 0;
 
 static const ComponentId kMaxComponentCount = FPL_ENTITY_MAX_COMPONENT_COUNT;
 

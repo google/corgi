@@ -19,7 +19,8 @@
 namespace fpl {
 namespace entity {
 
-EntityManager::EntityManager() : entity_factory_(nullptr) {
+EntityManager::EntityManager()
+    : entity_factory_(nullptr), max_component_id_(kInvalidComponent) {
   for (int i = 0; i < kMaxComponentCount; i++) {
     components_[i] = nullptr;
   }
@@ -79,6 +80,7 @@ void EntityManager::RegisterComponentHelper(ComponentInterface* new_component,
   assert(components_[id] == nullptr);
   components_[id] = new_component;
   new_component->SetEntityManager(this);
+  new_component->SetComponentIdOnDataType(id);
   new_component->Init();
 }
 
