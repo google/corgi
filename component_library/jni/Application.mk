@@ -12,22 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-LOCAL_PATH := $(call my-dir)
+APP_STL:=gnustl_static
+APP_ABI := armeabi-v7a x86 armeabi
+NDK_TOOLCHAIN_VERSION := 4.8
+APP_CPPFLAGS += -std=c++11 -Wno-literal-suffix
 
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := entity
-LOCAL_ARM_MODE := arm
-LOCAL_STATIC_LIBRARIES :=
-LOCAL_SHARED_LIBRARIES :=
-
-ENTITY_RELATIVE_DIR := ..
-ENTITY_DIR := $(LOCAL_PATH)/$(ENTITY_RELATIVE_DIR)
-
-LOCAL_EXPORT_C_INCLUDES := $(ENTITY_DIR)/include
-
-LOCAL_C_INCLUDES := $(LOCAL_EXPORT_C_INCLUDES) $(ENTITY_DIR)/src
-
-LOCAL_SRC_FILES := $(ENTITY_RELATIVE_DIR)/src/entity_manager.cpp
-
-include $(BUILD_STATIC_LIBRARY)
+APP_PLATFORM := android-15
