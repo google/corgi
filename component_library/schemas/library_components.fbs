@@ -28,24 +28,7 @@ table TransformDef {
   child_ids:[string];
 }
 
-// How to allow selection of this entity, in the editor.
-enum EditorSelectionOption:ubyte {
-     Unspecified, // Not specified, so you don't overwrite a prototype value.
-     Any,         // Allow this entity to be selected by any means.
-     None,        // Never allow this entity to be selected.
-     CycleOnly,   // Only allow this entity to be cycled through.
-     PointerOnly, // Only allow this to be pointed at, not cycled through.
-}
-
-// When to render this entity: in the editor, not in the editor, etc.
-enum EditorRenderOption:ubyte {
-     Unspecified,  // Not specified, so you don't overwrite a prototype value.
-     Always,       // Always render this entity.
-     OnlyInEditor, // Only render when in the editor.
-     NotInEditor,  // Only render when outside the editor.
-}
-
-table EditorDef {
+table MetaDef {
   // Each entity has a unique entity ID. This includes entity prototypes.
   // If you don't specify the entity ID for your entity, it will be automatically
   // generated when needed.
@@ -56,14 +39,6 @@ table EditorDef {
 
   // A human-readable comment to remember what this entity is for.
   comment:string;
-
-  ignore_selection:byte = -1 (deprecated);
-
-  // How to select this item in the editor (cycling thru, mouse pointer, etc.)
-  selection_option:EditorSelectionOption = Unspecified;
-
-  // Whether to render the object always, only in edit mode, etc.
-  render_option:EditorRenderOption = Unspecified;
 }
 
 enum RenderPass:ubyte {

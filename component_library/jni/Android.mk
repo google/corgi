@@ -44,7 +44,7 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_SRC_FILES := \
 	$(COMPONENTS_RELATIVE_DIR)/src/common_services.cpp \
-	$(COMPONENTS_RELATIVE_DIR)/src/editor.cpp \
+	$(COMPONENTS_RELATIVE_DIR)/src/meta.cpp \
 	$(COMPONENTS_RELATIVE_DIR)/src/entity_factory.cpp \
 	$(COMPONENTS_RELATIVE_DIR)/src/physics.cpp \
 	$(COMPONENTS_RELATIVE_DIR)/src/rendermesh.cpp \
@@ -54,7 +54,8 @@ COMPONENTS_SCHEMA_DIR := $(COMPONENTS_DIR)/schemas
 COMPONENTS_SCHEMA_INCLUDE_DIRS := $(DEPENDENCIES_FPLBASE_DIR)/schemas
 
 COMPONENTS_SCHEMA_FILES := \
-  $(COMPONENTS_SCHEMA_DIR)/base_components.fbs \
+  $(COMPONENTS_SCHEMA_DIR)/component_library_events.fbs \
+  $(COMPONENTS_SCHEMA_DIR)/library_components.fbs \
   $(COMPONENTS_SCHEMA_DIR)/bullet_def.fbs
 
 ifeq (,$(COMPONENTS_RUN_ONCE))

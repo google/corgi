@@ -86,20 +86,20 @@ set(entity_SRCS
     src/entity_manager.cpp)
 
 # Includes for this project.
-include_directories(src include src/entity include/entity)
+include_directories(src include)
 
 if (entity_build_component_library)
   set(COMPONENT_COLLECTION_DIR ${CMAKE_CURRENT_SOURCE_DIR}/component_library)
   # component library source files.
   set(component_library_SRCS
       ${COMPONENT_COLLECTION_DIR}/include/component_library/common_services.h
-      ${COMPONENT_COLLECTION_DIR}/include/component_library/editor.h
+      ${COMPONENT_COLLECTION_DIR}/include/component_library/meta.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/entity_factory.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/physics.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/rendermesh.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/transform.h
       ${COMPONENT_COLLECTION_DIR}/src/common_services.cpp
-      ${COMPONENT_COLLECTION_DIR}/src/editor.cpp
+      ${COMPONENT_COLLECTION_DIR}/src/meta.cpp
       ${COMPONENT_COLLECTION_DIR}/src/entity_factory.cpp
       ${COMPONENT_COLLECTION_DIR}/src/rendermesh.cpp
       ${COMPONENT_COLLECTION_DIR}/src/physics.cpp
@@ -124,11 +124,13 @@ if (entity_build_component_library)
     get_filename_component(filename ${flatbuffers_schema} NAME_WE)
     set(flatbuffers_include
       ${COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR}/${filename}_generated.h)
+    file(COPY ${flatbuffers_schema}
+         DESTINATION ${CMAKE_BINARY_DIR}/assets/flatbufferschemas/)
     add_custom_command(
       OUTPUT ${flatbuffers_include}
       COMMAND flatc --gen-includes --gen-mutable
-          -I ${dependencies_fplbase_dir}/schemas
           -o ${COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR}
+          -I ${dependencies_fplbase_dir}/schemas
           -c ${flatbuffers_schema}
       DEPENDS flatc ${flatbuffers_schema})
     list(APPEND FLATBUFFERS_GENERATED_INCLUDES ${flatbuffers_include})

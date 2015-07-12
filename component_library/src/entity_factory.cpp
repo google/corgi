@@ -15,14 +15,14 @@
 #include "component_library/entity_factory.h"
 
 #include <set>
-#include "component_library/editor.h"
+#include "component_library/meta.h"
 #include "fplbase/utilities.h"
 
 namespace fpl {
 namespace component_library {
 
-using component_library::EditorComponent;
-using component_library::EditorData;
+using component_library::MetaComponent;
+using component_library::MetaData;
 
 bool EntityFactory::AddEntityLibrary(const char* entity_library_filename) {
   std::string library_data;
@@ -44,7 +44,7 @@ bool EntityFactory::AddEntityLibrary(const char* entity_library_filename) {
     LogInfo("EntityFactory: Reading %d prototypes from file %s",
             entities.size(), entity_library_filename);
   }
-  unsigned int editor_id = EditorComponent::GetComponentId();
+  unsigned int meta_id = MetaComponent::GetComponentId();
 
   for (size_t i = 0; i < entities.size(); i++) {
     std::vector<const void*> components;
@@ -54,19 +54,18 @@ bool EntityFactory::AddEntityLibrary(const char* entity_library_filename) {
     }
 
     // Read the name from the entity component definition.
-    const EditorDef* editor_def =
-        static_cast<const EditorDef*>(components[editor_id]);
-    if (editor_def == nullptr || editor_def->entity_id() == nullptr) {
+    const MetaDef* meta_def = static_cast<const MetaDef*>(components[meta_id]);
+    if (meta_def == nullptr || meta_def->entity_id() == nullptr) {
       LogInfo("EntityFactory: Library entity %d has no entity_id, skipping", i);
       continue;
     }
 
     if (debug_entity_creation()) {
       LogInfo("EntityFactory: Loaded prototype %s from file %s",
-              editor_def->entity_id()->c_str(), entity_library_filename);
+              meta_def->entity_id()->c_str(), entity_library_filename);
     }
     // This entity has an entity ID, so index the pointer to it.
-    prototype_data_[editor_def->entity_id()->c_str()] = entities[i];
+    prototype_data_[meta_def->entity_id()->c_str()] = entities[i];
   }
   return true;
 }
@@ -90,14 +89,13 @@ int EntityFactory::LoadEntitiesFromFile(const char* filename,
 
   // Go through all the entities we just created and mark them with their source
   // file.
-  EditorComponent* editor_component =
-      entity_manager->GetComponent<EditorComponent>();
+  MetaComponent* meta_component = entity_manager->GetComponent<MetaComponent>();
   for (size_t i = 0; i < entities_loaded.size(); i++) {
     entity::EntityRef& entity = entities_loaded[i];
     // Track which source file this entity came from, so we can later output
-    // it to the same file if we save it in the editor.
-    if (editor_component != nullptr) {
-      entity_manager->GetComponent<EditorComponent>()->AddWithSourceFile(
+    // it to the same file if we save it in the meta.
+    if (meta_component != nullptr) {
+      entity_manager->GetComponent<MetaComponent>()->AddWithSourceFile(
           entity, filename);
     }
   }
@@ -132,9 +130,8 @@ void EntityFactory::LoadEntityData(const void* def,
                                    entity::EntityManager* entity_manager,
                                    entity::EntityRef& entity,
                                    bool is_prototype) {
-  unsigned int editor_id = EditorComponent::GetComponentId();
-  EditorComponent* editor_component =
-      entity_manager->GetComponent<EditorComponent>();
+  unsigned int meta_id = MetaComponent::GetComponentId();
+  MetaComponent* meta_component = entity_manager->GetComponent<MetaComponent>();
 
   std::vector<const void*> components;
   if (!ReadEntityDefinition(def, &components)) {
@@ -142,10 +139,9 @@ void EntityFactory::LoadEntityData(const void* def,
     return;
   }
 
-  const EditorDef* editor_def =
-      static_cast<const EditorDef*>(components[editor_id]);
-  if (editor_def != nullptr && editor_def->prototype() != nullptr) {
-    const char* prototype_name = editor_def->prototype()->c_str();
+  const MetaDef* meta_def = static_cast<const MetaDef*>(components[meta_id]);
+  if (meta_def != nullptr && meta_def->prototype() != nullptr) {
+    const char* prototype_name = meta_def->prototype()->c_str();
     if (prototype_data_.find(prototype_name) != prototype_data_.end()) {
       if (debug_entity_creation()) {
         LogInfo("EntityFactory::LoadEntityData: Loading prototype: %s",
@@ -169,10 +165,10 @@ void EntityFactory::LoadEntityData(const void* def,
                 is_prototype ? "prototype" : "entity", i);
       }
       overridden_components.insert(i);
-      if (is_prototype && i == editor_id) {
-        // EditorDef from prototypes gets loaded special.
-        editor_component->AddFromPrototypeData(
-            entity, static_cast<const EditorDef*>(component_data));
+      if (is_prototype && i == meta_id) {
+        // MetaDef from prototypes gets loaded special.
+        meta_component->AddFromPrototypeData(
+            entity, static_cast<const MetaDef*>(component_data));
       } else {
         entity::ComponentInterface* component = entity_manager->GetComponent(i);
         assert(component != nullptr);
@@ -184,16 +180,16 @@ void EntityFactory::LoadEntityData(const void* def,
   // Final clean-up on the top-level entity load: keep track of which parts
   // came from the initial entity and which came from prototypes.
   if (!is_prototype) {
-    EditorData* editor_data =
-        entity_manager->GetComponent<EditorComponent>()->AddEntity(entity);
+    MetaData* meta_data =
+        entity_manager->GetComponent<MetaComponent>()->AddEntity(entity);
     for (int component_id = 0; component_id <= max_component_id();
          component_id++) {
-      // If we don't already have an EditorComponent, we should get one added.
+      // If we don't already have a MetaComponent, we should get one added.
       if (entity_manager->GetComponent(component_id) != nullptr &&
           entity->IsRegisteredForComponent(component_id) &&
           overridden_components.find(component_id) ==
               overridden_components.end()) {
-        editor_data->components_from_prototype.insert(component_id);
+        meta_data->components_from_prototype.insert(component_id);
       }
     }
   }
@@ -241,7 +237,7 @@ entity::EntityRef EntityFactory::CreateEntityFromPrototype(
 bool EntityFactory::SerializeEntity(
     entity::EntityRef& entity, entity::EntityManager* entity_manager,
     std::vector<uint8_t>* entity_serialized_output) {
-  auto editor_component = entity_manager->GetComponent<EditorComponent>();
+  auto meta_component = entity_manager->GetComponent<MetaComponent>();
 
   std::vector<entity::ComponentInterface::RawDataUniquePtr> exported_data;
   std::vector<const void*> exported_pointers;
@@ -249,9 +245,9 @@ bool EntityFactory::SerializeEntity(
   exported_pointers.resize(max_component_id() + 1, nullptr);
   for (int component_id = 0; component_id <= max_component_id();
        component_id++) {
-    const EditorData* editor_data = editor_component->GetComponentData(entity);
-    if (editor_data->components_from_prototype.find(component_id) ==
-        editor_data->components_from_prototype.end()) {
+    const MetaData* meta_data = meta_component->GetComponentData(entity);
+    if (meta_data->components_from_prototype.find(component_id) ==
+        meta_data->components_from_prototype.end()) {
       auto component = entity_manager->GetComponent(component_id);
       if (component != nullptr) {
         exported_data.push_back(component->ExportRawData(entity));

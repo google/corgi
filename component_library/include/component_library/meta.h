@@ -12,41 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef COMPONENT_LIBRARY_EDITOR_H_
-#define COMPONENT_LIBRARY_EDITOR_H_
+#ifndef COMPONENT_LIBRARY_META_H_
+#define COMPONENT_LIBRARY_META_H_
 
 #include <string>
 #include <unordered_map>
 #include <set>
-#include "base_components_generated.h"
 #include "entity/component.h"
+#include "library_components_generated.h"
 
 namespace fpl {
 namespace component_library {
 
-struct EditorData {
-  EditorData()
-      : selection_option(EditorSelectionOption_Unspecified),
-        render_option(EditorRenderOption_Unspecified) {}
+struct MetaData {
+  MetaData() {}
   std::string entity_id;
   std::string prototype;
   std::string source_file;
   std::string comment;
-  EditorSelectionOption selection_option;
-  EditorRenderOption render_option;
   // Keep track of which of this entity's components came from the prototype.
   std::set<entity::ComponentId> components_from_prototype;
-
-  // Back up some other components' data that may be changed when we go
-  // in and out of edit mode
-  bool backup_rendermesh_hidden;
 };
 
-class EditorComponent : public entity::Component<EditorData> {
+class MetaComponent : public entity::Component<MetaData> {
  public:
   virtual void AddFromRawData(entity::EntityRef& entity, const void* raw_data);
-  void AddFromPrototypeData(entity::EntityRef& entity,
-                            const EditorDef* editor_def);
+  void AddFromPrototypeData(entity::EntityRef& entity, const MetaDef* meta_def);
   void AddWithSourceFile(entity::EntityRef& entity,
                          const std::string& source_file);
   virtual RawDataUniquePtr ExportRawData(entity::EntityRef& entity) const;
@@ -60,9 +51,6 @@ class EditorComponent : public entity::Component<EditorData> {
   // Non-const because if we find an invalid entity, it gets silently removed.
   entity::EntityRef GetEntityFromDictionary(const std::string& key);
 
-  void OnEditorEnter();
-  void OnEditorExit();
-
  private:
   void AddEntityToDictionary(const std::string& key, entity::EntityRef& entity);
   void RemoveEntityFromDictionary(const std::string& key);
@@ -75,7 +63,7 @@ class EditorComponent : public entity::Component<EditorData> {
 }  // namespace component_library
 }  // namespace fpl
 
-FPL_ENTITY_REGISTER_COMPONENT(fpl::component_library::EditorComponent,
-                              fpl::component_library::EditorData)
+FPL_ENTITY_REGISTER_COMPONENT(fpl::component_library::MetaComponent,
+                              fpl::component_library::MetaData)
 
-#endif  // COMPONENT_LIBRARY_EDITOR_H_
+#endif  // COMPONENT_LIBRARY_META_H_

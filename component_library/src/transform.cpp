@@ -15,7 +15,7 @@
 #include <math.h>
 #include "component_library/transform.h"
 #include "component_library/physics.h"
-#include "component_library/editor.h"
+#include "component_library/meta.h"
 #include "component_library/common_services.h"
 #include "fplbase/utilities.h"
 
@@ -98,12 +98,12 @@ void TransformComponent::UpdateChildLinks(entity::EntityRef& entity) {
       // If so, just connect it up as a child.
       // Otherwise, instantiate a prototype with that entity ID and map it
       // as a child.
-      entity::EntityRef child = entity_manager_->GetComponent<EditorComponent>()
+      entity::EntityRef child = entity_manager_->GetComponent<MetaComponent>()
                                     ->GetEntityFromDictionary(child_id);
 
       if (!child.IsValid()) {
         // Do some FlatBuffering to create a nearly-empty EntityDef
-        // which only contains one component: an EditorDef specifying
+        // which only contains one component: a MetaDef specifying
         // the prototype to use for the child.
         child =
             entity_manager_->GetComponent<CommonServicesComponent>()

@@ -17,8 +17,8 @@
 
 #include <vector>
 #include <set>
-#include "base_components_generated.h"
 #include "entity/component.h"
+#include "library_components_generated.h"
 #include "mathfu/constants.h"
 #include "mathfu/glsl_mappings.h"
 #include "mathfu/matrix_4x4.h"

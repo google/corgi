@@ -15,10 +15,10 @@
 #ifndef COMPONENT_LIBRARY_RENDERMESH_H_
 #define COMPONENT_LIBRARY_RENDERMESH_H_
 
-#include "base_components_generated.h"
 #include "component_library/transform.h"
 #include "entity/component.h"
 #include "fplbase/camera_interface.h"
+#include "library_components_generated.h"
 #include "mathfu/constants.h"
 #include "mathfu/glsl_mappings.h"
 #include "mathfu/matrix_4x4.h"

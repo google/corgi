@@ -44,6 +44,8 @@ struct CollisionPayload {
 
 // TODO(amablue): This is a hard-coded event ID for Zooshi! This will need to
 // be refactored to not require event IDs to come from the Flatbuffer union.
-FPL_REGISTER_EVENT_PAYLOAD_ID(4, fpl::component_library::CollisionPayload)
+const int kEventSinkUnion_Collision = 4;
+FPL_REGISTER_EVENT_PAYLOAD_ID(kEventSinkUnion_Collision,
+                              fpl::component_library::CollisionPayload)
 
 #endif  // FPL_COMPONENT_LIBRARY_EVENTS_COLLISION_H_

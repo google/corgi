@@ -18,9 +18,9 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "base_components_generated.h"
 #include "entity/entity_manager.h"
 #include "flatbuffers/flatbuffers.h"
+#include "library_components_generated.h"
 
 namespace fpl {
 namespace component_library {
@@ -138,7 +138,7 @@ class EntityFactory : public entity::EntityFactoryInterface {
 
   // You must override this function, which creates an entity list that contains
   // a single entity definition, which contains a single component definition:
-  // an EditorDef with "prototype" set to the requested prototype name.
+  // an MetaDef with "prototype" set to the requested prototype name.
   virtual bool CreatePrototypeRequest(const char* prototype_name,
                                       std::vector<uint8_t>* request) = 0;
 

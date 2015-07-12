@@ -16,13 +16,13 @@
 #define COMPONENT_LIBRARY_PHYSICS_H_
 
 #include "btBulletDynamicsCommon.h"
-#include "base_components_generated.h"
 #include "entity/component.h"
 #include "event/event_manager.h"
 #include "fplbase/asset_manager.h"
 #include "flatbuffers/reflection.h"
 #include "fplbase/renderer.h"
 #include "fplbase/shader.h"
+#include "library_components_generated.h"
 #include "mathfu/glsl_mappings.h"
 
 namespace fpl {

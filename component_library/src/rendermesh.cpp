@@ -15,7 +15,7 @@
 #include "component_library/rendermesh.h"
 #include "component_library/common_services.h"
 #include "component_library/transform.h"
-#include "base_components_generated.h"
+#include "library_components_generated.h"
 #include "fplbase/mesh.h"
 
 using mathfu::vec3;
