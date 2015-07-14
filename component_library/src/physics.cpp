@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <cfloat>
 #include "component_library/physics.h"
 #include "component_library/common_services.h"
+#include "component_library/component_utils.h"
+#include "component_library/rendermesh.h"
 #include "component_library/transform.h"
 #include "event/event_manager.h"
 #include "events/collision.h"
@@ -161,6 +164,7 @@ void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
           rb_data->collides_with |= static_cast<short>(*collides);
         }
       }
+      rb_data->should_export = true;
 
       bullet_world_->addRigidBody(rb_data->rigid_body.get(),
                                   rb_data->collision_type,
@@ -184,6 +188,10 @@ entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
     kinematic = data->rigid_bodies[0].rigid_body->isKinematicObject();
     for (int index = 0; index < data->body_count; ++index) {
       const RigidBodyData& body = data->rigid_bodies[index];
+      // Skip shapes that are set not to export.
+      if (!body.should_export) {
+        continue;
+      }
       BulletShapeUnion shape_type = BulletShapeUnion_BulletNoShapeDef;
       flatbuffers::Offset<void> shape_data;
       switch (body.shape->getShapeType()) {
@@ -279,6 +287,11 @@ entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
       shape_vector.push_back(shape_builder.Finish());
     }
   }
+  // If no shapes were exported, there is nothing to be saved, as the
+  // additional flags all reflect information about the saved shapes.
+  if (!shape_vector.size()) {
+    return nullptr;
+  }
 
   auto shapes = fbb.CreateVector(shape_vector);
   PhysicsDefBuilder builder(fbb);
@@ -299,7 +312,7 @@ void PhysicsComponent::UpdateAllEntities(entity::WorldTime delta_time) {
     PhysicsData* physics_data = Data<PhysicsData>(iter->entity);
     TransformData* transform_data = Data<TransformData>(iter->entity);
 
-    if (physics_data->body_count == 0) {
+    if (physics_data->body_count == 0 || !physics_data->enabled) {
       continue;
     }
     if (!physics_data->rigid_bodies[0].rigid_body->isKinematicObject()) {
@@ -454,6 +467,59 @@ entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
     }
   }
   return entity::EntityRef();
+}
+
+void PhysicsComponent::GenerateRaycastShape(entity::EntityRef& entity,
+                                            bool result_exportable) {
+  PhysicsData* data = GetComponentData(entity);
+  if (data->body_count == kMaxPhysicsBodies) {
+    return;
+  }
+  // If the entity is already raycastable, there isn't a need to do anything
+  for (int index; index < data->body_count; ++index) {
+    auto shape = &data->rigid_bodies[index];
+    if (shape->collides_with & BulletCollisionType_Raycast) {
+      return;
+    }
+  }
+  // Add an AABB about the entity for raycasting purposes
+  vec3 max(-FLT_MAX);
+  vec3 min(FLT_MAX);
+  if (!GetMaxMinPositionsForEntity(entity, *entity_manager_, &max, &min)) {
+    max = min = mathfu::kZeros3f;
+  }
+  auto rb_data = &data->rigid_bodies[data->body_count++];
+  auto transform_data = Data<TransformData>(entity);
+  // Make sure it is at least one unit in each direction
+  vec3 extents = vec3::Max(max - min, mathfu::kOnes3f);
+  btVector3 bt_extents(extents.x(), extents.y(), extents.z());
+  rb_data->offset = (max + min) / 2.0f;
+  rb_data->shape.reset(new btBoxShape(bt_extents / 2.0f));
+  vec3 transformed_offset =
+      transform_data->orientation.Inverse() * rb_data->offset;
+  btVector3 position(transform_data->position.x() + transformed_offset.x(),
+                     transform_data->position.y() + transformed_offset.y(),
+                     transform_data->position.z() + transformed_offset.z());
+  btQuaternion orientation(-transform_data->orientation.vector().x(),
+                           -transform_data->orientation.vector().y(),
+                           -transform_data->orientation.vector().z(),
+                           transform_data->orientation.scalar());
+  rb_data->motion_state.reset(
+      new btDefaultMotionState(btTransform(orientation, position)));
+  btRigidBody::btRigidBodyConstructionInfo rigid_body_builder(
+      0, rb_data->motion_state.get(), rb_data->shape.get(), btVector3());
+  rb_data->rigid_body.reset(new btRigidBody(rigid_body_builder));
+  rb_data->rigid_body->setUserIndex(entity.index());
+  rb_data->rigid_body->setUserPointer(entity.container());
+  rb_data->rigid_body->setCollisionFlags(
+      rb_data->rigid_body->getCollisionFlags() |
+      btCollisionObject::CF_KINEMATIC_OBJECT);
+  rb_data->collision_type = BulletCollisionType_Raycast;
+  rb_data->collides_with = BulletCollisionType_Raycast;
+  rb_data->should_export = result_exportable;
+  bullet_world_->addRigidBody(rb_data->rigid_body.get(),
+                              rb_data->collision_type, rb_data->collides_with);
+  data->enabled = true;
 }
 
 void PhysicsComponent::DebugDrawWorld(Renderer* renderer,

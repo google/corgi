@@ -38,6 +38,7 @@ struct RigidBodyData {
   std::unique_ptr<btCollisionShape> shape;
   std::unique_ptr<btMotionState> motion_state;
   std::unique_ptr<btRigidBody> rigid_body;
+  bool should_export;  // Whether the shape should be included on export.
 };
 
 // Data for scene object components.
@@ -118,6 +119,11 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   void EnablePhysics(const entity::EntityRef& entity);
   void DisablePhysics(const entity::EntityRef& entity);
 
+  // Generate an AABB based on the rendermesh that collides with the raycast
+  // layer. Note, if the entity already collides with the raycast layer, no
+  // change occurs. If there is no rendermesh, a unit cube is used instead.
+  // Also sets whether the resulting shape should be exported.
+  void GenerateRaycastShape(entity::EntityRef& entity, bool result_exportable);
   entity::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end);
   void DebugDrawWorld(Renderer* renderer, const mathfu::mat4& camera_transform);
 

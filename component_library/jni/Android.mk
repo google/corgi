@@ -44,6 +44,7 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_SRC_FILES := \
 	$(COMPONENTS_RELATIVE_DIR)/src/common_services.cpp \
+        $(COMPONENTS_RELATIVE_DIR)/src/component_utils.cpp \
 	$(COMPONENTS_RELATIVE_DIR)/src/meta.cpp \
 	$(COMPONENTS_RELATIVE_DIR)/src/entity_factory.cpp \
 	$(COMPONENTS_RELATIVE_DIR)/src/physics.cpp \
