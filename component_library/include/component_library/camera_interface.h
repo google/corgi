@@ -26,6 +26,7 @@ class CameraInterface {
 
  public:
   virtual mathfu::mat4 GetTransformMatrix() const = 0;
+  virtual mathfu::mat4 GetViewMatrix() const = 0;
 
   virtual mathfu::vec3 position() const = 0;
   virtual void set_position(mathfu::vec3 position) = 0;
@@ -36,12 +37,15 @@ class CameraInterface {
   virtual const mathfu::vec3& up() const = 0;
   virtual void set_up(const mathfu::vec3& up) = 0;
 
+  virtual void set_viewport_angle(float viewport_angle) = 0;
   virtual float viewport_angle() const = 0;
 
+  virtual void set_viewport_resolution(mathfu::vec2 viewport_resolution) = 0;
   virtual mathfu::vec2 viewport_resolution() const = 0;
 
+  virtual void set_viewport_near_plane(float viewport_near_plane) = 0;
   virtual float viewport_near_plane() const = 0;
-
+  virtual void set_viewport_far_plane(float viewport_far_plane) = 0;
   virtual float viewport_far_plane() const = 0;
 };
 
