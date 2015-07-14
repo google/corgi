@@ -92,6 +92,7 @@ if (entity_build_component_library)
   set(COMPONENT_COLLECTION_DIR ${CMAKE_CURRENT_SOURCE_DIR}/component_library)
   # component library source files.
   set(component_library_SRCS
+      ${COMPONENT_COLLECTION_DIR}/include/component_library/camera_interface.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/common_services.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/meta.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/entity_factory.h

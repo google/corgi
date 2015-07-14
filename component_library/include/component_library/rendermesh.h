@@ -17,7 +17,7 @@
 
 #include "component_library/transform.h"
 #include "entity/component.h"
-#include "fplbase/camera_interface.h"
+#include "component_library/camera_interface.h"
 #include "library_components_generated.h"
 #include "mathfu/constants.h"
 #include "mathfu/glsl_mappings.h"
