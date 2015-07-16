@@ -126,6 +126,9 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   void GenerateRaycastShape(entity::EntityRef& entity, bool result_exportable);
   entity::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end);
   void DebugDrawWorld(Renderer* renderer, const mathfu::mat4& camera_transform);
+  void DebugDrawObject(Renderer* renderer, const mathfu::mat4& camera_transform,
+                       const entity::EntityRef& entity,
+                       const mathfu::vec3& color);
 
   btDiscreteDynamicsWorld* bullet_world() { return bullet_world_.get(); }
 

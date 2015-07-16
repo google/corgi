@@ -529,6 +529,24 @@ void PhysicsComponent::DebugDrawWorld(Renderer* renderer,
   bullet_world_->debugDrawWorld();
 }
 
+void PhysicsComponent::DebugDrawObject(Renderer* renderer,
+                                       const mathfu::mat4& camera_transform,
+                                       const entity::EntityRef& entity,
+                                       const mathfu::vec3& color) {
+  auto physics_data = Data<PhysicsData>(entity);
+  if (physics_data == nullptr) {
+    return;
+  }
+  renderer->model_view_projection() = camera_transform;
+  debug_drawer_.set_renderer(renderer);
+  for (int i = 0; i < physics_data->body_count; i++) {
+    auto rb_data = &physics_data->rigid_bodies[i];
+    bullet_world_->debugDrawObject(rb_data->rigid_body->getWorldTransform(),
+                                   rb_data->shape.get(),
+                                   btVector3(color.x(), color.y(), color.z()));
+  }
+}
+
 void PhysicsDebugDrawer::drawLine(const btVector3& from, const btVector3& to,
                                   const btVector3& color) {
   if (renderer_ != nullptr) {
