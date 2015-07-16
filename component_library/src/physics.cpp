@@ -476,7 +476,7 @@ void PhysicsComponent::GenerateRaycastShape(entity::EntityRef& entity,
     return;
   }
   // If the entity is already raycastable, there isn't a need to do anything
-  for (int index; index < data->body_count; ++index) {
+  for (int index = 0; index < data->body_count; ++index) {
     auto shape = &data->rigid_bodies[index];
     if (shape->collides_with & BulletCollisionType_Raycast) {
       return;
