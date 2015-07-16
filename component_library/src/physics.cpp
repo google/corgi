@@ -604,7 +604,7 @@ void PhysicsDebugDrawer::drawLine(const btVector3& from, const btVector3& to,
   static const Attribute attributes[] = {kPosition3f, kEND};
   static const unsigned short indices[] = {0, 1};
   const btVector3 vertices[] = {from, to};
-  Mesh::RenderArray(GL_LINES, 2, attributes, sizeof(btVector3),
+  Mesh::RenderArray(Mesh::kLines, 2, attributes, sizeof(btVector3),
                     reinterpret_cast<const char*>(vertices), indices);
 }
 
