@@ -62,8 +62,6 @@ set(dependencies_fplbase_dir "${fpl_root}/fplbase"
     CACHE PATH "Directory containing the FPLBase library.")
 set(dependencies_entity_dir "${fpl_root}/entity"
     CACHE PATH "Directory containing the Entity library.")
-set(dependencies_flatui_dir "${fpl_root}/flatui"
-    CACHE PATH "Directory containing the FlatUI library.")
 set(dependencies_mathfu_dir "${fpl_root}/mathfu"
     CACHE PATH "Directory containing the MathFu library.")
 set(dependencies_motive_dir "${fpl_root}/motive"
@@ -150,7 +148,6 @@ if (entity_build_component_library)
   include_directories(${dependencies_flatbuffers_dir}/include)
   include_directories(${dependencies_fplbase_dir}/include)
   include_directories(${dependencies_fplutil_dir}/libfplutil/include)
-  include_directories(${dependencies_flatui_dir}/include)
   include_directories(${dependencies_motive_dir}/include)
   include_directories(${dependencies_mathfu_dir}/include)
   include_directories(${dependencies_pindrop_dir}/include)

@@ -20,6 +20,7 @@
 #include "event/event_manager.h"
 #include "fplbase/asset_manager.h"
 #include "fplbase/input.h"
+#include "fplbase/renderer.h"
 #include "fplbase/utilities.h"
 
 namespace fpl {
@@ -37,19 +38,21 @@ class CommonServicesComponent : public entity::Component<CommonServicesData> {
  public:
   CommonServicesComponent() {}
 
-  void Initialize(AssetManager* asset_manager, InputSystem* input_system,
-                  event::EventManager* event_manager,
-                  EntityFactory* entity_factory) {
+  void Initialize(AssetManager* asset_manager, EntityFactory* entity_factory,
+                  event::EventManager* event_manager, InputSystem* input_system,
+                  Renderer* renderer) {
     asset_manager_ = asset_manager;
-    input_system_ = input_system;
-    event_manager_ = event_manager;
     entity_factory_ = entity_factory;
+    event_manager_ = event_manager;
+    input_system_ = input_system;
+    renderer_ = renderer;
   }
 
   AssetManager* asset_manager() { return asset_manager_; }
   event::EventManager* event_manager() { return event_manager_; }
   InputSystem* input_system() { return input_system_; }
   EntityFactory* entity_factory() { return entity_factory_; }
+  Renderer* renderer() { return renderer_; }
 
   // This component should never be added to an entity.  It is only provided
   // as an interface for other components to access common resources.
@@ -59,9 +62,10 @@ class CommonServicesComponent : public entity::Component<CommonServicesData> {
 
  private:
   AssetManager* asset_manager_;
+  EntityFactory* entity_factory_;
   event::EventManager* event_manager_;
   InputSystem* input_system_;
-  EntityFactory* entity_factory_;
+  Renderer* renderer_;
 };
 
 }  // component_library
