@@ -72,4 +72,5 @@ table BulletShapeDef {
   restitution:float;
   collision_type:BulletCollisionType;
   collides_with:[BulletCollisionType];
+  user_tag:string;
 }

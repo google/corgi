@@ -164,6 +164,9 @@ void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
           rb_data->collides_with |= static_cast<short>(*collides);
         }
       }
+      if (shape_def->user_tag()) {
+        rb_data->user_tag = shape_def->user_tag()->str();
+      }
       rb_data->should_export = true;
 
       bullet_world_->addRigidBody(rb_data->rigid_body.get(),
@@ -272,6 +275,7 @@ entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
         }
       }
       auto collides = fbb.CreateVector(collides_with);
+      auto user_tag = fbb.CreateString(body.user_tag);
 
       BulletShapeDefBuilder shape_builder(fbb);
       shape_builder.add_data_type(shape_type);
@@ -284,6 +288,7 @@ entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
       shape_builder.add_collision_type(
           static_cast<BulletCollisionType>(body.collision_type));
       shape_builder.add_collides_with(collides);
+      shape_builder.add_user_tag(user_tag);
       shape_vector.push_back(shape_builder.Finish());
     }
   }
@@ -376,9 +381,23 @@ void PhysicsComponent::ProcessBulletTickCallback() {
         vec3 position_b(pt.getPositionWorldOnB().x(),
                         pt.getPositionWorldOnB().y(),
                         pt.getPositionWorldOnB().z());
+        std::string tag_a;
+        std::string tag_b;
+        auto physics_a = Data<PhysicsData>(entity_a);
+        for (int i = 0; i < physics_a->body_count; i++) {
+          if (physics_a->rigid_bodies[i].rigid_body.get() == body_a) {
+            tag_a = physics_a->rigid_bodies[i].user_tag;
+          }
+        }
+        auto physics_b = Data<PhysicsData>(entity_b);
+        for (int i = 0; i < physics_b->body_count; i++) {
+          if (physics_b->rigid_bodies[i].rigid_body.get() == body_b) {
+            tag_b = physics_b->rigid_bodies[i].user_tag;
+          }
+        }
 
-        event_manager_->BroadcastEvent(
-            CollisionPayload(entity_a, position_a, entity_b, position_b));
+        event_manager_->BroadcastEvent(CollisionPayload(
+            entity_a, position_a, tag_a, entity_b, position_b, tag_b));
       }
     }
   }

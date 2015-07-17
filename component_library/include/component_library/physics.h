@@ -35,6 +35,7 @@ struct RigidBodyData {
   mathfu::vec3 offset;
   short collision_type;
   short collides_with;
+  std::string user_tag;
   std::unique_ptr<btCollisionShape> shape;
   std::unique_ptr<btMotionState> motion_state;
   std::unique_ptr<btRigidBody> rigid_body;

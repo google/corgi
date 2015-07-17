@@ -23,20 +23,27 @@ namespace component_library {
 
 struct CollisionPayload {
   CollisionPayload(entity::EntityRef entity_a_, mathfu::vec3 position_a_,
-                   entity::EntityRef entity_b_, mathfu::vec3 position_b_)
+                   const std::string& tag_a_, entity::EntityRef entity_b_,
+                   mathfu::vec3 position_b_, const std::string& tag_b_)
       : entity_a(entity_a_),
         position_a(position_a_),
+        tag_a(tag_a_),
         entity_b(entity_b_),
-        position_b(position_b_) {}
+        position_b(position_b_),
+        tag_b(tag_b_) {}
 
   // The first entity in the collision.
   entity::EntityRef entity_a;
   // The position on the first entity the collision occurred.
   mathfu::vec3 position_a;
+  // The tag attached to the physics shape on the first entity.
+  const std::string& tag_a;
   // The second entity in the collision.
   entity::EntityRef entity_b;
   // The position on the second entity the collision occurred.
   mathfu::vec3 position_b;
+  // The tag attached to the physics shape on the second entity.
+  const std::string& tag_b;
 };
 
 }  // fpl_project
