@@ -125,6 +125,8 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   // Also sets whether the resulting shape should be exported.
   void GenerateRaycastShape(entity::EntityRef& entity, bool result_exportable);
   entity::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end);
+  entity::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end,
+                                  mathfu::vec3* hit_point);
   void DebugDrawWorld(Renderer* renderer, const mathfu::mat4& camera_transform);
   void DebugDrawObject(Renderer* renderer, const mathfu::mat4& camera_transform,
                        const entity::EntityRef& entity,
