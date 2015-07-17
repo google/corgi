@@ -453,6 +453,12 @@ void PhysicsComponent::UpdatePhysicsObjectsTransform(entity::EntityRef& entity,
 
 entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
                                                   mathfu::vec3& end) {
+  return RaycastSingle(start, end, nullptr);
+}
+
+entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
+                                                  mathfu::vec3& end,
+                                                  mathfu::vec3* hit_point) {
   btVector3 bt_start = btVector3(start.x(), start.y(), start.z());
   btVector3 bt_end = btVector3(end.x(), end.y(), end.z());
   btCollisionWorld::ClosestRayResultCallback ray_results(bt_start, bt_end);
@@ -462,6 +468,11 @@ entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
     auto container = static_cast<VectorPool<entity::Entity>*>(
         ray_results.m_collisionObject->getUserPointer());
     if (container != nullptr) {
+      if (hit_point != nullptr)
+        *hit_point = vec3(ray_results.m_hitPointWorld.x(),
+                          ray_results.m_hitPointWorld.y(),
+                          ray_results.m_hitPointWorld.z());
+
       return entity::EntityRef(container,
                                ray_results.m_collisionObject->getUserIndex());
     }
