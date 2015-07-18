@@ -125,9 +125,17 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   // change occurs. If there is no rendermesh, a unit cube is used instead.
   // Also sets whether the resulting shape should be exported.
   void GenerateRaycastShape(entity::EntityRef& entity, bool result_exportable);
+  // Performs a raycast into the world, returning the first entity hit.
+  // Optionally takes a layer_mask, which the shape much collide with to be
+  // raycast against, and output vector, where it will store the world position
+  // the collision with the ray occurred.
   entity::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end);
   entity::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end,
+                                  short layer_mask);
+  entity::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end,
                                   mathfu::vec3* hit_point);
+  entity::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end,
+                                  short layer_mask, mathfu::vec3* hit_point);
   void DebugDrawWorld(Renderer* renderer, const mathfu::mat4& camera_transform);
   void DebugDrawObject(Renderer* renderer, const mathfu::mat4& camera_transform,
                        const entity::EntityRef& entity,

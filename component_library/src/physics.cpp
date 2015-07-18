@@ -472,15 +472,29 @@ void PhysicsComponent::UpdatePhysicsObjectsTransform(entity::EntityRef& entity,
 
 entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
                                                   mathfu::vec3& end) {
-  return RaycastSingle(start, end, nullptr);
+  return RaycastSingle(start, end, BulletCollisionType_Raycast, nullptr);
+}
+
+entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
+                                                  mathfu::vec3& end,
+                                                  short layer_mask) {
+  return RaycastSingle(start, end, layer_mask, nullptr);
 }
 
 entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
                                                   mathfu::vec3& end,
                                                   mathfu::vec3* hit_point) {
+  return RaycastSingle(start, end, BulletCollisionType_Raycast, hit_point);
+}
+
+entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
+                                                  mathfu::vec3& end,
+                                                  short layer_mask,
+                                                  mathfu::vec3* hit_point) {
   btVector3 bt_start = btVector3(start.x(), start.y(), start.z());
   btVector3 bt_end = btVector3(end.x(), end.y(), end.z());
   btCollisionWorld::ClosestRayResultCallback ray_results(bt_start, bt_end);
+  ray_results.m_collisionFilterGroup = layer_mask;
 
   bullet_world_->rayTest(bt_start, bt_end, ray_results);
   if (ray_results.hasHit()) {
