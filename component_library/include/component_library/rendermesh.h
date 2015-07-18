@@ -85,7 +85,26 @@ class RenderMeshComponent : public entity::Component<RenderMeshData> {
   // Nothing really happens per-update to these things.
   virtual void UpdateAllEntities(entity::WorldTime /*delta_time*/) {}
 
+  // Prepares to do rendering.  (Must be called before any RenderPass calls.)
+  // Pregenerates the draw lists, sorted by z-depth, and applies frustrum
+  // culling.  (So that renderpass can just iterate through the list and draw
+  // everything with minimum of fuss.)
   void RenderPrep(const CameraInterface& camera);
+
+  // Renders all entities marked as being part of the specified renderpass to
+  // the current output buffer.  Shader_override is an optional parameter, which
+  // (if provided) overrides the mesh-specified shader, and instead renders
+  // the entire pass with override_shader.
+  void RenderPass(int pass_id, const CameraInterface& camera,
+                  Renderer& renderer);
+  void RenderPass(int pass_id, const CameraInterface& camera,
+                  Renderer& renderer, const Shader* shader_override);
+
+  // Goes through and renders every entity that is visible from the camera,
+  // in pass order.  Is equivalent to iterating through all of the passes
+  // and calling RenderPass on each one.
+  // Important!  You must have called RenderPrep first, in order to
+  // pre-populate the lists of things visible from the camera!
   void RenderAllEntities(Renderer& renderer, const CameraInterface& camera);
 
   // Get and set the light position.  This is a special uniform that is sent

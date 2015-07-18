@@ -17,6 +17,7 @@
 #include "component_library/transform.h"
 #include "library_components_generated.h"
 #include "fplbase/mesh.h"
+#include "fplbase/utilities.h"
 
 using mathfu::vec3;
 using mathfu::mat4;
@@ -43,9 +44,6 @@ void RenderMeshComponent::InitEntity(entity::EntityRef& entity) {
 }
 
 void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
-  // TODO: create entity for this?
-  set_light_position(vec3(100, 100, 500));
-
   for (int pass = 0; pass < RenderPass_kCount; pass++) {
     pass_render_list[pass].clear();
   }
@@ -62,6 +60,7 @@ void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
     // planning on participating in.
     for (int pass = 0; pass < RenderPass_kCount; pass++) {
       if (rendermesh_data->pass_mask & (1 << pass)) {
+        if (rendermesh_data->currently_hidden) continue;
         if (!rendermesh_data->ignore_culling) {
           // Check to make sure objects are inside the frustrum of our
           // view-cone before we draw:
@@ -98,30 +97,49 @@ void RenderMeshComponent::RenderAllEntities(Renderer& renderer,
                                             const CameraInterface& camera) {
   // Make sure we only draw the front-facing polygons:
   renderer.SetCulling(Renderer::kCullBack);
+
+  // Render the actual game:
   for (int pass = 0; pass < RenderPass_kCount; pass++) {
-    for (size_t i = 0; i < pass_render_list[pass].size(); i++) {
-      entity::EntityRef& entity = pass_render_list[pass][i].entity;
+    RenderPass(pass, camera, renderer);
+  }
+}
 
-      RenderMeshData* rendermesh_data = Data<RenderMeshData>(entity);
-      if (rendermesh_data->currently_hidden) continue;
+// Render a pass.
+void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
+                                     Renderer& renderer) {
+  RenderPass(pass_id, camera, renderer, nullptr);
+}
 
-      TransformData* transform_data = Data<TransformData>(entity);
+// Render a single render-pass, by ID.
+void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
+                                     Renderer& renderer,
+                                     const Shader* shader_override) {
+  mat4 camera_vp = camera.GetTransformMatrix();
 
-      mat4 world_transform = transform_data->world_transform;
+  for (size_t i = 0; i < pass_render_list[pass_id].size(); i++) {
+    entity::EntityRef& entity = pass_render_list[pass_id][i].entity;
 
-      const mat4 mvp = camera.GetTransformMatrix() * world_transform;
-      const mat4 world_matrix_inverse = world_transform.Inverse();
+    RenderMeshData* rendermesh_data = Data<RenderMeshData>(entity);
 
-      renderer.camera_pos() = world_matrix_inverse * camera.position();
-      renderer.light_pos() = world_matrix_inverse * light_position_;
-      renderer.model_view_projection() = mvp;
-      renderer.color() = rendermesh_data->tint;
+    TransformData* transform_data = Data<TransformData>(entity);
 
-      if (rendermesh_data->shader) {
-        rendermesh_data->shader->Set(renderer);
-      }
-      rendermesh_data->mesh->Render(renderer);
+    mat4 world_transform = transform_data->world_transform;
+
+    const mat4 mvp = camera_vp * world_transform;
+    const mat4 world_matrix_inverse = world_transform.Inverse();
+
+    renderer.camera_pos() = world_matrix_inverse * camera.position();
+    renderer.light_pos() = world_matrix_inverse * light_position_;
+    renderer.model_view_projection() = mvp;
+    renderer.color() = rendermesh_data->tint;
+    renderer.model() = world_transform;
+
+    if (!shader_override && rendermesh_data->shader) {
+      rendermesh_data->shader->Set(renderer);
+    } else {
+      shader_override->Set(renderer);
     }
+    rendermesh_data->mesh->Render(renderer);
   }
 }
 
