@@ -70,6 +70,19 @@ bool EntityFactory::AddEntityLibrary(const char* entity_library_filename) {
   return true;
 }
 
+bool EntityFactory::WillBeKeptInMemory(const void* pointer) {
+  if (pointer == nullptr)
+    return true;  // nullptr will never become less null than it is now...
+  for (auto iter = loaded_files_.begin(); iter != loaded_files_.end(); ++iter) {
+    if (pointer >= iter->second.c_str() &&
+        pointer < iter->second.c_str() + iter->second.length())
+      // We are from this already-loaded file.
+      return true;
+  }
+  // Nope, not from a loaded file!
+  return false;
+}
+
 int EntityFactory::LoadEntitiesFromFile(const char* filename,
                                         entity::EntityManager* entity_manager) {
   LogInfo("EntityFactory::LoadEntitiesFromFile: Reading %s", filename);
