@@ -44,6 +44,11 @@ class EntityFactory : public entity::EntityFactoryInterface {
   // Add a file from which you can then load entity prototype definitions.
   bool AddEntityLibrary(const char* entity_library_file);
 
+  // Returns true if this pointer points to something we will be keeping
+  // in memory for you. If true, this pointer will remain valid for the
+  // lifetime of the EntityFactory.
+  bool WillBeKeptInMemory(const void* pointer);
+
   // Load entities from an entity list file.
   // Returns the number of entities loaded, or kErrorLoadingEntities if there
   // was an error.
