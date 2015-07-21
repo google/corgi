@@ -351,15 +351,16 @@ static void BulletTickCallback(btDynamicsWorld* world,
 }
 
 void PhysicsComponent::ProcessBulletTickCallback() {
-  // Check for collisions
-  int num_manifolds = collision_dispatcher_->getNumManifolds();
-  for (int manifold_index = 0; manifold_index < num_manifolds;
+  // Check for collisions. Note that the number of manifolds and contacts might
+  // change when resolving collisions, so the result should not be cached.
+  for (int manifold_index = 0;
+       manifold_index < collision_dispatcher_->getNumManifolds();
        manifold_index++) {
     btPersistentManifold* contact_manifold =
         collision_dispatcher_->getManifoldByIndexInternal(manifold_index);
 
-    int num_contacts = contact_manifold->getNumContacts();
-    for (int contact_index = 0; contact_index < num_contacts; contact_index++) {
+    for (int contact_index = 0;
+         contact_index < contact_manifold->getNumContacts(); contact_index++) {
       btManifoldPoint& pt = contact_manifold->getContactPoint(contact_index);
       if (pt.getDistance() < 0.0f) {
         auto body_a = contact_manifold->getBody0();
