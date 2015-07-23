@@ -68,6 +68,8 @@ entity::ComponentInterface::RawDataUniquePtr MetaComponent::ExportRawData(
   if (data == nullptr) return nullptr;
 
   flatbuffers::FlatBufferBuilder fbb;
+  fbb.ForceDefaults(entity_manager_->GetComponent<CommonServicesComponent>()
+                        ->export_force_defaults());
   // Const-cast should be okay here because we're just giving
   // something an entity ID before exporting it (if it doesn't already
   // have one).
