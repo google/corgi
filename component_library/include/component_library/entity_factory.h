@@ -15,6 +15,7 @@
 #ifndef ENTITY_FACTORY_H_
 #define ENTITY_FACTORY_H_
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -64,6 +65,10 @@ class EntityFactory : public entity::EntityFactoryInterface {
   int LoadEntityListFromMemory(const void* raw_entity_list,
                                entity::EntityManager* entity_manager,
                                std::vector<entity::EntityRef>* entities_loaded);
+
+  // Override a cached file with data from memory; this will persist until exit.
+  void OverrideCachedFile(const char* filename,
+                          std::unique_ptr<std::string> new_data);
 
   // Initialize an entity from an entity definition. This is what
   // LoadRawEntityList calls for each entity definition.
@@ -181,7 +186,11 @@ class EntityFactory : public entity::EntityFactoryInterface {
 
  private:
   // Storage for entity files.
-  std::unordered_map<std::string, std::string> loaded_files_;
+  std::unordered_map<std::string, std::unique_ptr<std::string>> loaded_files_;
+
+  // Storage for old entity files we don't need any more; these will be cleared
+  // out once there are no entities referencing them.
+  std::vector<std::unique_ptr<std::string>> stale_files_;
 
   // Index the prototype library's entity definitions by prototype name.
   std::unordered_map<std::string, const void*> prototype_data_;

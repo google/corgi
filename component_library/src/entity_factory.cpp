@@ -25,16 +25,17 @@ using component_library::MetaComponent;
 using component_library::MetaData;
 
 bool EntityFactory::AddEntityLibrary(const char* entity_library_filename) {
-  std::string library_data;
-  if (!LoadFile(entity_library_filename, &library_data)) {
+  std::string* library_data = new std::string;
+  if (!LoadFile(entity_library_filename, library_data)) {
     LogInfo("EntityFactory: Couldn't load entity library %s",
             entity_library_filename);
+    delete library_data;
     return false;
   }
-  loaded_files_[entity_library_filename] = library_data;
+  loaded_files_[entity_library_filename].reset(library_data);
 
   std::vector<const void*> entities;
-  if (!ReadEntityList(loaded_files_[entity_library_filename].c_str(),
+  if (!ReadEntityList(loaded_files_[entity_library_filename]->c_str(),
                       &entities)) {
     LogInfo("EntityFactory: Couldn't read entity library list '%s'",
             entity_library_filename);
@@ -74,8 +75,8 @@ bool EntityFactory::WillBeKeptInMemory(const void* pointer) {
   if (pointer == nullptr)
     return true;  // nullptr will never become less null than it is now...
   for (auto iter = loaded_files_.begin(); iter != loaded_files_.end(); ++iter) {
-    if (pointer >= iter->second.c_str() &&
-        pointer < iter->second.c_str() + iter->second.length())
+    if (pointer >= iter->second->c_str() &&
+        pointer < iter->second->c_str() + iter->second->length())
       // We are from this already-loaded file.
       return true;
   }
@@ -87,17 +88,18 @@ int EntityFactory::LoadEntitiesFromFile(const char* filename,
                                         entity::EntityManager* entity_manager) {
   LogInfo("EntityFactory::LoadEntitiesFromFile: Reading %s", filename);
   if (loaded_files_.find(filename) == loaded_files_.end()) {
-    std::string data;
-    if (!LoadFile(filename, &data)) {
+    std::string* data = new std::string();
+    if (!LoadFile(filename, data)) {
       LogInfo("EntityFactory::LoadEntitiesFromFile: Couldn't open file %s",
               filename);
+      delete data;
       return kErrorLoadingEntities;
     }
-    loaded_files_[filename] = data;
+    loaded_files_[filename].reset(data);
   }
 
   std::vector<entity::EntityRef> entities_loaded;
-  int total = LoadEntityListFromMemory(loaded_files_[filename].c_str(),
+  int total = LoadEntityListFromMemory(loaded_files_[filename]->c_str(),
                                        entity_manager, &entities_loaded);
 
   // Go through all the entities we just created and mark them with their source
@@ -120,6 +122,11 @@ int EntityFactory::LoadEntitiesFromFile(const char* filename,
 int EntityFactory::LoadEntityListFromMemory(
     const void* entity_list, entity::EntityManager* entity_manager,
     std::vector<entity::EntityRef>* entities_loaded) {
+  // First, if there are currently no entities loaded, it's safe to clear out
+  // stale entity files.
+  if (entity_manager->begin() == entity_manager->end()) {
+    stale_files_.clear();
+  }
   std::vector<const void*> entities;
   if (!ReadEntityList(entity_list, &entities)) {
     LogInfo("EntityFactory: Couldn't read entity list");
@@ -137,6 +144,15 @@ int EntityFactory::LoadEntityListFromMemory(
     }
   }
   return total;
+}
+
+// Override a cached file with data from memory.
+void EntityFactory::OverrideCachedFile(const char* filename,
+                                       std::unique_ptr<std::string> new_data) {
+  if (loaded_files_.find(filename) != loaded_files_.end()) {
+    stale_files_.push_back(std::move(loaded_files_[filename]));
+  }
+  loaded_files_[filename] = std::move(new_data);
 }
 
 void EntityFactory::LoadEntityData(const void* def,
