@@ -96,6 +96,10 @@ class TransformComponent : public entity::Component<TransformData> {
   mathfu::quat WorldOrientation(entity::EntityRef entity);
   mathfu::mat4 WorldTransform(entity::EntityRef entity);
 
+  // Returns the topmost parent of this entity.  Returns the entity itself
+  // if it has no parents.
+  entity::EntityRef GetRootParent(const entity::EntityRef& entity) const;
+
   virtual void AddFromRawData(entity::EntityRef& entity, const void* raw_data);
   virtual RawDataUniquePtr ExportRawData(entity::EntityRef& entity) const;
 

@@ -56,6 +56,16 @@ mathfu::mat4 TransformComponent::WorldTransform(entity::EntityRef entity) {
   }
 }
 
+entity::EntityRef TransformComponent::GetRootParent(
+    const entity::EntityRef& entity) const {
+  TransformData* transform_data = Data<TransformData>(entity);
+  entity::EntityRef result = entity;
+  while (transform_data->parent.IsValid()) {
+    result = transform_data->parent;
+  }
+  return result;
+}
+
 void TransformComponent::InitEntity(entity::EntityRef& entity) {
   TransformData* transform_data = Data<TransformData>(entity);
   transform_data->owner = entity;

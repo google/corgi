@@ -143,6 +143,21 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
   }
 }
 
+void RenderMeshComponent::SetHiddenRecursively(const entity::EntityRef& entity,
+                                               bool hidden) {
+  RenderMeshData* rendermesh_data = Data<RenderMeshData>(entity);
+  TransformData* transform_data = Data<TransformData>(entity);
+  if (transform_data) {
+    if (rendermesh_data) {
+      rendermesh_data->currently_hidden = hidden;
+    }
+    for (auto iter = transform_data->children.begin();
+         iter != transform_data->children.end(); ++iter) {
+      SetHiddenRecursively(iter->owner, hidden);
+    }
+  }
+}
+
 void RenderMeshComponent::AddFromRawData(entity::EntityRef& entity,
                                          const void* raw_data) {
   auto rendermesh_def = static_cast<const RenderMeshDef*>(raw_data);
