@@ -191,6 +191,8 @@ entity::ComponentInterface::RawDataUniquePtr TransformComponent::ExportRawData(
   if (data == nullptr) return nullptr;
 
   flatbuffers::FlatBufferBuilder fbb;
+  fbb.ForceDefaults(entity_manager_->GetComponent<CommonServicesComponent>()
+                        ->export_force_defaults());
 
   mathfu::vec3 euler = data->orientation.ToEulerAngles() / kDegreesToRadians;
   fpl::Vec3 position{data->position.x(), data->position.y(),

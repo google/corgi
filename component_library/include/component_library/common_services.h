@@ -36,7 +36,7 @@ struct CommonServicesData {};
 // components.)
 class CommonServicesComponent : public entity::Component<CommonServicesData> {
  public:
-  CommonServicesComponent() {}
+  CommonServicesComponent() : export_force_defaults_(false) {}
 
   void Initialize(AssetManager* asset_manager, EntityFactory* entity_factory,
                   event::EventManager* event_manager, InputSystem* input_system,
@@ -60,12 +60,17 @@ class CommonServicesComponent : public entity::Component<CommonServicesData> {
     assert(false);
   }
 
+  // When components are exporting their data, should they use ForceDefaults?
+  bool export_force_defaults() const { return export_force_defaults_; }
+  void set_export_force_defaults(bool b) { export_force_defaults_ = b; }
+
  private:
   AssetManager* asset_manager_;
   EntityFactory* entity_factory_;
   event::EventManager* event_manager_;
   InputSystem* input_system_;
   Renderer* renderer_;
+  bool export_force_defaults_;
 };
 
 }  // component_library

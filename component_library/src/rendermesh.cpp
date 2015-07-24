@@ -199,6 +199,8 @@ entity::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
   }
 
   flatbuffers::FlatBufferBuilder fbb;
+  fbb.ForceDefaults(entity_manager_->GetComponent<CommonServicesComponent>()
+                        ->export_force_defaults());
 
   auto source_file =
       (data->mesh_filename != "") ? fbb.CreateString(data->mesh_filename) : 0;
