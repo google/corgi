@@ -161,6 +161,13 @@ class Component : public ComponentInterface {
     return entity_manager_->GetComponentData<ComponentDataType>(entity);
   }
 
+  // Utility function for getting the component data for a specific component.
+  template <typename ComponentDataType>
+  ComponentDataType* Data(const EntityRef& entity) const {
+    return entity_manager_->GetComponentData<ComponentDataType>(entity);
+  }
+
+
   // Utility function for getting the component object for a specific component.
   template <typename ComponentDataType>
   ComponentDataType* GetComponent() {

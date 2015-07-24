@@ -107,6 +107,9 @@ class RenderMeshComponent : public entity::Component<RenderMeshData> {
   // pre-populate the lists of things visible from the camera!
   void RenderAllEntities(Renderer& renderer, const CameraInterface& camera);
 
+  // Recursively sets the hidden-ness of the entity and all children.
+  void SetHiddenRecursively(const entity::EntityRef& entity, bool hidden);
+
   // Get and set the light position.  This is a special uniform that is sent
   // to all shaders without having to declare it explicitly in the
   // shader_instance variable.
