@@ -272,7 +272,7 @@ bool EntityFactory::SerializeEntity(
   std::vector<const void*> exported_pointers;
 
   exported_pointers.resize(max_component_id() + 1, nullptr);
-  for (int component_id = 0; component_id <= max_component_id();
+  for (entity::ComponentId component_id = 0; component_id <= max_component_id();
        component_id++) {
     const MetaData* meta_data = meta_component->GetComponentData(entity);
     if (meta_data->components_from_prototype.find(component_id) ==

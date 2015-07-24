@@ -85,11 +85,6 @@ class EntityFactory : public entity::EntityFactoryInterface {
   void SetComponentType(entity::ComponentId component_id,
                         unsigned int data_type, const char* table_name);
 
-  // If you are using the world editor, this factory needs to know how to
-  // parse the entity flatbuffers using reflection.
-  // You will need to specify the .bfbs file for your component data type.
-  void SetFlatbufferSchema(const char* binary_schema_filename);
-
   // Get the component for a given data type specifier.
   entity::ComponentId DataTypeToComponentId(unsigned int data_type) {
     if (data_type >= data_type_to_component_id_.size())
@@ -109,14 +104,14 @@ class EntityFactory : public entity::EntityFactoryInterface {
   }
 
   // Serialize an entity into whatever binary type you are using for them.
-  // Calls CreateEntityDefinition() to do the work.
+  // Calls CreateEntityDefinition(), which you implement, to do the work.
   virtual bool SerializeEntity(entity::EntityRef& entity,
                                entity::EntityManager* entity_manager,
                                std::vector<uint8_t>* entity_serialized_output);
 
   // After you call SerializeEntity on a few entities, you'll probably want
   // to put them in a proper list. This function does that, via
-  // CreateEntityList() that you override.
+  // a CreateEntityList() that you implement.
   virtual bool SerializeEntityList(
       const std::vector<std::vector<uint8_t>>& entity_definitions,
       std::vector<uint8_t>* entity_list_serialized);
@@ -126,18 +121,17 @@ class EntityFactory : public entity::EntityFactoryInterface {
   bool debug_entity_creation() const { return debug_entity_creation_; }
   void set_debug_entity_creation(bool b) { debug_entity_creation_ = b; }
 
- protected:
   // Here are the virtual methods you must override to create your own entity
   // factory. They are mainly the ones concerned with reading and writing your
   // application's specific Flatbuffer format.
 
-  // You must override this function, which handles reading an entity list
+  // You MUST override this function, which handles reading an entity list
   // and extracting the individual entity data definitions.
   // Return true if you parsed the list successfully or false if not.
   virtual bool ReadEntityList(const void* entity_list,
                               std::vector<const void*>* entity_defs) = 0;
 
-  // You must override this function, which handles reading an entity definition
+  // You MUST override this function, which handles reading an entity definition
   // and extracting the individual component data definitions. In your output,
   // you should index component_defs by component ID, and any components not
   // specified by this entity's definition should be set to nullptr. Return
@@ -146,45 +140,61 @@ class EntityFactory : public entity::EntityFactoryInterface {
       const void* entity_definition,
       std::vector<const void*>* component_defs) = 0;
 
-  // You must override this function, which creates an entity list that contains
+  // You MUST override this function, which creates an entity list that contains
   // a single entity definition, which contains a single component definition:
   // an MetaDef with "prototype" set to the requested prototype name.
   virtual bool CreatePrototypeRequest(const char* prototype_name,
                                       std::vector<uint8_t>* request) = 0;
 
-  // You must override this function, which handles building a single entity
+  // You MUST override this function, which handles building a single entity
   // definition flatbuffer from a list of entity component definitions.
-
-  // TODO: Takes vector<void*> indexed by component ID, outputs a
-  // vector<uint8_t> containing a single EntityDef
+  //
+  // Takes vector<void*> indexed by component ID, outputs a vector<uint8_t>
+  // containing a single EntityDef
   virtual bool CreateEntityDefinition(
       const std::vector<const void*>& component_data,
       std::vector<uint8_t>* entity_definition) = 0;
 
-  // You must override this function, which handles building a entity list
+  // You MUST override this function, which handles building a entity list
   // flatbuffer from a collection of individual entity flatbuffers.
-
-  // TODO: Takes vector<void*> containing all the entities, outputs a
-  // vector<uint8_t> containing a flatbuffer with a single EntityDefList in it.
+  //
+  // Takes vector<void*> containing all the entities, outputs a vector<uint8_t>
+  // containing a flatbuffer with a single EntityDefList in it.
   virtual bool CreateEntityList(const std::vector<const void*>& entity_defs,
                                 std::vector<uint8_t>* entity_list) = 0;
 
-  // You may override this function, which takes a binary list of entities and
+  // You MAY override this function, which takes a binary list of entities and
   // outputs a human-readable text version (aka JSON) of the entity list.
   //
-  // TODO: Takes a void* and outputs a std::string containing the human
-  // readable entity file.
+  // Takes a void* and outputs a std::string containing the human readable
+  // entity file.
+  //
+  // TODO: Implement this function using reflection.
 
   // Creates an entity from the entity definition, recursively building up from
-  // the prototypes. Returns true if successful or false if not. You can
-  // this if you want to change the way prototyping works.
+  // the prototypes. Returns true if successful or false if not.
+  //
+  // You MAY override this if you want to change the way prototyping works.
   virtual void LoadEntityData(const void* def,
                               entity::EntityManager* entity_manager,
                               entity::EntityRef& entity, bool is_prototype);
 
-  std::string flatbuffer_binary_schema_data_;
+  // This factory and its subclasses need to know how to parse the entity
+  // flatbuffers using reflection.
+  //
+  // You will need to specify the .bfbs file for your component data type.
+  void SetFlatbufferSchema(const char* binary_schema_filename);
+
+  // Get the Flatbuffer binary schema that you loaded with
+  // SetFlatbufferSchema().
+  const std::string& flatbuffer_binary_schema_data() const {
+    return flatbuffer_binary_schema_data_;
+  }
 
  private:
+  // Storage for the Flatbuffer binary schema.
+  std::string flatbuffer_binary_schema_data_;
+
   // Storage for entity files.
   std::unordered_map<std::string, std::unique_ptr<std::string>> loaded_files_;
 
