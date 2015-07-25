@@ -42,16 +42,22 @@ table MetaDef {
 }
 
 enum RenderPass:ubyte {
-  kOpaque,
-  kAlpha,
-  kCount
+  Opaque,
+  Alpha,
+  Count
+}
+
+enum CullingTest:ubyte {
+  Distance,
+  ViewAngle,
+  Count
 }
 
 table RenderMeshDef {
   source_file:string;
   shader:string;
-  ignore_culling:bool = false;
-  render_pass: [RenderPass];
+  culling:[CullingTest];
+  render_pass:[RenderPass];
   hidden:bool = false;
 }
 

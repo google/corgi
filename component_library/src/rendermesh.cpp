@@ -44,7 +44,7 @@ void RenderMeshComponent::InitEntity(entity::EntityRef& entity) {
 }
 
 void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
-  for (int pass = 0; pass < RenderPass_kCount; pass++) {
+  for (int pass = 0; pass < RenderPass_Count; pass++) {
     pass_render_list[pass].clear();
   }
   for (auto iter = component_data_.begin(); iter != component_data_.end();
@@ -58,38 +58,48 @@ void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
 
     // Put each entity into the list for each render pass it is
     // planning on participating in.
-    for (int pass = 0; pass < RenderPass_kCount; pass++) {
+    for (int pass = 0; pass < RenderPass_Count; pass++) {
       if (rendermesh_data->pass_mask & (1 << pass)) {
         if (rendermesh_data->currently_hidden) continue;
-        if (!rendermesh_data->ignore_culling) {
-          // Check to make sure objects are inside the frustrum of our
-          // view-cone before we draw:
-          vec3 entity_position =
-              transform_data->world_transform.TranslationVector3D();
-          vec3 pos_relative_to_camera = (entity_position - camera_position) +
-                                        camera_facing * kFrustrumOffset;
 
-          // Cache off the distance from the camera because we'll use it
-          // later as a depth aproxamation.
-          rendermesh_data->z_depth =
-              (entity_position - camera.position()).LengthSquared();
+        // Check to make sure objects are inside the frustrum of our
+        // view-cone before we draw:
+        vec3 entity_position =
+            transform_data->world_transform.TranslationVector3D();
+        vec3 pos_relative_to_camera = (entity_position - camera_position) +
+                                      camera_facing * kFrustrumOffset;
 
-          if (vec3::DotProduct(pos_relative_to_camera.Normalized(),
-                               camera_facing.Normalized()) < max_cos) {
+        // Cache off the distance from the camera because we'll use it
+        // later as a depth aproxamation.
+        rendermesh_data->z_depth =
+            (entity_position - camera.position()).LengthSquared();
+
+        // Are we culling this object based on the view angle?
+        // If so, does this lie outside of our view frustrum?
+        if ((rendermesh_data->culling_mask & (1 << CullingTest_ViewAngle)) &&
+            (vec3::DotProduct(pos_relative_to_camera.Normalized(),
+                               camera_facing.Normalized()) < max_cos)) {
             // The origin point for this mesh is not in our field of view.  Cut
             // out early, and don't bother rendering it.
-            continue;
-          }
+          continue;
         }
+
+        // Are we culling this object based on view distance?  If so,
+        // is it far enough away that we should skip it?
+        if ((rendermesh_data->culling_mask & (1 << CullingTest_Distance)) &&
+            rendermesh_data->z_depth > culling_distance_squared) {
+          continue;
+        }
+
         pass_render_list[pass].push_back(
             RenderlistEntry(iter->entity, &iter->data));
       }
     }
   }
-  std::sort(pass_render_list[RenderPass_kOpaque].begin(),
-            pass_render_list[RenderPass_kOpaque].end());
-  std::sort(pass_render_list[RenderPass_kAlpha].begin(),
-            pass_render_list[RenderPass_kAlpha].end(),
+  std::sort(pass_render_list[RenderPass_Opaque].begin(),
+            pass_render_list[RenderPass_Opaque].end());
+  std::sort(pass_render_list[RenderPass_Alpha].begin(),
+            pass_render_list[RenderPass_Alpha].end(),
             std::greater<RenderlistEntry>());
 }
 
@@ -99,7 +109,7 @@ void RenderMeshComponent::RenderAllEntities(Renderer& renderer,
   renderer.SetCulling(Renderer::kCullBack);
 
   // Render the actual game:
-  for (int pass = 0; pass < RenderPass_kCount; pass++) {
+  for (int pass = 0; pass < RenderPass_Count; pass++) {
     RenderPass(pass, camera, renderer);
   }
 }
@@ -172,7 +182,6 @@ void RenderMeshComponent::AddFromRawData(entity::EntityRef& entity,
 
   rendermesh_data->mesh_filename = rendermesh_def->source_file()->c_str();
   rendermesh_data->shader_filename = rendermesh_def->shader()->c_str();
-  rendermesh_data->ignore_culling = rendermesh_def->ignore_culling();
 
   rendermesh_data->mesh =
       asset_manager_->LoadMesh(rendermesh_def->source_file()->c_str());
@@ -181,7 +190,6 @@ void RenderMeshComponent::AddFromRawData(entity::EntityRef& entity,
   rendermesh_data->shader =
       asset_manager_->LoadShader(rendermesh_def->shader()->c_str());
   assert(rendermesh_data->shader != nullptr);
-  rendermesh_data->ignore_culling = rendermesh_def->ignore_culling();
 
   rendermesh_data->default_hidden = rendermesh_def->hidden();
   rendermesh_data->currently_hidden = rendermesh_def->hidden();
@@ -190,12 +198,20 @@ void RenderMeshComponent::AddFromRawData(entity::EntityRef& entity,
   if (rendermesh_def->render_pass() != nullptr) {
     for (size_t i = 0; i < rendermesh_def->render_pass()->size(); i++) {
       int render_pass = rendermesh_def->render_pass()->Get(i);
-      assert(render_pass < RenderPass_kCount);
+      assert(render_pass < RenderPass_Count);
       rendermesh_data->pass_mask |= 1 << render_pass;
     }
   } else {
     // Anything unspecified is assumed to be opaque.
-    rendermesh_data->pass_mask = (1 << RenderPass_kOpaque);
+    rendermesh_data->pass_mask = (1 << RenderPass_Opaque);
+  }
+
+  if (rendermesh_def->culling() != nullptr) {
+    for (size_t i = 0; i < rendermesh_def->culling()->size(); i++) {
+      int culling_test = rendermesh_def->culling()->Get(i);
+      assert(culling_test < CullingTest_Count);
+      rendermesh_data->culling_mask |= 1 << culling_test;
+    }
   }
 
   // TODO: Load this from a flatbuffer file instead of setting it.
@@ -223,12 +239,21 @@ entity::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
                     ? fbb.CreateString(data->shader_filename)
                     : 0;
   std::vector<unsigned char> render_pass_vec;
-  for (int i = 0; i < RenderPass_kCount; i++) {
+  for (int i = 0; i < RenderPass_Count; i++) {
     if (data->pass_mask & (1 << i)) {
       render_pass_vec.push_back(i);
     }
   }
   auto render_pass = fbb.CreateVector(render_pass_vec);
+
+  std::vector<unsigned char> culling_mask_vec;
+  for (int i = 0; i < CullingTest_Count; i++) {
+    if (data->culling_mask & (1 << i)) {
+      culling_mask_vec.push_back(i);
+    }
+  }
+  auto culling_mask = data->culling_mask ?
+      fbb.CreateVector(culling_mask_vec) : 0;
 
   RenderMeshDefBuilder builder(fbb);
   if (source_file.o != 0) {
@@ -240,7 +265,10 @@ entity::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
   if (render_pass.o != 0) {
     builder.add_render_pass(render_pass);
   }
-  builder.add_ignore_culling(data->ignore_culling);
+
+  if (culling_mask.o != 0) {
+    builder.add_culling(culling_mask);
+  }
 
   fbb.Finish(builder.Finish());
   return fbb.ReleaseBufferPointer();

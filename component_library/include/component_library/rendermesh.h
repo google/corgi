@@ -39,9 +39,9 @@ struct RenderMeshData {
         tint(mathfu::kOnes4f),
         mesh_filename(""),
         shader_filename(""),
-        ignore_culling(false),
-        pass_mask(0),
         z_depth(0),
+        culling_mask(0),
+        pass_mask(0),
         default_hidden(false),
         currently_hidden(false) {}
   Mesh* mesh;
@@ -49,9 +49,9 @@ struct RenderMeshData {
   mathfu::vec4 tint;
   std::string mesh_filename;
   std::string shader_filename;
-  bool ignore_culling;
-  unsigned char pass_mask;
   float z_depth;
+  unsigned char culling_mask;
+  unsigned char pass_mask;
   bool default_hidden;
   bool currently_hidden;
 };
@@ -74,7 +74,10 @@ struct RenderlistEntry {
 
 class RenderMeshComponent : public entity::Component<RenderMeshData> {
  public:
-  RenderMeshComponent() : asset_manager_(nullptr) {}
+  const float kDefaultCullDist = 80.0f;
+
+  RenderMeshComponent() : asset_manager_(nullptr),
+    culling_distance_squared(kDefaultCullDist * kDefaultCullDist) {}
 
   virtual void Init();
   virtual void AddFromRawData(entity::EntityRef& entity, const void* raw_data);
@@ -118,6 +121,10 @@ class RenderMeshComponent : public entity::Component<RenderMeshData> {
     light_position_ = light_position;
   }
 
+  void SetCullDistance(float distance) {
+    culling_distance_squared = distance * distance;
+  }
+
  private:
   // todo(ccornell) expand this if needed - make an array for multiple lights.
   // Also maybe make this into a full fledged struct to store things like
@@ -125,9 +132,10 @@ class RenderMeshComponent : public entity::Component<RenderMeshData> {
   // these.)
   mathfu::vec3 light_position_;
   AssetManager* asset_manager_;
+  float culling_distance_squared;
   // An array of vectors we use for keeping track of things we're going
   // to render.
-  std::vector<RenderlistEntry> pass_render_list[RenderPass_kCount];
+  std::vector<RenderlistEntry> pass_render_list[RenderPass_Count];
 };
 
 }  // component_library
