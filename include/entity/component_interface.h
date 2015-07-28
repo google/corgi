@@ -78,7 +78,7 @@ class ComponentInterface {
 
   // Export current state to raw data to be later reimported via AddFromRawData.
   // If you don't support this functionality, return nullptr here.
-  virtual RawDataUniquePtr ExportRawData(EntityRef& entity) const = 0;
+  virtual RawDataUniquePtr ExportRawData(const EntityRef& entity) const = 0;
 
   // Called just before removal from the entitymanager.
   virtual void Cleanup() = 0;

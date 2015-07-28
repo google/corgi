@@ -29,6 +29,10 @@ namespace entity {
 // All components should should extend this class.  The type T is used to
 // specify the structure of the data that needs to be associated with each
 // entity.
+//
+// Note: On some of the API, EntityRef& parameters are non-const so that
+//       the referenced entity can be changed. The EntityRef itself is
+//       never modified.
 template <typename T>
 class Component : public ComponentInterface {
  public:
@@ -69,7 +73,7 @@ class Component : public ComponentInterface {
     return &(component_data->data);
   }
 
-  T* AddEntity(EntityRef entity) { return AddEntity(entity, kAddToBack); }
+  T* AddEntity(EntityRef& entity) { return AddEntity(entity, kAddToBack); }
 
   // Removes an entity from our list of entities, marks the entity as not using
   // this component anymore, calls the destructor on the data, and returns
@@ -187,7 +191,7 @@ class Component : public ComponentInterface {
 
   // By default, components don't support this functionality. If you do
   // support it, override this to return raw data that you can read back later.
-  virtual RawDataUniquePtr ExportRawData(EntityRef& /*unused*/) const {
+  virtual RawDataUniquePtr ExportRawData(const EntityRef& /*unused*/) const {
     return nullptr;
   }
 

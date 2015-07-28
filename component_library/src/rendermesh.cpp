@@ -219,7 +219,7 @@ void RenderMeshComponent::AddFromRawData(entity::EntityRef& entity,
 }
 
 entity::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
-    entity::EntityRef& entity) const {
+    const entity::EntityRef& entity) const {
   const RenderMeshData* data = GetComponentData(entity);
   if (data == nullptr) return nullptr;
 

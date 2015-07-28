@@ -196,7 +196,7 @@ void TransformComponent::AddFromRawData(entity::EntityRef& entity,
 }
 
 entity::ComponentInterface::RawDataUniquePtr TransformComponent::ExportRawData(
-    entity::EntityRef& entity) const {
+    const entity::EntityRef& entity) const {
   const TransformData* data = GetComponentData(entity);
   if (data == nullptr) return nullptr;
 

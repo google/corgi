@@ -40,19 +40,20 @@ class MetaComponent : public entity::Component<MetaData> {
   void AddFromPrototypeData(entity::EntityRef& entity, const MetaDef* meta_def);
   void AddWithSourceFile(entity::EntityRef& entity,
                          const std::string& source_file);
-  virtual RawDataUniquePtr ExportRawData(entity::EntityRef& entity) const;
+  virtual RawDataUniquePtr ExportRawData(const entity::EntityRef& entity) const;
 
   virtual void InitEntity(entity::EntityRef& entity);
   virtual void CleanupEntity(entity::EntityRef& entity);
   virtual void UpdateAllEntities(entity::WorldTime /*delta_time*/) {}
 
-  const std::string& GetEntityID(entity::EntityRef& entity);
+  const std::string& GetEntityID(const entity::EntityRef& entity);
 
   // Non-const because if we find an invalid entity, it gets silently removed.
   entity::EntityRef GetEntityFromDictionary(const std::string& key);
 
  private:
-  void AddEntityToDictionary(const std::string& key, entity::EntityRef& entity);
+  void AddEntityToDictionary(const std::string& key,
+                             const entity::EntityRef& entity);
   void RemoveEntityFromDictionary(const std::string& key);
   void GenerateRandomEntityID(std::string* output);
 

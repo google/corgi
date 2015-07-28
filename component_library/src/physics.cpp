@@ -180,7 +180,7 @@ void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
 }
 
 entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
-    entity::EntityRef& entity) const {
+    const entity::EntityRef& entity) const {
   const PhysicsData* data = GetComponentData(entity);
   if (data == nullptr) return nullptr;
 

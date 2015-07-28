@@ -63,7 +63,7 @@ void MetaComponent::AddWithSourceFile(entity::EntityRef& entity,
 }
 
 entity::ComponentInterface::RawDataUniquePtr MetaComponent::ExportRawData(
-    entity::EntityRef& entity) const {
+    const entity::EntityRef& entity) const {
   const MetaData* data = GetComponentData(entity);
   if (data == nullptr) return nullptr;
 
@@ -103,7 +103,7 @@ void MetaComponent::CleanupEntity(entity::EntityRef& entity) {
     RemoveEntityFromDictionary(data->entity_id);
 }
 
-const std::string& MetaComponent::GetEntityID(entity::EntityRef& entity) {
+const std::string& MetaComponent::GetEntityID(const entity::EntityRef& entity) {
   MetaData* data = GetComponentData(entity);
   if (data == nullptr) {
     return empty_string;
@@ -117,7 +117,7 @@ const std::string& MetaComponent::GetEntityID(entity::EntityRef& entity) {
 }
 
 void MetaComponent::AddEntityToDictionary(const std::string& key,
-                                          entity::EntityRef& entity) {
+                                          const entity::EntityRef& entity) {
   entity_dictionary_[key] = entity;
 }
 void MetaComponent::RemoveEntityFromDictionary(const std::string& key) {
