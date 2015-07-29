@@ -39,12 +39,14 @@ LOCAL_C_INCLUDES := \
   $(DEPENDENCIES_FPLBASE_DIR)/include \
   $(DEPENDENCIES_FPLUTIL_DIR)/libfplutil/include \
   $(DEPENDENCIES_MATHFU_DIR)/include \
+  $(DEPENDENCIES_MOTIVE_DIR)/include \
   $(DEPENDENCIES_BULLETPHYSICS_DIR)/src \
   $(COMPONENTS_DIR)/src
 
 LOCAL_SRC_FILES := \
+  $(COMPONENTS_RELATIVE_DIR)/src/animation.cpp \
 	$(COMPONENTS_RELATIVE_DIR)/src/common_services.cpp \
-        $(COMPONENTS_RELATIVE_DIR)/src/component_utils.cpp \
+  $(COMPONENTS_RELATIVE_DIR)/src/component_utils.cpp \
 	$(COMPONENTS_RELATIVE_DIR)/src/meta.cpp \
 	$(COMPONENTS_RELATIVE_DIR)/src/entity_factory.cpp \
 	$(COMPONENTS_RELATIVE_DIR)/src/physics.cpp \

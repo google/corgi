@@ -90,6 +90,7 @@ if (entity_build_component_library)
   set(COMPONENT_COLLECTION_DIR ${CMAKE_CURRENT_SOURCE_DIR}/component_library)
   # component library source files.
   set(component_library_SRCS
+      ${COMPONENT_COLLECTION_DIR}/include/component_library/animation.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/camera_interface.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/common_services.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/component_utils.h
@@ -98,6 +99,7 @@ if (entity_build_component_library)
       ${COMPONENT_COLLECTION_DIR}/include/component_library/physics.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/rendermesh.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/transform.h
+      ${COMPONENT_COLLECTION_DIR}/src/animation.cpp
       ${COMPONENT_COLLECTION_DIR}/src/common_services.cpp
       ${COMPONENT_COLLECTION_DIR}/src/component_utils.cpp
       ${COMPONENT_COLLECTION_DIR}/src/meta.cpp
@@ -118,7 +120,7 @@ if (entity_build_component_library)
   file(GLOB_RECURSE
     COMPONENT_LIBRARY_FLATBUFFERS_SCHEMAS
     ${COMPONENT_COLLECTION_DIR}/schemas/*.fbs)
-  
+
   # Generate rules to build the set of output files from the set of input
   # schema files.
   foreach(flatbuffers_schema ${COMPONENT_LIBRARY_FLATBUFFERS_SCHEMAS})

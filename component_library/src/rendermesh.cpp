@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "component_library/animation.h"
 #include "component_library/rendermesh.h"
 #include "component_library/common_services.h"
 #include "component_library/transform.h"
@@ -133,7 +134,14 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
 
     TransformData* transform_data = Data<TransformData>(entity);
 
-    mat4 world_transform = transform_data->world_transform;
+    AnimationData* anim_data = Data<AnimationData>(entity);
+
+    // TODO: anim_data will set uniforms for an array of matricies. Each
+    //       matrix represents one bone position.
+    const bool has_anim = anim_data != nullptr && anim_data->motivator.Valid();
+    const mat4 world_transform = has_anim ?
+        transform_data->world_transform * anim_data->motivator.Value() :
+        transform_data->world_transform;
 
     const mat4 mvp = camera_vp * world_transform;
     const mat4 world_matrix_inverse = world_transform.Inverse();
