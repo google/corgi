@@ -115,6 +115,21 @@ class TransformComponent : public entity::Component<TransformData> {
   // Take any pending child IDs and set up the child links.
   void UpdateChildLinks(entity::EntityRef& entity);
 
+  // Returns `entity` or the first child of entity (in breadth-first order)
+  // that has component `id`. Or returns an invalid EntityRef if no such child
+  // exists.
+  entity::EntityRef ChildWithComponent(const entity::EntityRef& entity,
+                                       entity::ComponentId id) const {
+    return ChildWithComponents(entity, &id, 1);
+  }
+
+  // Returns `entity` or the first child of entity (in breadth-first order)
+  // that has all components in array `ids`. Or returns an invalid EntityRef
+  // if no such child exists.
+  entity::EntityRef ChildWithComponents(const entity::EntityRef& entity,
+                                        const entity::ComponentId* ids,
+                                        size_t num_ids) const;
+
  private:
   void UpdateWorldPosition(entity::EntityRef& entity, mathfu::mat4 transform);
 };
