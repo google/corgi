@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <math.h>
+#include <queue>
 #include "component_library/transform.h"
 #include "component_library/physics.h"
 #include "component_library/meta.h"
@@ -251,6 +252,40 @@ void TransformComponent::RemoveChild(entity::EntityRef& child) {
   child_data->parent = entity::EntityRef();
   child_data->child_node.remove();
 }
+
+entity::EntityRef TransformComponent::ChildWithComponents(
+    const entity::EntityRef& entity, const entity::ComponentId* ids,
+    size_t num_ids) const {
+  // Breadth-first search on child-tree.
+  // Seed the search queue with current entity.
+  std::queue<entity::EntityRef> entities_to_search;
+  entities_to_search.push(entity);
+
+  while (!entities_to_search.empty()) {
+    // Grab the oldest element in the search queue.
+    const entity::EntityRef e = entities_to_search.front();
+    entities_to_search.pop();
+
+    // If this entity has the components we're looking for, return it.
+    bool has_components = true;
+    for (size_t i = 0; i < num_ids; ++i) {
+      has_components = has_components && e->IsRegisteredForComponent(ids[i]);
+    }
+    if (has_components) return e;
+
+    // Add children to the search queue.
+    const TransformData* transform_data = Data<TransformData>(e);
+    if (transform_data != nullptr) {
+      for (auto iter = transform_data->children.begin();
+           iter != transform_data->children.end(); ++iter) {
+        entities_to_search.push(iter->owner);
+      }
+    }
+  }
+
+  return entity::EntityRef();
+}
+
 
 }  // component_library
 }  // fpl
