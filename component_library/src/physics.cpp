@@ -185,8 +185,9 @@ entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
   if (data == nullptr) return nullptr;
 
   flatbuffers::FlatBufferBuilder fbb;
-  fbb.ForceDefaults(entity_manager_->GetComponent<CommonServicesComponent>()
-                        ->export_force_defaults());
+  bool defaults = entity_manager_->GetComponent<CommonServicesComponent>()
+                      ->export_force_defaults();
+  fbb.ForceDefaults(defaults);
   std::vector<flatbuffers::Offset<fpl::BulletShapeDef>> shape_vector;
   bool kinematic = true;
   if (data->body_count > 0) {

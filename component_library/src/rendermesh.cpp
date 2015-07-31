@@ -79,9 +79,9 @@ void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
         // If so, does this lie outside of our view frustrum?
         if ((rendermesh_data->culling_mask & (1 << CullingTest_ViewAngle)) &&
             (vec3::DotProduct(pos_relative_to_camera.Normalized(),
-                               camera_facing.Normalized()) < max_cos)) {
-            // The origin point for this mesh is not in our field of view.  Cut
-            // out early, and don't bother rendering it.
+                              camera_facing.Normalized()) < max_cos)) {
+          // The origin point for this mesh is not in our field of view.  Cut
+          // out early, and don't bother rendering it.
           continue;
         }
 
@@ -238,8 +238,9 @@ entity::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
   }
 
   flatbuffers::FlatBufferBuilder fbb;
-  fbb.ForceDefaults(entity_manager_->GetComponent<CommonServicesComponent>()
-                        ->export_force_defaults());
+  bool defaults = entity_manager_->GetComponent<CommonServicesComponent>()
+                      ->export_force_defaults();
+  fbb.ForceDefaults(defaults);
 
   auto source_file =
       (data->mesh_filename != "") ? fbb.CreateString(data->mesh_filename) : 0;
@@ -260,21 +261,21 @@ entity::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
       culling_mask_vec.push_back(i);
     }
   }
-  auto culling_mask = data->culling_mask ?
-      fbb.CreateVector(culling_mask_vec) : 0;
+  auto culling_mask =
+      data->culling_mask ? fbb.CreateVector(culling_mask_vec) : 0;
 
   RenderMeshDefBuilder builder(fbb);
-  if (source_file.o != 0) {
+  if (defaults || source_file.o != 0) {
     builder.add_source_file(source_file);
   }
-  if (shader.o != 0) {
+  if (defaults || shader.o != 0) {
     builder.add_shader(shader);
   }
-  if (render_pass.o != 0) {
+  if (defaults || render_pass.o != 0) {
     builder.add_render_pass(render_pass);
   }
 
-  if (culling_mask.o != 0) {
+  if (defaults || culling_mask.o != 0) {
     builder.add_culling(culling_mask);
   }
 
