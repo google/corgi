@@ -71,6 +71,8 @@ void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
                                       const void* raw_data) {
   auto physics_def = static_cast<const PhysicsDef*>(raw_data);
   PhysicsData* physics_data = AddEntity(entity);
+  TransformData* transform_data = Data<TransformData>(entity);
+  const vec3& scale = transform_data->scale;
 
   if (physics_def->shapes() && physics_def->shapes()->Length() > 0) {
     int shape_count = physics_def->shapes()->Length() > kMaxPhysicsBodies
@@ -132,6 +134,8 @@ void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
           break;
         }
       }
+      rb_data->shape->setLocalScaling(
+          btVector3(scale.x(), scale.y(), scale.z()));
       rb_data->motion_state.reset(new btDefaultMotionState());
       btScalar mass = shape_def->mass();
       btVector3 inertia(0.0f, 0.0f, 0.0f);
@@ -333,8 +337,9 @@ void PhysicsComponent::UpdateAllEntities(entity::WorldTime delta_time) {
           -trans.getRotation().getY(), -trans.getRotation().getZ());
       transform_data->orientation.Normalize();
 
-      vec3 offset = transform_data->orientation.Inverse() *
-                    physics_data->rigid_bodies[0].offset;
+      vec3 local_offset = vec3::HadamardProduct(
+          transform_data->scale, physics_data->rigid_bodies[0].offset);
+      vec3 offset = transform_data->orientation.Inverse() * local_offset;
       transform_data->position =
           mathfu::vec3(trans.getOrigin().getX(), trans.getOrigin().getY(),
                        trans.getOrigin().getZ()) -
@@ -440,8 +445,10 @@ void PhysicsComponent::DisablePhysics(const entity::EntityRef& entity) {
 }
 
 void PhysicsComponent::UpdatePhysicsFromTransform(entity::EntityRef& entity) {
-  // Update all objects on the entity, not just kinematic ones.
+  // Update all objects on the entity, not just kinematic ones. Also needs to
+  // check for updates on the scale.
   UpdatePhysicsObjectsTransform(entity, false);
+  UpdatePhysicsScale(entity);
 }
 
 void PhysicsComponent::UpdatePhysicsObjectsTransform(entity::EntityRef& entity,
@@ -463,13 +470,44 @@ void PhysicsComponent::UpdatePhysicsObjectsTransform(entity::EntityRef& entity,
     if (kinematic_only && !rb_data->rigid_body->isKinematicObject()) {
       continue;
     }
-    vec3 offset = transform_data->orientation.Inverse() * rb_data->offset;
+    vec3 local_offset =
+        vec3::HadamardProduct(rb_data->offset, transform_data->scale);
+    vec3 offset = transform_data->orientation.Inverse() * local_offset;
     btVector3 position(transform_data->position.x() + offset.x(),
                        transform_data->position.y() + offset.y(),
                        transform_data->position.z() + offset.z());
     btTransform transform(orientation, position);
     rb_data->rigid_body->setWorldTransform(transform);
     rb_data->motion_state->setWorldTransform(transform);
+  }
+}
+
+void PhysicsComponent::UpdatePhysicsScale(entity::EntityRef& entity) {
+  if (Data<PhysicsData>(entity) == nullptr) return;
+
+  PhysicsData* physics_data = Data<PhysicsData>(entity);
+  TransformData* transform_data = Data<TransformData>(entity);
+
+  for (int i = 0; i < physics_data->body_count; i++) {
+    auto rb_data = &physics_data->rigid_bodies[i];
+    const btVector3& localScale = rb_data->shape->getLocalScaling();
+    const btVector3 newScale(transform_data->scale.x(),
+                             transform_data->scale.y(),
+                             transform_data->scale.z());
+    if ((localScale - newScale).length2() > FLT_EPSILON) {
+      // If the scale has changed, the rigid body needs to be removed from the
+      // world, updated accordingly, and added back in.
+      bullet_world_->removeRigidBody(rb_data->rigid_body.get());
+      rb_data->shape->setLocalScaling(newScale);
+      btVector3 localInertia;
+      float invMass = rb_data->rigid_body->getInvMass();
+      float mass = invMass ? 1.0f / invMass : 0.0f;
+      rb_data->shape->calculateLocalInertia(mass, localInertia);
+      rb_data->rigid_body->setMassProps(mass, localInertia);
+      bullet_world_->addRigidBody(rb_data->rigid_body.get(),
+                                  rb_data->collision_type,
+                                  rb_data->collides_with);
+    }
   }
 }
 
@@ -529,21 +567,30 @@ void PhysicsComponent::GenerateRaycastShape(entity::EntityRef& entity,
       return;
     }
   }
+  auto transform_data = Data<TransformData>(entity);
   // Add an AABB about the entity for raycasting purposes
   vec3 max(-FLT_MAX);
   vec3 min(FLT_MAX);
   if (!GetMaxMinPositionsForEntity(entity, *entity_manager_, &max, &min)) {
     max = min = mathfu::kZeros3f;
+  } else {
+    // Bullet physics handles the scale itself, so it needs to be removed here.
+    max /= transform_data->scale;
+    min /= transform_data->scale;
   }
   auto rb_data = &data->rigid_bodies[data->body_count++];
-  auto transform_data = Data<TransformData>(entity);
   // Make sure it is at least one unit in each direction
   vec3 extents = vec3::Max(max - min, mathfu::kOnes3f);
   btVector3 bt_extents(extents.x(), extents.y(), extents.z());
   rb_data->offset = (max + min) / 2.0f;
   rb_data->shape.reset(new btBoxShape(bt_extents / 2.0f));
+  rb_data->shape->setLocalScaling(btVector3(transform_data->scale.x(),
+                                            transform_data->scale.y(),
+                                            transform_data->scale.z()));
+  vec3 local_offset =
+      vec3::HadamardProduct(rb_data->offset, transform_data->scale);
   vec3 transformed_offset =
-      transform_data->orientation.Inverse() * rb_data->offset;
+      transform_data->orientation.Inverse() * local_offset;
   btVector3 position(transform_data->position.x() + transformed_offset.x(),
                      transform_data->position.y() + transformed_offset.y(),
                      transform_data->position.z() + transformed_offset.z());

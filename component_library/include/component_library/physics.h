@@ -116,6 +116,7 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   void ProcessBulletTickCallback();
 
   void UpdatePhysicsFromTransform(entity::EntityRef& entity);
+  void UpdatePhysicsScale(entity::EntityRef& entity);
 
   void EnablePhysics(const entity::EntityRef& entity);
   void DisablePhysics(const entity::EntityRef& entity);
