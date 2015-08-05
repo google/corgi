@@ -202,8 +202,9 @@ entity::ComponentInterface::RawDataUniquePtr TransformComponent::ExportRawData(
   if (data == nullptr) return nullptr;
 
   flatbuffers::FlatBufferBuilder fbb;
-  fbb.ForceDefaults(entity_manager_->GetComponent<CommonServicesComponent>()
-                        ->export_force_defaults());
+  bool defaults = entity_manager_->GetComponent<CommonServicesComponent>()
+                      ->export_force_defaults();
+  fbb.ForceDefaults(defaults);
 
   mathfu::vec3 euler = data->orientation.ToEulerAngles() / kDegreesToRadians;
   fpl::Vec3 position{data->position.x(), data->position.y(),
@@ -224,7 +225,7 @@ entity::ComponentInterface::RawDataUniquePtr TransformComponent::ExportRawData(
   builder.add_position(&position);
   builder.add_scale(&scale);
   builder.add_orientation(&orientation);
-  if (child_ids_vector.size() > 0) {
+  if (defaults || child_ids_vector.size() > 0) {
     builder.add_child_ids(child_ids);
   }
 

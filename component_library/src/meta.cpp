@@ -68,8 +68,9 @@ entity::ComponentInterface::RawDataUniquePtr MetaComponent::ExportRawData(
   if (data == nullptr) return nullptr;
 
   flatbuffers::FlatBufferBuilder fbb;
-  fbb.ForceDefaults(entity_manager_->GetComponent<CommonServicesComponent>()
-                        ->export_force_defaults());
+  bool defaults = entity_manager_->GetComponent<CommonServicesComponent>()
+                      ->export_force_defaults();
+  fbb.ForceDefaults(defaults);
   // Const-cast should be okay here because we're just giving
   // something an entity ID before exporting it (if it doesn't already
   // have one).
@@ -81,10 +82,10 @@ entity::ComponentInterface::RawDataUniquePtr MetaComponent::ExportRawData(
 
   MetaDefBuilder builder(fbb);
   builder.add_entity_id(entity_id);
-  if (data->prototype != "") {
+  if (defaults || prototype.o != 0) {
     builder.add_prototype(prototype);
   }
-  if (data->comment != "") {
+  if (defaults || comment.o != 0) {
     builder.add_comment(comment);
   }
   fbb.Finish(builder.Finish());
