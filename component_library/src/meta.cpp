@@ -100,7 +100,8 @@ void MetaComponent::InitEntity(entity::EntityRef& entity) {
 
 void MetaComponent::CleanupEntity(entity::EntityRef& entity) {
   MetaData* data = GetComponentData(entity);
-  if (data != nullptr && data->entity_id != "")
+  if (data != nullptr && data->entity_id != "" &&
+      GetEntityFromDictionary(data->entity_id) == entity)
     RemoveEntityFromDictionary(data->entity_id);
 }
 
