@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <cfloat>
+#include <cmath>
 #include "component_library/physics.h"
 #include "component_library/common_services.h"
 #include "component_library/component_utils.h"
@@ -135,7 +136,7 @@ void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
         }
       }
       rb_data->shape->setLocalScaling(
-          btVector3(scale.x(), scale.y(), scale.z()));
+          btVector3(fabs(scale.x()), fabs(scale.y()), fabs(scale.z())));
       rb_data->motion_state.reset(new btDefaultMotionState());
       btScalar mass = shape_def->mass();
       btVector3 inertia(0.0f, 0.0f, 0.0f);
@@ -492,9 +493,10 @@ void PhysicsComponent::UpdatePhysicsScale(entity::EntityRef& entity) {
   for (int i = 0; i < physics_data->body_count; i++) {
     auto rb_data = &physics_data->rigid_bodies[i];
     const btVector3& localScale = rb_data->shape->getLocalScaling();
-    const btVector3 newScale(transform_data->scale.x(),
-                             transform_data->scale.y(),
-                             transform_data->scale.z());
+    // Bullet doesn't handle a negative scale, so prevent any from being set.
+    const btVector3 newScale(fabs(transform_data->scale.x()),
+                             fabs(transform_data->scale.y()),
+                             fabs(transform_data->scale.z()));
     if ((localScale - newScale).length2() > FLT_EPSILON) {
       // If the scale has changed, the rigid body needs to be removed from the
       // world, updated accordingly, and added back in.
@@ -585,9 +587,9 @@ void PhysicsComponent::GenerateRaycastShape(entity::EntityRef& entity,
   btVector3 bt_extents(extents.x(), extents.y(), extents.z());
   rb_data->offset = (max + min) / 2.0f;
   rb_data->shape.reset(new btBoxShape(bt_extents / 2.0f));
-  rb_data->shape->setLocalScaling(btVector3(transform_data->scale.x(),
-                                            transform_data->scale.y(),
-                                            transform_data->scale.z()));
+  rb_data->shape->setLocalScaling(btVector3(fabs(transform_data->scale.x()),
+                                            fabs(transform_data->scale.y()),
+                                            fabs(transform_data->scale.z())));
   vec3 local_offset =
       vec3::HadamardProduct(rb_data->offset, transform_data->scale);
   vec3 transformed_offset =
