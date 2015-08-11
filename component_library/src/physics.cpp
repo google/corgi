@@ -92,18 +92,14 @@ void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
         }
         case BulletShapeUnion_BulletBoxDef: {
           auto box_data = static_cast<const BulletBoxDef*>(shape_def->data());
-          btVector3 half_extents(box_data->half_extents()->x(),
-                                 box_data->half_extents()->y(),
-                                 box_data->half_extents()->z());
-          rb_data->shape.reset(new btBoxShape(btVector3(half_extents)));
+          btVector3 half_extents = ToBtVector3(*box_data->half_extents());
+          rb_data->shape.reset(new btBoxShape(half_extents));
           break;
         }
         case BulletShapeUnion_BulletCylinderDef: {
           auto cylinder_data =
               static_cast<const BulletCylinderDef*>(shape_def->data());
-          btVector3 half_extents(cylinder_data->half_extents()->x(),
-                                 cylinder_data->half_extents()->y(),
-                                 cylinder_data->half_extents()->z());
+          btVector3 half_extents = ToBtVector3(*cylinder_data->half_extents());
           rb_data->shape.reset(new btCylinderShape(half_extents));
           break;
         }
@@ -123,8 +119,7 @@ void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
         case BulletShapeUnion_BulletStaticPlaneDef: {
           auto plane_data =
               static_cast<const BulletStaticPlaneDef*>(shape_def->data());
-          btVector3 normal(plane_data->normal()->x(), plane_data->normal()->y(),
-                           plane_data->normal()->z());
+          btVector3 normal = ToBtVector3(*plane_data->normal());
           rb_data->shape.reset(
               new btStaticPlaneShape(normal, plane_data->constant()));
           break;
@@ -217,9 +212,7 @@ entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
         case BOX_SHAPE_PROXYTYPE: {
           auto box = static_cast<const btBoxShape*>(body.shape.get());
           BulletBoxDefBuilder box_builder(fbb);
-          btVector3 bt_half_extents = box->getHalfExtentsWithMargin();
-          Vec3 half_extents{bt_half_extents.x(), bt_half_extents.y(),
-                            bt_half_extents.z()};
+          Vec3 half_extents = ToVec3(box->getHalfExtentsWithMargin());
           box_builder.add_half_extents(&half_extents);
           shape_type = BulletShapeUnion_BulletBoxDef;
           shape_data = box_builder.Finish().Union();
@@ -228,9 +221,7 @@ entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
         case CYLINDER_SHAPE_PROXYTYPE: {
           auto cylinder = static_cast<const btCylinderShape*>(body.shape.get());
           BulletCylinderDefBuilder cylinder_builder(fbb);
-          btVector3 bt_half_extents = cylinder->getHalfExtentsWithMargin();
-          Vec3 half_extents{bt_half_extents.x(), bt_half_extents.y(),
-                            bt_half_extents.z()};
+          Vec3 half_extents = ToVec3(cylinder->getHalfExtentsWithMargin());
           cylinder_builder.add_half_extents(&half_extents);
           shape_type = BulletShapeUnion_BulletCylinderDef;
           shape_data = cylinder_builder.Finish().Union();
@@ -257,8 +248,7 @@ entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
         case STATIC_PLANE_PROXYTYPE: {
           auto plane = static_cast<const btStaticPlaneShape*>(body.shape.get());
           BulletStaticPlaneDefBuilder plane_builder(fbb);
-          btVector3 bt_normal = plane->getPlaneNormal();
-          Vec3 normal{bt_normal.x(), bt_normal.y(), bt_normal.z()};
+          Vec3 normal = ToVec3(plane->getPlaneNormal());
           plane_builder.add_normal(&normal);
           plane_builder.add_constant(plane->getPlaneConstant());
           shape_type = BulletShapeUnion_BulletStaticPlaneDef;
@@ -331,21 +321,14 @@ void PhysicsComponent::UpdateAllEntities(entity::WorldTime delta_time) {
     if (!physics_data->rigid_bodies[0].rigid_body->isKinematicObject()) {
       auto trans =
           physics_data->rigid_bodies[0].rigid_body->getWorldTransform();
-      // The quaternion provided by Bullet is using a right-handed coordinate
-      // system, while mathfu assumes left. Thus the axes need to be negated.
-      // It also needs to be normalized, as the provided value is not.
-      transform_data->orientation = mathfu::quat(
-          trans.getRotation().getW(), -trans.getRotation().getX(),
-          -trans.getRotation().getY(), -trans.getRotation().getZ());
+      // The quaternion needs to be normalized, as the provided one is not.
+      transform_data->orientation = ToMathfuQuat(trans.getRotation());
       transform_data->orientation.Normalize();
 
       vec3 local_offset = vec3::HadamardProduct(
           transform_data->scale, physics_data->rigid_bodies[0].offset);
       vec3 offset = transform_data->orientation.Inverse() * local_offset;
-      transform_data->position =
-          mathfu::vec3(trans.getOrigin().getX(), trans.getOrigin().getY(),
-                       trans.getOrigin().getZ()) -
-          offset;
+      transform_data->position = ToMathfuVec3(trans.getOrigin()) - offset;
     }
     // Update any kinematic objects with the current transform.
     UpdatePhysicsObjectsTransform(iter->entity, true);
@@ -385,12 +368,8 @@ void PhysicsComponent::ProcessBulletTickCallback() {
 
         entity::EntityRef entity_a(container_a, body_a->getUserIndex());
         entity::EntityRef entity_b(container_b, body_b->getUserIndex());
-        vec3 position_a(pt.getPositionWorldOnA().x(),
-                        pt.getPositionWorldOnA().y(),
-                        pt.getPositionWorldOnA().z());
-        vec3 position_b(pt.getPositionWorldOnB().x(),
-                        pt.getPositionWorldOnB().y(),
-                        pt.getPositionWorldOnB().z());
+        vec3 position_a = ToMathfuVec3(pt.getPositionWorldOnA());
+        vec3 position_b = ToMathfuVec3(pt.getPositionWorldOnB());
         std::string tag_a;
         std::string tag_b;
         auto physics_a = Data<PhysicsData>(entity_a);
@@ -459,13 +438,7 @@ void PhysicsComponent::UpdatePhysicsObjectsTransform(entity::EntityRef& entity,
 
   PhysicsData* physics_data = Data<PhysicsData>(entity);
   TransformData* transform_data = Data<TransformData>(entity);
-
-  // Bullet assumes a right handed system, while mathfu is left, so the axes
-  // need to be negated.
-  btQuaternion orientation(-transform_data->orientation.vector().x(),
-                           -transform_data->orientation.vector().y(),
-                           -transform_data->orientation.vector().z(),
-                           transform_data->orientation.scalar());
+  btQuaternion orientation = ToBtQuaternion(transform_data->orientation);
 
   for (int i = 0; i < physics_data->body_count; i++) {
     auto rb_data = &physics_data->rigid_bodies[i];
@@ -475,9 +448,7 @@ void PhysicsComponent::UpdatePhysicsObjectsTransform(entity::EntityRef& entity,
     vec3 local_offset =
         vec3::HadamardProduct(rb_data->offset, transform_data->scale);
     vec3 offset = transform_data->orientation.Inverse() * local_offset;
-    btVector3 position(transform_data->position.x() + offset.x(),
-                       transform_data->position.y() + offset.y(),
-                       transform_data->position.z() + offset.z());
+    btVector3 position = ToBtVector3(transform_data->position + offset);
     btTransform transform(orientation, position);
     rb_data->rigid_body->setWorldTransform(transform);
     rb_data->motion_state->setWorldTransform(transform);
@@ -535,8 +506,8 @@ entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
                                                   mathfu::vec3& end,
                                                   short layer_mask,
                                                   mathfu::vec3* hit_point) {
-  btVector3 bt_start = btVector3(start.x(), start.y(), start.z());
-  btVector3 bt_end = btVector3(end.x(), end.y(), end.z());
+  btVector3 bt_start = ToBtVector3(start);
+  btVector3 bt_end = ToBtVector3(end);
   btCollisionWorld::ClosestRayResultCallback ray_results(bt_start, bt_end);
   ray_results.m_collisionFilterGroup = layer_mask;
 
@@ -546,9 +517,7 @@ entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
         ray_results.m_collisionObject->getUserPointer());
     if (container != nullptr) {
       if (hit_point != nullptr)
-        *hit_point = vec3(ray_results.m_hitPointWorld.x(),
-                          ray_results.m_hitPointWorld.y(),
-                          ray_results.m_hitPointWorld.z());
+        *hit_point = ToMathfuVec3(ray_results.m_hitPointWorld);
 
       return entity::EntityRef(container,
                                ray_results.m_collisionObject->getUserIndex());
@@ -584,7 +553,7 @@ void PhysicsComponent::GenerateRaycastShape(entity::EntityRef& entity,
   auto rb_data = &data->rigid_bodies[data->body_count++];
   // Make sure it is at least one unit in each direction
   vec3 extents = vec3::Max(max - min, mathfu::kOnes3f);
-  btVector3 bt_extents(extents.x(), extents.y(), extents.z());
+  btVector3 bt_extents = ToBtVector3(extents);
   rb_data->offset = (max + min) / 2.0f;
   rb_data->shape.reset(new btBoxShape(bt_extents / 2.0f));
   rb_data->shape->setLocalScaling(btVector3(fabs(transform_data->scale.x()),
@@ -594,13 +563,9 @@ void PhysicsComponent::GenerateRaycastShape(entity::EntityRef& entity,
       vec3::HadamardProduct(rb_data->offset, transform_data->scale);
   vec3 transformed_offset =
       transform_data->orientation.Inverse() * local_offset;
-  btVector3 position(transform_data->position.x() + transformed_offset.x(),
-                     transform_data->position.y() + transformed_offset.y(),
-                     transform_data->position.z() + transformed_offset.z());
-  btQuaternion orientation(-transform_data->orientation.vector().x(),
-                           -transform_data->orientation.vector().y(),
-                           -transform_data->orientation.vector().z(),
-                           transform_data->orientation.scalar());
+  btVector3 position =
+      ToBtVector3(transform_data->position + transformed_offset);
+  btQuaternion orientation = ToBtQuaternion(transform_data->orientation);
   rb_data->motion_state.reset(
       new btDefaultMotionState(btTransform(orientation, position)));
   btRigidBody::btRigidBodyConstructionInfo rigid_body_builder(
@@ -639,8 +604,7 @@ void PhysicsComponent::DebugDrawObject(Renderer* renderer,
   for (int i = 0; i < physics_data->body_count; i++) {
     auto rb_data = &physics_data->rigid_bodies[i];
     bullet_world_->debugDrawObject(rb_data->rigid_body->getWorldTransform(),
-                                   rb_data->shape.get(),
-                                   btVector3(color.x(), color.y(), color.z()));
+                                   rb_data->shape.get(), ToBtVector3(color));
   }
 }
 

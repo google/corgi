@@ -150,6 +150,29 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   void set_max_steps(int max_steps) { max_steps_ = max_steps; }
   float max_steps() const { return max_steps_; }
 
+  static inline btVector3 ToBtVector3(const mathfu::vec3& v) {
+    return btVector3(v.x(), v.y(), v.z());
+  }
+  static inline btVector3 ToBtVector3(const fpl::Vec3& v) {
+    return btVector3(v.x(), v.y(), v.z());
+  }
+  static inline fpl::Vec3 ToVec3(const btVector3& v) {
+    return fpl::Vec3(v.x(), v.y(), v.z());
+  }
+  static inline mathfu::vec3 ToMathfuVec3(const btVector3& v) {
+    return mathfu::vec3(v.x(), v.y(), v.z());
+  }
+  static inline btQuaternion ToBtQuaternion(const mathfu::quat& q) {
+    // Bullet assumes a right handed system, while mathfu is left, so the axes
+    // need to be negated.
+    return btQuaternion(-q.vector().x(), -q.vector().y(), -q.vector().z(),
+                        q.scalar());
+  }
+  static inline mathfu::quat ToMathfuQuat(const btQuaternion& q) {
+    // As above, the axes need to be negated.
+    return mathfu::quat(q.getW(), -q.getX(), -q.getY(), -q.getZ());
+  }
+
  private:
   void UpdatePhysicsObjectsTransform(entity::EntityRef& entity,
                                      bool kinematic_only);
