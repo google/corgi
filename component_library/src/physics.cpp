@@ -403,7 +403,7 @@ void PhysicsComponent::CleanupEntity(entity::EntityRef& entity) {
 
 void PhysicsComponent::EnablePhysics(const entity::EntityRef& entity) {
   PhysicsData* physics_data = Data<PhysicsData>(entity);
-  if (!physics_data->enabled) {
+  if (physics_data != nullptr && !physics_data->enabled) {
     physics_data->enabled = true;
     for (int i = 0; i < physics_data->body_count; i++) {
       auto rb_data = &physics_data->rigid_bodies[i];
@@ -416,7 +416,7 @@ void PhysicsComponent::EnablePhysics(const entity::EntityRef& entity) {
 
 void PhysicsComponent::DisablePhysics(const entity::EntityRef& entity) {
   PhysicsData* physics_data = Data<PhysicsData>(entity);
-  if (physics_data->enabled) {
+  if (physics_data != nullptr && physics_data->enabled) {
     physics_data->enabled = false;
     for (int i = 0; i < physics_data->body_count; i++) {
       auto rb_data = &physics_data->rigid_bodies[i];
@@ -529,7 +529,7 @@ entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
 void PhysicsComponent::GenerateRaycastShape(entity::EntityRef& entity,
                                             bool result_exportable) {
   PhysicsData* data = GetComponentData(entity);
-  if (data->body_count == kMaxPhysicsBodies) {
+  if (data == nullptr || data->body_count == kMaxPhysicsBodies) {
     return;
   }
   // If the entity is already raycastable, there isn't a need to do anything
