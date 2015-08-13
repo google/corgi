@@ -198,6 +198,11 @@ entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
       if (!body.should_export) {
         continue;
       }
+      // The local scale of the shape adjusts the size of the shapes, but we
+      // want to save out the original size. So temporarily remove the scale,
+      // and add it back after saving out the original size.
+      btVector3 scale = body.shape->getLocalScaling();
+      body.shape->setLocalScaling(btVector3(1.0f, 1.0f, 1.0f));
       BulletShapeUnion shape_type = BulletShapeUnion_BulletNoShapeDef;
       flatbuffers::Offset<void> shape_data;
       switch (body.shape->getShapeType()) {
@@ -263,6 +268,8 @@ entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
         }
         default: { assert(0); }
       }
+      // Set the local scaling back in place.
+      body.shape->setLocalScaling(scale);
 
       std::vector<signed short> collides_with;
       for (signed short layer = 1;
