@@ -74,6 +74,9 @@ void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
   PhysicsData* physics_data = AddEntity(entity);
   TransformData* transform_data = Data<TransformData>(entity);
   const vec3& scale = transform_data->scale;
+  // Make sure the physics data has been cleared from any previous loading,
+  // as the shapes need to be removed from the bullet world.
+  ClearPhysicsData(entity);
 
   if (physics_def->shapes() && physics_def->shapes()->Length() > 0) {
     int shape_count = physics_def->shapes()->Length() > kMaxPhysicsBodies
@@ -429,6 +432,20 @@ void PhysicsComponent::DisablePhysics(const entity::EntityRef& entity) {
       auto rb_data = &physics_data->rigid_bodies[i];
       bullet_world_->removeRigidBody(rb_data->rigid_body.get());
     }
+  }
+}
+
+void PhysicsComponent::ClearPhysicsData(const entity::EntityRef& entity) {
+  PhysicsData* physics_data = Data<PhysicsData>(entity);
+  if (physics_data != nullptr) {
+    DisablePhysics(entity);
+    for (int i = 0; i < physics_data->body_count; ++i) {
+      auto rb_data = &physics_data->rigid_bodies[i];
+      rb_data->motion_state.reset();
+      rb_data->shape.reset();
+      rb_data->rigid_body.reset();
+    }
+    physics_data->body_count = 0;
   }
 }
 

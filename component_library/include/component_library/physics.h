@@ -174,6 +174,7 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   }
 
  private:
+  void ClearPhysicsData(const entity::EntityRef& entity);
   void UpdatePhysicsObjectsTransform(entity::EntityRef& entity,
                                      bool kinematic_only);
 
