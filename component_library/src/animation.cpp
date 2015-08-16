@@ -22,16 +22,20 @@ FPL_ENTITY_DEFINE_COMPONENT(fpl::component_library::AnimationComponent,
 
 using fpl::entity::EntityRef;
 using motive::RigAnim;
+using motive::RigInit;
 
 namespace fpl {
 namespace component_library {
 
 void AnimationComponent::Animate(const EntityRef& entity, const RigAnim& anim) {
   AnimationData* data = Data<AnimationData>(entity);
-  assert(data != nullptr);
+  RenderMeshData* render_data = Data<RenderMeshData>(entity);
+  assert(data != nullptr && render_data != nullptr);
 
-  // Initialize the MatrixMotivator to animate the matrix according to `anim`.
-  const motive::MatrixInit init(anim.Anim(0).ops());
+  // Initialize the RigMotivator to animate the `mesh` according to `anim`.
+  const Mesh* mesh = render_data->mesh;
+  const RigInit init(anim, mesh->bone_transforms(), mesh->bone_parents(),
+                     mesh->num_bones());
   data->motivator.Initialize(init, &engine_);
 }
 

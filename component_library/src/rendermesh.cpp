@@ -138,10 +138,15 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
 
     // TODO: anim_data will set uniforms for an array of matricies. Each
     //       matrix represents one bone position.
+    const int num_bones = rendermesh_data->mesh->num_bones();
     const bool has_anim = anim_data != nullptr && anim_data->motivator.Valid();
-    const mat4 world_transform = has_anim ?
-        transform_data->world_transform * anim_data->motivator.Value() :
-        transform_data->world_transform;
+    const bool has_one_bone_anim = has_anim && num_bones <= 1;
+    const bool has_rigged_anim = has_anim && num_bones > 1;
+    const mat4 world_transform =
+        has_one_bone_anim
+            ? transform_data->world_transform *
+                  anim_data->motivator.GlobalTransforms()[0]
+            : transform_data->world_transform;
 
     const mat4 mvp = camera_vp * world_transform;
     const mat4 world_matrix_inverse = world_transform.Inverse();
@@ -151,6 +156,9 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
     renderer.model_view_projection() = mvp;
     renderer.color() = rendermesh_data->tint;
     renderer.model() = world_transform;
+    renderer.SetBoneTransforms(
+        has_rigged_anim ? anim_data->motivator.GlobalTransforms() : nullptr,
+        has_rigged_anim ? num_bones : 0);
 
     if (!shader_override && rendermesh_data->shader) {
       rendermesh_data->shader->Set(renderer);

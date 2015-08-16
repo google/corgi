@@ -29,7 +29,7 @@ namespace component_library {
 struct AnimationData;
 
 struct AnimationData {
-  motive::MotivatorMatrix4f motivator;
+  motive::RigMotivator motivator;
 };
 
 class AnimationComponent : public entity::Component<AnimationData> {
