@@ -19,7 +19,9 @@
 #include "motive/motivator.h"
 #include "motive/engine.h"
 
-namespace motive { class MatrixAnim; }
+namespace motive {
+class RigAnim;
+}
 
 namespace fpl {
 namespace component_library {
@@ -45,7 +47,7 @@ class AnimationComponent : public entity::Component<AnimationData> {
   // Begin playback of `anim` on `entity`.
   // Note that `entity` must also have a RenderMeshComponent in order for
   // this animation to be applied.
-  void Animate(const entity::EntityRef& entity, const motive::MatrixAnim& anim);
+  void Animate(const entity::EntityRef& entity, const motive::RigAnim& anim);
 
   // The engine can be used for external Motivators as well.
   // For the greatest efficiency, there should be only one MotiveEngine.

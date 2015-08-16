@@ -15,23 +15,24 @@
 #include "component_library/animation.h"
 #include "component_library/rendermesh.h"
 #include "motive/anim.h"
+#include "motive/init.h"
 
 FPL_ENTITY_DEFINE_COMPONENT(fpl::component_library::AnimationComponent,
                             fpl::component_library::AnimationData)
 
 using fpl::entity::EntityRef;
-using motive::MatrixAnim;
+using motive::RigAnim;
 
 namespace fpl {
 namespace component_library {
 
-void AnimationComponent::Animate(const EntityRef& entity,
-                                 const MatrixAnim& anim) {
+void AnimationComponent::Animate(const EntityRef& entity, const RigAnim& anim) {
   AnimationData* data = Data<AnimationData>(entity);
   assert(data != nullptr);
 
   // Initialize the MatrixMotivator to animate the matrix according to `anim`.
-  data->motivator.Initialize(anim.init(), &engine_);
+  const motive::MatrixInit init(anim.Anim(0).ops());
+  data->motivator.Initialize(init, &engine_);
 }
 
 }  // component_library
