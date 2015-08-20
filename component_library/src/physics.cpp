@@ -512,6 +512,75 @@ void PhysicsComponent::UpdatePhysicsScale(entity::EntityRef& entity) {
   }
 }
 
+void PhysicsComponent::InitStaticMesh(entity::EntityRef& entity) {
+  PhysicsData* data = AddEntity(entity);
+  // Instantiate a holder for the triangle data. Note that the reset clears any
+  // previous data that might have been created.
+  data->triangle_mesh.reset(new btTriangleMesh());
+}
+
+void PhysicsComponent::AddStaticMeshTriangle(const entity::EntityRef& entity,
+                                             const vec3& pt0, const vec3& pt1,
+                                             const vec3& pt2) {
+  PhysicsData* data = GetComponentData(entity);
+  assert(data != nullptr && data->triangle_mesh.get() != nullptr);
+
+  data->triangle_mesh->addTriangle(ToBtVector3(pt0), ToBtVector3(pt1),
+                                   ToBtVector3(pt2));
+}
+
+void PhysicsComponent::FinalizeStaticMesh(entity::EntityRef& entity,
+                                          short collision_type,
+                                          short collides_with, float mass,
+                                          float restitution) {
+  PhysicsData* data = GetComponentData(entity);
+  assert(data != nullptr && data->triangle_mesh.get() != nullptr);
+
+  // If there are no triangles, there is nothing to add.
+  if (data->triangle_mesh->getNumTriangles() == 0) {
+    return;
+  }
+
+  // If a static mesh was already defined, replace it.
+  // Otherwise a new shape needs to be added for it.
+  RigidBodyData* rb_data = nullptr;
+  for (int i = 0; i < data->body_count; i++) {
+    if (data->rigid_bodies[i].shape.get() != nullptr &&
+        data->rigid_bodies[i].shape->getShapeType() ==
+            TRIANGLE_MESH_SHAPE_PROXYTYPE) {
+      rb_data = &data->rigid_bodies[i];
+      bullet_world_->removeRigidBody(rb_data->rigid_body.get());
+      break;
+    }
+  }
+  if (rb_data == nullptr) {
+    assert(data->body_count < kMaxPhysicsBodies);
+    rb_data = &data->rigid_bodies[data->body_count++];
+  }
+
+  rb_data->shape.reset(
+      new btBvhTriangleMeshShape(data->triangle_mesh.get(), false));
+  rb_data->collision_type = collision_type;
+  rb_data->collides_with = collides_with;
+  rb_data->should_export = false;
+  rb_data->offset = mathfu::kZeros3f;
+  rb_data->motion_state.reset(new btDefaultMotionState());
+  btVector3 inertia;
+  rb_data->shape->calculateLocalInertia(mass, inertia);
+  btRigidBody::btRigidBodyConstructionInfo rigid_body_builder(
+      mass, rb_data->motion_state.get(), rb_data->shape.get(), inertia);
+  rigid_body_builder.m_restitution = restitution;
+  rb_data->rigid_body.reset(new btRigidBody(rigid_body_builder));
+  rb_data->rigid_body->setUserIndex(entity.index());
+  rb_data->rigid_body->setUserPointer(entity.container());
+  rb_data->rigid_body->setCollisionFlags(
+      rb_data->rigid_body->getCollisionFlags() |
+      btCollisionObject::CF_KINEMATIC_OBJECT);
+  bullet_world_->addRigidBody(rb_data->rigid_body.get(),
+                              rb_data->collision_type, rb_data->collides_with);
+  data->enabled = true;
+}
+
 entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
                                                   mathfu::vec3& end) {
   return RaycastSingle(start, end, BulletCollisionType_Raycast, nullptr);

@@ -122,6 +122,7 @@ struct PhysicsData {
   // The rigid bodies associated with the entity. Note that only the first one
   // can be set to not be kinematic, all subsequent ones are forced to be.
   RigidBodyData rigid_bodies[kMaxPhysicsBodies];
+  std::unique_ptr<btTriangleMesh> triangle_mesh;
   int body_count;
   bool enabled;
 
@@ -194,6 +195,19 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
 
   void EnablePhysics(const entity::EntityRef& entity);
   void DisablePhysics(const entity::EntityRef& entity);
+
+  // Initialize the data needed to generate a static mesh. Adds the entity to
+  // the physics component if necessary.
+  void InitStaticMesh(entity::EntityRef& entity);
+  // Add a triangle to the static mesh for the given entity. Note that Prepare
+  // needs to be called beforehand.
+  void AddStaticMeshTriangle(const entity::EntityRef& entity,
+                             const mathfu::vec3& pt0, const mathfu::vec3& pt1,
+                             const mathfu::vec3& pt2);
+  // Generates a static mesh shape and adds it to the world, based on the
+  // previously added static mesh triangles.
+  void FinalizeStaticMesh(entity::EntityRef& entity, short collision_type,
+                          short collides_with, float mass, float restitution);
 
   // Generate an AABB based on the rendermesh that collides with the raycast
   // layer. Note, if the entity already collides with the raycast layer, no
