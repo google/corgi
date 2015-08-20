@@ -497,11 +497,13 @@ void PhysicsComponent::UpdatePhysicsScale(entity::EntityRef& entity) {
       // world, updated accordingly, and added back in.
       bullet_world_->removeRigidBody(rb_data->rigid_body.get());
       rb_data->shape->setLocalScaling(newScale);
-      btVector3 localInertia;
-      float invMass = rb_data->rigid_body->getInvMass();
-      float mass = invMass ? 1.0f / invMass : 0.0f;
-      rb_data->shape->calculateLocalInertia(mass, localInertia);
-      rb_data->rigid_body->setMassProps(mass, localInertia);
+      if (rb_data->shape->getShapeType() != EMPTY_SHAPE_PROXYTYPE) {
+        btVector3 localInertia;
+        float invMass = rb_data->rigid_body->getInvMass();
+        float mass = invMass ? 1.0f / invMass : 0.0f;
+        rb_data->shape->calculateLocalInertia(mass, localInertia);
+        rb_data->rigid_body->setMassProps(mass, localInertia);
+      }
       bullet_world_->addRigidBody(rb_data->rigid_body.get(),
                                   rb_data->collision_type,
                                   rb_data->collides_with);
