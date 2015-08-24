@@ -42,34 +42,71 @@ struct RigidBodyData {
   bool should_export;  // Whether the shape should be included on export.
 };
 
+static inline btVector3 ToBtVector3(const mathfu::vec3& v) {
+  return btVector3(v.x(), v.y(), v.z());
+}
+
+static inline btVector3 ToBtVector3(const fpl::Vec3& v) {
+  return btVector3(v.x(), v.y(), v.z());
+}
+
+static inline fpl::Vec3 BtToFlatVec3(const btVector3& v) {
+  return fpl::Vec3(v.x(), v.y(), v.z());
+}
+
+static inline mathfu::vec3 BtToMathfuVec3(const btVector3& v) {
+  return mathfu::vec3(v.x(), v.y(), v.z());
+}
+
+static inline btQuaternion ToBtQuaternion(const mathfu::quat& q) {
+  // Bullet assumes a right handed system, while mathfu is left, so the axes
+  // need to be negated.
+  return btQuaternion(-q.vector().x(), -q.vector().y(), -q.vector().z(),
+                      q.scalar());
+}
+
+static inline mathfu::quat BtToMathfuQuat(const btQuaternion& q) {
+  // As above, the axes need to be negated.
+  return mathfu::quat(q.getW(), -q.getX(), -q.getY(), -q.getZ());
+}
+
 // Data for scene object components.
 struct PhysicsData {
  public:
   PhysicsData() : body_count(0), enabled(false) {}
+
+  mathfu::vec3 Velocity() const {
+    // Only the first body can be non-kinematic, and thus use velocity.
+    return BtToMathfuVec3(rigid_bodies[0].rigid_body->getLinearVelocity());
+  }
+  void SetVelocity(const mathfu::vec3& velocity) {
+    rigid_bodies[0].rigid_body->setLinearVelocity(ToBtVector3(velocity));
+  }
+  mathfu::vec3 AngularVelocity() const {
+    return BtToMathfuVec3(rigid_bodies[0].rigid_body->getAngularVelocity());
+  }
+  void SetAngularVelocity(const mathfu::vec3& velocity) {
+    rigid_bodies[0].rigid_body->setAngularVelocity(ToBtVector3(velocity));
+  }
+  int RigidBodyIndex(const std::string& user_tag) const {
+    for (int i = 0; i < body_count; ++i) {
+      if (user_tag == rigid_bodies[i].user_tag) return i;
+    }
+    return -1;
+  }
+  void GetAabb(int rigid_body_idx, mathfu::vec3* min, mathfu::vec3* max) const {
+    btVector3 bt_min;
+    btVector3 bt_max;
+    rigid_bodies[rigid_body_idx].rigid_body->getAabb(bt_min, bt_max);
+    *min = BtToMathfuVec3(bt_min);
+    *max = BtToMathfuVec3(bt_max);
+  }
 
   // The rigid bodies associated with the entity. Note that only the first one
   // can be set to not be kinematic, all subsequent ones are forced to be.
   RigidBodyData rigid_bodies[kMaxPhysicsBodies];
   int body_count;
   bool enabled;
-
-  mathfu::vec3 Velocity() const {
-    // Only the first body can be non-kinematic, and thus use velocity.
-    const btVector3 vel = rigid_bodies[0].rigid_body->getLinearVelocity();
-    return mathfu::vec3(vel.x(), vel.y(), vel.z());
-  }
-  void SetVelocity(mathfu::vec3 velocity) {
-    const btVector3 vel(velocity.x(), velocity.y(), velocity.z());
-    rigid_bodies[0].rigid_body->setLinearVelocity(vel);
-  }
-  mathfu::vec3 AngularVelocity() const {
-    const btVector3 vel = rigid_bodies[0].rigid_body->getAngularVelocity();
-    return mathfu::vec3(vel.x(), vel.y(), vel.z());
-  }
-  void SetAngularVelocity(mathfu::vec3 velocity) {
-    const btVector3 vel(velocity.x(), velocity.y(), velocity.z());
-    rigid_bodies[0].rigid_body->setAngularVelocity(vel);
-  }
 };
 
 // Used by Bullet to render the physics scene as a wireframe.
@@ -149,29 +186,6 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
 
   void set_max_steps(int max_steps) { max_steps_ = max_steps; }
   float max_steps() const { return max_steps_; }
-
-  static inline btVector3 ToBtVector3(const mathfu::vec3& v) {
-    return btVector3(v.x(), v.y(), v.z());
-  }
-  static inline btVector3 ToBtVector3(const fpl::Vec3& v) {
-    return btVector3(v.x(), v.y(), v.z());
-  }
-  static inline fpl::Vec3 ToVec3(const btVector3& v) {
-    return fpl::Vec3(v.x(), v.y(), v.z());
-  }
-  static inline mathfu::vec3 ToMathfuVec3(const btVector3& v) {
-    return mathfu::vec3(v.x(), v.y(), v.z());
-  }
-  static inline btQuaternion ToBtQuaternion(const mathfu::quat& q) {
-    // Bullet assumes a right handed system, while mathfu is left, so the axes
-    // need to be negated.
-    return btQuaternion(-q.vector().x(), -q.vector().y(), -q.vector().z(),
-                        q.scalar());
-  }
-  static inline mathfu::quat ToMathfuQuat(const btQuaternion& q) {
-    // As above, the axes need to be negated.
-    return mathfu::quat(q.getW(), -q.getX(), -q.getY(), -q.getZ());
-  }
 
  private:
   void ClearPhysicsData(const entity::EntityRef& entity);
