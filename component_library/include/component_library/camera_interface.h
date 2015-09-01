@@ -25,6 +25,8 @@ class CameraInterface {
   // the game itself can implement the logic for.
 
  public:
+  virtual ~CameraInterface() {}
+
   virtual mathfu::mat4 GetTransformMatrix() const = 0;
   virtual mathfu::mat4 GetViewMatrix() const = 0;
 
