@@ -31,7 +31,7 @@ class CameraInterface {
   virtual mathfu::mat4 GetViewMatrix() const = 0;
 
   virtual mathfu::vec3 position() const = 0;
-  virtual void set_position(mathfu::vec3 position) = 0;
+  virtual void set_position(const mathfu::vec3& position) = 0;
 
   virtual const mathfu::vec3& facing() const = 0;
   virtual void set_facing(const mathfu::vec3& facing) = 0;

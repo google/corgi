@@ -42,8 +42,8 @@ bool GetMaxMinPositionsForEntity(entity::EntityRef& entity,
   bool child_had_values = false;
   vec3 child_max(-FLT_MAX);
   vec3 child_min(FLT_MAX);
-  for (auto iter = transform_data->children.begin();
-       iter != transform_data->children.end(); ++iter) {
+  for (auto iter = transform_data->children->list.begin();
+       iter != transform_data->children->list.end(); ++iter) {
     child_had_values |= GetMaxMinPositionsForEntity(iter->owner, entity_manager,
                                                     &child_max, &child_min);
   }

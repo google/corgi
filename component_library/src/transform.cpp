@@ -26,7 +26,18 @@ FPL_ENTITY_DEFINE_COMPONENT(fpl::component_library::TransformComponent,
 namespace fpl {
 namespace component_library {
 
-static const float kDegreesToRadians = M_PI / 180.0f;
+static const float kDegreesToRadians = static_cast<float>(M_PI) / 180.0f;
+
+TransformData::TransformData()
+    : position(mathfu::kZeros3f),
+      scale(mathfu::kOnes3f),
+      orientation(mathfu::quat::identity),
+      owner(),
+      parent(),
+      child_node() {
+  children = new TransformChildren;
+}
+TransformData::~TransformData() { delete children; }
 
 mathfu::vec3 TransformComponent::WorldPosition(entity::EntityRef entity) {
   TransformData* transform_data = Data<TransformData>(entity);
@@ -125,7 +136,7 @@ void TransformComponent::UpdateChildLinks(entity::EntityRef& entity) {
       if (child.IsValid()) {
         AddEntity(child);
         AddChild(child, entity);
-        // transform_data->children.push_back(*child_transform_data);
+        // transform_data->children->list.push_back(*child_transform_data);
         // child_transform_data->parent = entity;
       }
     }
@@ -133,13 +144,13 @@ void TransformComponent::UpdateChildLinks(entity::EntityRef& entity) {
 }
 
 void TransformComponent::UpdateWorldPosition(entity::EntityRef& entity,
-                                             mathfu::mat4 transform) {
+                                             const mathfu::mat4& transform) {
   TransformData* transform_data = GetComponentData(entity);
   transform_data->world_transform =
       transform * transform_data->GetTransformMatrix();
 
-  for (auto iter = transform_data->children.begin();
-       iter != transform_data->children.end(); ++iter) {
+  for (auto iter = transform_data->children->list.begin();
+       iter != transform_data->children->list.end(); ++iter) {
     UpdateWorldPosition(iter->owner, transform_data->world_transform);
   }
 }
@@ -148,8 +159,8 @@ void TransformComponent::CleanupEntity(entity::EntityRef& entity) {
   // Remove and cleanup children, if any exist:
   TransformData* transform_data = GetComponentData(entity);
   if (transform_data) {
-    for (auto iter = transform_data->children.begin();
-         iter != transform_data->children.end(); ++iter) {
+    for (auto iter = transform_data->children->list.begin();
+         iter != transform_data->children->list.end(); ++iter) {
       entity_manager_->DeleteEntity(iter->owner);
     }
   }
@@ -207,10 +218,10 @@ entity::ComponentInterface::RawDataUniquePtr TransformComponent::ExportRawData(
   fbb.ForceDefaults(defaults);
 
   mathfu::vec3 euler = data->orientation.ToEulerAngles() / kDegreesToRadians;
-  fpl::Vec3 position{data->position.x(), data->position.y(),
-                     data->position.z()};
-  fpl::Vec3 scale{data->scale.x(), data->scale.y(), data->scale.z()};
-  fpl::Vec3 orientation{euler.x(), euler.y(), euler.z()};
+  fpl::Vec3 position(data->position.x(), data->position.y(),
+                     data->position.z());
+  fpl::Vec3 scale(data->scale.x(), data->scale.y(), data->scale.z());
+  fpl::Vec3 orientation(euler.x(), euler.y(), euler.z());
 
   std::vector<flatbuffers::Offset<flatbuffers::String>> child_ids_vector;
   for (auto iter = data->child_ids.begin(); iter != data->child_ids.end();
@@ -242,7 +253,7 @@ void TransformComponent::AddChild(entity::EntityRef& child,
   if (child_data->parent) {
     RemoveChild(child);
   }
-  parent_data->children.push_back(*child_data);
+  parent_data->children->list.push_back(*child_data);
   child_data->parent = parent;
 }
 
@@ -277,8 +288,8 @@ entity::EntityRef TransformComponent::ChildWithComponents(
     // Add children to the search queue.
     const TransformData* transform_data = Data<TransformData>(e);
     if (transform_data != nullptr) {
-      for (auto iter = transform_data->children.begin();
-           iter != transform_data->children.end(); ++iter) {
+      for (auto iter = transform_data->children->list.begin();
+           iter != transform_data->children->list.end(); ++iter) {
         entities_to_search.push(iter->owner);
       }
     }

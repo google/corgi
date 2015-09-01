@@ -177,8 +177,8 @@ void RenderMeshComponent::SetHiddenRecursively(const entity::EntityRef& entity,
     if (rendermesh_data) {
       rendermesh_data->currently_hidden = hidden;
     }
-    for (auto iter = transform_data->children.begin();
-         iter != transform_data->children.end(); ++iter) {
+    for (auto iter = transform_data->children->list.begin();
+         iter != transform_data->children->list.end(); ++iter) {
       SetHiddenRecursively(iter->owner, hidden);
     }
   }

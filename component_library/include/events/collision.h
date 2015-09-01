@@ -22,9 +22,9 @@ namespace fpl {
 namespace component_library {
 
 struct CollisionPayload {
-  CollisionPayload(entity::EntityRef entity_a_, mathfu::vec3 position_a_,
+  CollisionPayload(entity::EntityRef entity_a_, const mathfu::vec3& position_a_,
                    const std::string& tag_a_, entity::EntityRef entity_b_,
-                   mathfu::vec3 position_b_, const std::string& tag_b_)
+                   const mathfu::vec3& position_b_, const std::string& tag_b_)
       : entity_a(entity_a_),
         position_a(position_a_),
         tag_a(tag_a_),

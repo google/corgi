@@ -237,10 +237,28 @@ class VectorPool {
   struct VectorPoolElement {
     VectorPoolElement()
         : next(kOutOfBounds), prev(kOutOfBounds), unique_id(kInvalidId) {}
+    VectorPoolElement& operator=(VectorPoolElement&& src) {
+      next = std::move(src.next);
+      prev = std::move(src.prev);
+      unique_id = std::move(src.unique_id);
+      data = std::move(src.data);
+      return *this;
+    }
+    VectorPoolElement(VectorPoolElement&& src) {
+      next = std::move(src.next);
+      prev = std::move(src.prev);
+      unique_id = std::move(src.unique_id);
+      data = std::move(src.data);
+    }
+
     T data;
     size_t next;
     size_t prev;
     UniqueIdType unique_id;
+
+   private:
+    VectorPoolElement(const VectorPoolElement&);
+    VectorPoolElement& operator=(const VectorPoolElement&);
   };
 
   // Constants for our first/last elements. They're never given actual data,
@@ -302,6 +320,7 @@ class VectorPool {
     active_count_++;
     // Placement new, to make sure we always give back a cleanly constructed
     // element:
+    elements_[index].data.~T();
     new (&(elements_[index].data)) T;
     elements_[index].unique_id = AllocateUniqueId();
     return VectorPoolReference(this, index);
@@ -314,7 +333,8 @@ class VectorPool {
     // Don't call the destructor directly - instead, assign over it.
     // This ensures that data will always contain an object that is safe to
     // destruct.
-    elements_[index].data = T();
+    elements_[index].data.~T();
+    new (&(elements_[index].data)) T;
     elements_[index].unique_id = kInvalidId;
     RemoveFromList(index);
     AddToListFront(index, kFirstFree);

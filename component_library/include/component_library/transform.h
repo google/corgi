@@ -29,16 +29,12 @@ namespace component_library {
 
 struct TransformData;
 
+struct TransformChildren;
+
 // Data for scene object components.
 struct TransformData {
-  TransformData()
-      : position(mathfu::kZeros3f),
-        scale(mathfu::kOnes3f),
-        orientation(mathfu::quat::identity),
-        owner(),
-        parent(),
-        child_node(),
-        children() {}
+  TransformData();
+  ~TransformData();
 
   mathfu::vec3 position;
   mathfu::vec3 scale;
@@ -60,7 +56,12 @@ struct TransformData {
 
   // The list of children.
   intrusive_list_node child_node;
-  intrusive_list<TransformData, &TransformData::child_node> children;
+  // TODO: This is a temporary fix to get the intrusive list to build on
+  // Windows.
+  // Fixing it properly requires refactoring intrusive_list to take the offset
+  // as
+  // a constructor parameter rather than a template parameter.
+  TransformChildren* children;
 
   // We construct the matrix by hand here, because we know that it will
   // always be a composition of rotation, scale, and translation, so we
@@ -88,6 +89,10 @@ struct TransformData {
     // Compose and return result:
     return mathfu::mat4(c0, c1, c2, c3);
   }
+};
+
+struct TransformChildren {
+  intrusive_list<TransformData, &TransformData::child_node> list;
 };
 
 class TransformComponent : public entity::Component<TransformData> {
@@ -131,7 +136,8 @@ class TransformComponent : public entity::Component<TransformData> {
                                         size_t num_ids) const;
 
  private:
-  void UpdateWorldPosition(entity::EntityRef& entity, mathfu::mat4 transform);
+  void UpdateWorldPosition(entity::EntityRef& entity,
+                           const mathfu::mat4& transform);
 };
 
 }  // component_library

@@ -32,11 +32,11 @@ namespace component_library {
 class EntityFactory : public entity::EntityFactoryInterface {
  public:
   // Equivalent to the "*_NONE" value of the Flatbuffer union enum.
-  const unsigned int kDataTypeNone = 0;
+  static const unsigned int kDataTypeNone = 0;
 
   // Return value for LoadEntitiesFromFile and LoadEntityListFromMemory if
   // unable to read the entity list.
-  const int kErrorLoadingEntities = -1;
+  static const int kErrorLoadingEntities = -1;
 
   EntityFactory()
       : max_component_id_(entity::kInvalidComponent),

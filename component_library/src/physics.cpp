@@ -292,7 +292,7 @@ entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
       float invMass = body.rigid_body->getInvMass();
       shape_builder.add_mass(invMass ? 1.0f / invMass : 0.0f);
       shape_builder.add_restitution(body.rigid_body->getRestitution());
-      fpl::Vec3 offset{body.offset.x(), body.offset.y(), body.offset.z()};
+      fpl::Vec3 offset(body.offset.x(), body.offset.y(), body.offset.z());
       shape_builder.add_offset(&offset);
       shape_builder.add_collision_type(
           static_cast<BulletCollisionType>(body.collision_type));

@@ -32,6 +32,7 @@ const int kMaxPhysicsBodies = 5;
 
 // Data describing a single Bullet rigid body shape.
 struct RigidBodyData {
+  RigidBodyData() {}
   mathfu::vec3 offset;
   short collision_type;
   short collides_with;
@@ -40,6 +41,22 @@ struct RigidBodyData {
   std::unique_ptr<btMotionState> motion_state;
   std::unique_ptr<btRigidBody> rigid_body;
   bool should_export;  // Whether the shape should be included on export.
+
+  RigidBodyData& operator=(RigidBodyData&& src) {
+    offset = std::move(src.offset);
+    collision_type = std::move(src.collision_type);
+    collides_with = std::move(src.collides_with);
+    user_tag = std::move(src.user_tag);
+    shape = std::move(src.shape);
+    motion_state = std::move(src.motion_state);
+    rigid_body = std::move(src.rigid_body);
+    should_export = std::move(src.should_export);
+    return *this;
+  }
+
+ private:
+  RigidBodyData& operator=(const RigidBodyData&);
+  RigidBodyData(const RigidBodyData&);
 };
 
 static inline btVector3 ToBtVector3(const mathfu::vec3& v) {
@@ -107,6 +124,26 @@ struct PhysicsData {
   RigidBodyData rigid_bodies[kMaxPhysicsBodies];
   int body_count;
   bool enabled;
+
+  PhysicsData(PhysicsData&& src) {
+    body_count = std::move(src.body_count);
+    enabled = std::move(src.enabled);
+    for (size_t i = 0; i < kMaxPhysicsBodies; i++) {
+      rigid_bodies[i] = std::move(src.rigid_bodies[i]);
+    }
+  }
+  PhysicsData& operator=(PhysicsData&& src) {
+    body_count = std::move(src.body_count);
+    enabled = std::move(src.enabled);
+    for (size_t i = 0; i < kMaxPhysicsBodies; i++) {
+      rigid_bodies[i] = std::move(src.rigid_bodies[i]);
+    }
+    return *this;
+  }
+
+ private:
+  PhysicsData(const PhysicsData&);
+  PhysicsData& operator=(const PhysicsData&);
 };
 
 // Used by Bullet to render the physics scene as a wireframe.

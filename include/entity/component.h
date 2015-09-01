@@ -40,8 +40,22 @@ class Component : public ComponentInterface {
   // Contains the template struct, as well as a pointer back to the
   // entity that owns this data.
   struct ComponentData {
+    ComponentData() {}
     EntityRef entity;
     T data;
+    ComponentData(ComponentData&& src) {
+      entity = std::move(src.entity);
+      data = std::move(src.data);
+    }
+    ComponentData& operator=(ComponentData&& src) {
+      entity = std::move(src.entity);
+      data = std::move(src.data);
+      return *this;
+    }
+
+   private:
+    ComponentData(const ComponentData&);
+    ComponentData& operator=(const ComponentData&);
   };
   typedef typename VectorPool<ComponentData>::Iterator EntityIterator;
   typedef T value_type;

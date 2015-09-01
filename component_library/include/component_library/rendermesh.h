@@ -74,7 +74,7 @@ struct RenderlistEntry {
 
 class RenderMeshComponent : public entity::Component<RenderMeshData> {
  public:
-  const float kDefaultCullDist = 80.0f;
+  static const int kDefaultCullDist = 80;
 
   RenderMeshComponent() : asset_manager_(nullptr),
     culling_distance_squared(kDefaultCullDist * kDefaultCullDist) {}
@@ -117,7 +117,7 @@ class RenderMeshComponent : public entity::Component<RenderMeshData> {
   // to all shaders without having to declare it explicitly in the
   // shader_instance variable.
   mathfu::vec3 light_position() { return light_position_; }
-  void set_light_position(mathfu::vec3 light_position) {
+  void set_light_position(const mathfu::vec3& light_position) {
     light_position_ = light_position;
   }
 
