@@ -44,6 +44,7 @@ class Component : public ComponentInterface {
     T data;
   };
   typedef typename VectorPool<ComponentData>::Iterator EntityIterator;
+  typedef T value_type;
 
   Component() : entity_manager_(nullptr) {}
 
