@@ -129,6 +129,7 @@ struct PhysicsData {
   PhysicsData(PhysicsData&& src) {
     body_count = std::move(src.body_count);
     enabled = std::move(src.enabled);
+    triangle_mesh = std::move(src.triangle_mesh);
     for (size_t i = 0; i < kMaxPhysicsBodies; i++) {
       rigid_bodies[i] = std::move(src.rigid_bodies[i]);
     }
@@ -136,6 +137,7 @@ struct PhysicsData {
   PhysicsData& operator=(PhysicsData&& src) {
     body_count = std::move(src.body_count);
     enabled = std::move(src.enabled);
+    triangle_mesh = std::move(src.triangle_mesh);
     for (size_t i = 0; i < kMaxPhysicsBodies; i++) {
       rigid_bodies[i] = std::move(src.rigid_bodies[i]);
     }
