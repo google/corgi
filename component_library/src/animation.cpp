@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "component_library/animation.h"
+#include "component_library/common_services.h"
 #include "component_library/rendermesh.h"
 #include "motive/anim.h"
 #include "motive/init.h"
@@ -27,6 +28,29 @@ using motive::RigInit;
 namespace fpl {
 namespace component_library {
 
+void AnimationComponent::AddFromRawData(entity::EntityRef& entity,
+                                        const void* raw_data) {
+  auto animation_def = static_cast<const AnimationDef*>(raw_data);
+  AnimationData* animation_data = AddEntity(entity);
+  animation_data->anim_table_object = animation_def->anim_table_object();
+  AnimateFromTable(entity, animation_def->anim_table_start_idx());
+}
+
+entity::ComponentInterface::RawDataUniquePtr AnimationComponent::ExportRawData(
+    const entity::EntityRef& entity) const {
+  const AnimationData* animation_data = GetComponentData(entity);
+  if (animation_data == nullptr) return nullptr;
+
+  flatbuffers::FlatBufferBuilder fbb;
+  bool defaults = entity_manager_->GetComponent<CommonServicesComponent>()
+                      ->export_force_defaults();
+  fbb.ForceDefaults(defaults);
+
+  auto anim_def = CreateAnimationDef(fbb, animation_data->anim_table_object, 0);
+  fbb.Finish(anim_def);
+  return fbb.ReleaseBufferPointer();
+}
+
 void AnimationComponent::Animate(const EntityRef& entity, const RigAnim& anim) {
   AnimationData* data = Data<AnimationData>(entity);
   RenderMeshData* render_data = Data<RenderMeshData>(entity);
@@ -37,6 +61,14 @@ void AnimationComponent::Animate(const EntityRef& entity, const RigAnim& anim) {
   const RigInit init(anim, mesh->bone_transforms(), mesh->bone_parents(),
                      mesh->num_bones());
   data->motivator.Initialize(init, &engine_);
+}
+
+void AnimationComponent::AnimateFromTable(const entity::EntityRef& entity,
+                                          int anim_idx) {
+  const AnimationData* data = Data<AnimationData>(entity);
+  const motive::RigAnim& anim =
+      anim_table_.Query(data->anim_table_object, anim_idx);
+  Animate(entity, anim);
 }
 
 }  // component_library

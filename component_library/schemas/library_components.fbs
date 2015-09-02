@@ -65,3 +65,14 @@ table PhysicsDef {
   shapes:[BulletShapeDef];
   kinematic:bool = false;
 }
+
+table AnimationDef {
+  // Object in the AnimTable that holds the array of animations.
+  anim_table_object:int;
+
+  // Initial index into the array of animations specified by anim_table_object.
+  // To play additional animations after this one, call
+  // AnimationComponent::AnimateFromTable().
+  anim_table_start_idx:int;
+}
+

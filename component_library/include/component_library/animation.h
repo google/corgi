@@ -16,6 +16,7 @@
 #define COMPONENT_LIBRARY_ANIMATION_H_
 
 #include "entity/component.h"
+#include "motive/anim_table.h"
 #include "motive/motivator.h"
 #include "motive/engine.h"
 
@@ -29,7 +30,15 @@ namespace component_library {
 struct AnimationData;
 
 struct AnimationData {
+  // Holds and processes the animation. Call motivator.GlobalTransforms()
+  // to get an array of matrices: one for each bone in the animation.
   motive::RigMotivator motivator;
+
+  // If animation is set using the AnimationComponent's anim_table_,
+  // specifies the query parameters for the anim_table_.
+  int anim_table_object;
+
+  AnimationData() : anim_table_object(-1) {}
 };
 
 class AnimationComponent : public entity::Component<AnimationData> {
@@ -40,24 +49,37 @@ class AnimationComponent : public entity::Component<AnimationData> {
     engine_.AdvanceFrame(delta_time);
   }
 
-  // Nothing to serialize or deserialize.
-  virtual void AddFromRawData(entity::EntityRef& /*entity*/,
-                              const void* /*data*/) {}
+  // Serialize and deserialize.
+  virtual void AddFromRawData(entity::EntityRef& entity, const void* data);
+  virtual RawDataUniquePtr ExportRawData(const entity::EntityRef& entity) const;
 
   // Begin playback of `anim` on `entity`.
   // Note that `entity` must also have a RenderMeshComponent in order for
   // this animation to be applied.
   void Animate(const entity::EntityRef& entity, const motive::RigAnim& anim);
 
+  // Query the anim_table for an animation, then play it.
+  void AnimateFromTable(const entity::EntityRef& entity, int anim_idx);
+
   // The engine can be used for external Motivators as well.
   // For the greatest efficiency, there should be only one MotiveEngine.
   motive::MotiveEngine& engine() { return engine_; }
   const motive::MotiveEngine& engine() const { return engine_; }
 
+  // The animation table is queried when AnimateFromTable() is called.
+  motive::AnimTable& anim_table() { return anim_table_; }
+  const motive::AnimTable& anim_table() const { return anim_table_; }
+
  private:
   // Holds MotiveProcessors that, in turn, hold the animation state.
   // Calling AdvanceFrame() on this updates all the animations at once.
   motive::MotiveEngine engine_;
+
+  // Holds a table of animations.
+  // AnimTable is a simple array of arrays. Top array is indexed by
+  // `anim_table_object` in AnimationData. Bottom array is indexed
+  // by `anim_idx` in the AnimateFromTable() call.
+  motive::AnimTable anim_table_;
 };
 
 }  // component_library
