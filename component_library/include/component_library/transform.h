@@ -30,6 +30,22 @@ namespace component_library {
 // Data for scene object components.
 struct TransformData {
   TransformData();
+  TransformData& operator=(TransformData&& other) {
+    position = std::move(other.position);
+    scale = std::move(other.scale);
+    orientation = std::move(other.orientation);
+    world_transform = std::move(other.world_transform);
+    owner = std::move(other.owner);
+    parent = std::move(other.parent);
+    child_ids = std::move(other.child_ids);
+    pending_child_ids = std::move(other.pending_child_ids);
+    child_node = std::move(other.child_node);
+    children = std::move(other.children);
+    return *this;
+  }
+  TransformData(TransformData&& other) : children(&TransformData::child_node) {
+    *this = std::move(other);  // Calls the move assignment operator.
+  }
 
   mathfu::vec3 position;
   mathfu::vec3 scale;
@@ -79,6 +95,10 @@ struct TransformData {
     // Compose and return result:
     return mathfu::mat4(c0, c1, c2, c3);
   }
+
+ private:
+  TransformData(const TransformData&);
+  TransformData& operator=(const TransformData&);
 };
 
 class TransformComponent : public entity::Component<TransformData> {
