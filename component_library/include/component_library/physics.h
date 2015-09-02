@@ -192,8 +192,8 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
 
   void ProcessBulletTickCallback();
 
-  void UpdatePhysicsFromTransform(entity::EntityRef& entity);
-  void UpdatePhysicsScale(entity::EntityRef& entity);
+  void UpdatePhysicsFromTransform(const entity::EntityRef& entity);
+  void UpdatePhysicsScale(const entity::EntityRef& entity);
 
   void EnablePhysics(const entity::EntityRef& entity);
   void DisablePhysics(const entity::EntityRef& entity);
@@ -208,7 +208,7 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
                              const mathfu::vec3& pt2);
   // Generates a static mesh shape and adds it to the world, based on the
   // previously added static mesh triangles.
-  void FinalizeStaticMesh(entity::EntityRef& entity, short collision_type,
+  void FinalizeStaticMesh(const entity::EntityRef& entity, short collision_type,
                           short collides_with, float mass, float restitution);
 
   // Generate an AABB based on the rendermesh that collides with the raycast
@@ -242,7 +242,7 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
 
  private:
   void ClearPhysicsData(const entity::EntityRef& entity);
-  void UpdatePhysicsObjectsTransform(entity::EntityRef& entity,
+  void UpdatePhysicsObjectsTransform(const entity::EntityRef& entity,
                                      bool kinematic_only);
 
   event::EventManager* event_manager_;

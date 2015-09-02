@@ -145,7 +145,7 @@ class VectorPool {
     Iterator ToIterator() const { return Iterator(container_, index_); }
 
     // Returns the raw index into the underlying vector for this object.
-    size_t index() { return index_; }
+    size_t index() const { return index_; }
 
     // Returns the pointer to the underlying vector for this object.
     VectorPool<T>* container() const { return container_; }
