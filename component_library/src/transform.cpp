@@ -34,10 +34,8 @@ TransformData::TransformData()
       orientation(mathfu::quat::identity),
       owner(),
       parent(),
-      child_node() {
-  children = new TransformChildren;
-}
-TransformData::~TransformData() { delete children; }
+      child_node(),
+      children(&TransformData::child_node) {}
 
 mathfu::vec3 TransformComponent::WorldPosition(entity::EntityRef entity) {
   TransformData* transform_data = Data<TransformData>(entity);
@@ -136,8 +134,6 @@ void TransformComponent::UpdateChildLinks(entity::EntityRef& entity) {
       if (child.IsValid()) {
         AddEntity(child);
         AddChild(child, entity);
-        // transform_data->children->list.push_back(*child_transform_data);
-        // child_transform_data->parent = entity;
       }
     }
   }
@@ -149,8 +145,8 @@ void TransformComponent::UpdateWorldPosition(entity::EntityRef& entity,
   transform_data->world_transform =
       transform * transform_data->GetTransformMatrix();
 
-  for (auto iter = transform_data->children->list.begin();
-       iter != transform_data->children->list.end(); ++iter) {
+  for (auto iter = transform_data->children.begin();
+       iter != transform_data->children.end(); ++iter) {
     UpdateWorldPosition(iter->owner, transform_data->world_transform);
   }
 }
@@ -159,8 +155,8 @@ void TransformComponent::CleanupEntity(entity::EntityRef& entity) {
   // Remove and cleanup children, if any exist:
   TransformData* transform_data = GetComponentData(entity);
   if (transform_data) {
-    for (auto iter = transform_data->children->list.begin();
-         iter != transform_data->children->list.end(); ++iter) {
+    for (auto iter = transform_data->children.begin();
+         iter != transform_data->children.end(); ++iter) {
       entity_manager_->DeleteEntity(iter->owner);
     }
   }
@@ -253,7 +249,7 @@ void TransformComponent::AddChild(entity::EntityRef& child,
   if (child_data->parent) {
     RemoveChild(child);
   }
-  parent_data->children->list.push_back(*child_data);
+  parent_data->children.push_back(*child_data);
   child_data->parent = parent;
 }
 
@@ -288,8 +284,8 @@ entity::EntityRef TransformComponent::ChildWithComponents(
     // Add children to the search queue.
     const TransformData* transform_data = Data<TransformData>(e);
     if (transform_data != nullptr) {
-      for (auto iter = transform_data->children->list.begin();
-           iter != transform_data->children->list.end(); ++iter) {
+      for (auto iter = transform_data->children.begin();
+           iter != transform_data->children.end(); ++iter) {
         entities_to_search.push(iter->owner);
       }
     }
@@ -297,7 +293,6 @@ entity::EntityRef TransformComponent::ChildWithComponents(
 
   return entity::EntityRef();
 }
-
 
 }  // component_library
 }  // fpl

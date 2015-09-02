@@ -27,14 +27,9 @@
 namespace fpl {
 namespace component_library {
 
-struct TransformData;
-
-struct TransformChildren;
-
 // Data for scene object components.
 struct TransformData {
   TransformData();
-  ~TransformData();
 
   mathfu::vec3 position;
   mathfu::vec3 scale;
@@ -56,12 +51,7 @@ struct TransformData {
 
   // The list of children.
   intrusive_list_node child_node;
-  // TODO: This is a temporary fix to get the intrusive list to build on
-  // Windows.
-  // Fixing it properly requires refactoring intrusive_list to take the offset
-  // as
-  // a constructor parameter rather than a template parameter.
-  TransformChildren* children;
+  intrusive_list<TransformData> children;
 
   // We construct the matrix by hand here, because we know that it will
   // always be a composition of rotation, scale, and translation, so we
@@ -89,10 +79,6 @@ struct TransformData {
     // Compose and return result:
     return mathfu::mat4(c0, c1, c2, c3);
   }
-};
-
-struct TransformChildren {
-  intrusive_list<TransformData, &TransformData::child_node> list;
 };
 
 class TransformComponent : public entity::Component<TransformData> {

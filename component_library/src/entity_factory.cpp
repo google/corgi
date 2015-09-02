@@ -24,6 +24,8 @@ namespace component_library {
 using component_library::MetaComponent;
 using component_library::MetaData;
 
+const unsigned int EntityFactory::kDataTypeNone;
+
 bool EntityFactory::AddEntityLibrary(const char* entity_library_filename) {
   std::string* library_data = new std::string;
   if (!LoadFile(entity_library_filename, library_data)) {
