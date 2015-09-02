@@ -450,15 +450,16 @@ void PhysicsComponent::ClearPhysicsData(const entity::EntityRef& entity) {
   }
 }
 
-void PhysicsComponent::UpdatePhysicsFromTransform(entity::EntityRef& entity) {
+void PhysicsComponent::UpdatePhysicsFromTransform(
+    const entity::EntityRef& entity) {
   // Update all objects on the entity, not just kinematic ones. Also needs to
   // check for updates on the scale.
   UpdatePhysicsObjectsTransform(entity, false);
   UpdatePhysicsScale(entity);
 }
 
-void PhysicsComponent::UpdatePhysicsObjectsTransform(entity::EntityRef& entity,
-                                                     bool kinematic_only) {
+void PhysicsComponent::UpdatePhysicsObjectsTransform(
+    const entity::EntityRef& entity, bool kinematic_only) {
   if (Data<PhysicsData>(entity) == nullptr) return;
 
   PhysicsData* physics_data = Data<PhysicsData>(entity);
@@ -480,7 +481,7 @@ void PhysicsComponent::UpdatePhysicsObjectsTransform(entity::EntityRef& entity,
   }
 }
 
-void PhysicsComponent::UpdatePhysicsScale(entity::EntityRef& entity) {
+void PhysicsComponent::UpdatePhysicsScale(const entity::EntityRef& entity) {
   if (Data<PhysicsData>(entity) == nullptr) return;
 
   PhysicsData* physics_data = Data<PhysicsData>(entity);
@@ -529,7 +530,7 @@ void PhysicsComponent::AddStaticMeshTriangle(const entity::EntityRef& entity,
                                    ToBtVector3(pt2));
 }
 
-void PhysicsComponent::FinalizeStaticMesh(entity::EntityRef& entity,
+void PhysicsComponent::FinalizeStaticMesh(const entity::EntityRef& entity,
                                           short collision_type,
                                           short collides_with, float mass,
                                           float restitution) {
