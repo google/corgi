@@ -499,7 +499,8 @@ void PhysicsComponent::UpdatePhysicsScale(const entity::EntityRef& entity) {
       // world, updated accordingly, and added back in.
       bullet_world_->removeRigidBody(rb_data->rigid_body.get());
       rb_data->shape->setLocalScaling(newScale);
-      if (rb_data->shape->getShapeType() != EMPTY_SHAPE_PROXYTYPE) {
+      if (rb_data->shape->getShapeType() != EMPTY_SHAPE_PROXYTYPE &&
+          !rb_data->rigid_body->isStaticObject()) {
         btVector3 localInertia;
         float invMass = rb_data->rigid_body->getInvMass();
         float mass = invMass ? 1.0f / invMass : 0.0f;
@@ -566,8 +567,7 @@ void PhysicsComponent::FinalizeStaticMesh(const entity::EntityRef& entity,
   rb_data->should_export = false;
   rb_data->offset = mathfu::kZeros3f;
   rb_data->motion_state.reset(new btDefaultMotionState());
-  btVector3 inertia;
-  rb_data->shape->calculateLocalInertia(mass, inertia);
+  btVector3 inertia(0.0f, 0.0f, 0.0f);
   btRigidBody::btRigidBodyConstructionInfo rigid_body_builder(
       mass, rb_data->motion_state.get(), rb_data->shape.get(), inertia);
   rigid_body_builder.m_restitution = restitution;
