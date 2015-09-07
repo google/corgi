@@ -51,16 +51,35 @@ entity::ComponentInterface::RawDataUniquePtr AnimationComponent::ExportRawData(
   return fbb.ReleaseBufferPointer();
 }
 
-void AnimationComponent::Animate(const EntityRef& entity, const RigAnim& anim) {
+void AnimationComponent::InitializeMotivator(const EntityRef& entity) {
   AnimationData* data = Data<AnimationData>(entity);
   RenderMeshData* render_data = Data<RenderMeshData>(entity);
   assert(data != nullptr && render_data != nullptr);
 
-  // Initialize the RigMotivator to animate the `mesh` according to `anim`.
+  // Remember the entry in the anim table for this entity.
+  const motive::RigAnim& defining_anim =
+      anim_table_.DefiningAnim(data->anim_table_object);
+
+  // Initialize the RigMotivator to animate the `mesh` according to
+  // `defining_anim`.
   const Mesh* mesh = render_data->mesh;
-  const RigInit init(anim, mesh->bone_transforms(), mesh->bone_parents(),
-                     mesh->num_bones());
+  const RigInit init(defining_anim, mesh->bone_transforms(),
+                     mesh->bone_parents(), mesh->num_bones());
   data->motivator.Initialize(init, &engine_);
+}
+
+void AnimationComponent::Animate(const EntityRef& entity, const RigAnim& anim) {
+  AnimationData* data = Data<AnimationData>(entity);
+
+  // We initialize the rig motivator only once, using the defining_anim so that
+  // it can play back any animation for this object in the `anim_table_`.
+  if (!data->motivator.Valid()) {
+    InitializeMotivator(entity);
+  }
+
+  // Instead of reinitializing the rig motivator, we perform a smooth transition
+  // from the current state to the new animation `anim`.
+  data->motivator.BlendToAnim(anim);
 }
 
 void AnimationComponent::AnimateFromTable(const entity::EntityRef& entity,

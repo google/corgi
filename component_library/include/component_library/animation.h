@@ -77,6 +77,9 @@ class AnimationComponent : public entity::Component<AnimationData> {
   const motive::AnimTable& anim_table() const { return anim_table_; }
 
  private:
+  // Set the motivator up for any of the animations on the `object`.
+  void InitializeMotivator(const entity::EntityRef& entity);
+
   // Holds MotiveProcessors that, in turn, hold the animation state.
   // Calling AdvanceFrame() on this updates all the animations at once.
   motive::MotiveEngine engine_;
