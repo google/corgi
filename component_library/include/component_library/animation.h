@@ -61,6 +61,12 @@ class AnimationComponent : public entity::Component<AnimationData> {
   // Query the anim_table for an animation, then play it.
   void AnimateFromTable(const entity::EntityRef& entity, int anim_idx);
 
+  // Return true if an animation exists in the AnimTable for `anim_idx`.
+  bool HasAnim(const entity::EntityRef& entity, int anim_idx) const {
+    const AnimationData* data = Data<AnimationData>(entity);
+    return anim_table_.Query(data->anim_table_object, anim_idx) != nullptr;
+  }
+
   // The engine can be used for external Motivators as well.
   // For the greatest efficiency, there should be only one MotiveEngine.
   motive::MotiveEngine& engine() { return engine_; }

@@ -66,9 +66,10 @@ void AnimationComponent::Animate(const EntityRef& entity, const RigAnim& anim) {
 void AnimationComponent::AnimateFromTable(const entity::EntityRef& entity,
                                           int anim_idx) {
   const AnimationData* data = Data<AnimationData>(entity);
-  const motive::RigAnim& anim =
+  const motive::RigAnim* anim =
       anim_table_.Query(data->anim_table_object, anim_idx);
-  Animate(entity, anim);
+  assert(anim != nullptr);
+  Animate(entity, *anim);
 }
 
 }  // component_library
