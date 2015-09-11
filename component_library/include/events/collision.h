@@ -16,6 +16,7 @@
 #define FPL_COMPONENT_LIBRARY_EVENTS_COLLISION_H_
 
 #include "event/event_registry.h"
+#include "fplbase/fpl_common.h"
 #include "mathfu/vector.h"
 
 namespace fpl {
@@ -44,6 +45,9 @@ struct CollisionPayload {
   mathfu::vec3 position_b;
   // The tag attached to the physics shape on the second entity.
   const std::string& tag_b;
+
+ private:
+  FPL_DISALLOW_COPY_AND_ASSIGN(CollisionPayload);
 };
 
 }  // fpl_project

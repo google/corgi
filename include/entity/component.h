@@ -80,7 +80,8 @@ class Component : public ComponentInterface {
       return GetComponentData(entity);
     }
     // No existing data, so we allocate some and return it:
-    size_t index = component_data_.GetNewElement(alloc_location).index();
+    ComponentIndex index = static_cast<ComponentIndex>(
+        component_data_.GetNewElement(alloc_location).index());
     entity->SetComponentDataIndex(GetComponentId(), index);
     ComponentData* component_data = component_data_.GetElementData(index);
     component_data->entity = entity;
@@ -227,7 +228,7 @@ class Component : public ComponentInterface {
 
   // Returns the ID of this component.
   static ComponentId GetComponentId() {
-    return ComponentIdLookup<T>::component_id;
+    return static_cast<ComponentId>(ComponentIdLookup<T>::component_id);
   }
 
   // Called by the entity manager; sets the component ID on the data type.

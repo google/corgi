@@ -24,8 +24,6 @@ namespace component_library {
 using component_library::MetaComponent;
 using component_library::MetaData;
 
-const unsigned int EntityFactory::kDataTypeNone;
-
 bool EntityFactory::AddEntityLibrary(const char* entity_library_filename) {
   std::string* library_data = new std::string;
   if (!LoadFile(entity_library_filename, library_data)) {
@@ -309,7 +307,13 @@ void EntityFactory::SetComponentType(entity::ComponentId component_id,
   data_type_to_component_id_[data_type] = component_id;
 
   if (component_id_to_data_type_.size() <= component_id)
-    component_id_to_data_type_.resize(component_id + 1, kDataTypeNone);
+    // Note: the int-construtor is required here to avoid taking the address
+    //       of kDataTypeNone. If we took the address of kDataTypeNone, then
+    //       Clang would required that we explicitly declare it in the .cpp
+    //       file. However, Visual Studio complains if we explicitly declare it
+    //       in the .cpp file, because we've assigned it a value (=0) in the
+    //       header file.
+    component_id_to_data_type_.resize(component_id + 1, int(kDataTypeNone));
   component_id_to_data_type_[component_id] = data_type;
 
   if (component_id_to_table_name_.size() <= component_id)

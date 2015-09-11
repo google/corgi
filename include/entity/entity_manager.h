@@ -62,7 +62,8 @@ class EntityManager {
   // Asserts if it doesn't exist.
   template <typename T>
   T* GetComponent() {
-    ComponentId id = ComponentIdLookup<T>::component_id;
+    ComponentId id =
+        static_cast<ComponentId>(ComponentIdLookup<T>::component_id);
     assert(id != kInvalidComponent);
     assert(id < kMaxComponentCount);
     return static_cast<T*>(components_[id]);
@@ -72,7 +73,8 @@ class EntityManager {
   // Asserts if it doesn't exist.
   template <typename T>
   const T* GetComponent() const {
-    ComponentId id = ComponentIdLookup<T>::component_id;
+    ComponentId id =
+        static_cast<ComponentId>(ComponentIdLookup<T>::component_id);
     assert(id != kInvalidComponent);
     assert(id < kMaxComponentCount);
     return static_cast<const T*>(components_[id]);
@@ -82,7 +84,8 @@ class EntityManager {
   // Asserts if the component doesn't exist.
   template <typename T>
   void AddEntityToComponent(EntityRef entity) {
-    ComponentId id = ComponentIdLookup<T>::component_id;
+    ComponentId id =
+        static_cast<ComponentId>(ComponentIdLookup<T>::component_id);
     assert(id != kInvalidComponent);
     assert(id < kMaxComponentCount);
     AddEntityToComponent(entity, id);

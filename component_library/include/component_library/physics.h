@@ -15,7 +15,7 @@
 #ifndef COMPONENT_LIBRARY_PHYSICS_H_
 #define COMPONENT_LIBRARY_PHYSICS_H_
 
-#include "btBulletDynamicsCommon.h"
+#include "component_library/bullet_physics.h"
 #include "entity/component.h"
 #include "event/event_manager.h"
 #include "fplbase/asset_manager.h"
@@ -238,7 +238,7 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   float gravity() const { return gravity_; }
 
   void set_max_steps(int max_steps) { max_steps_ = max_steps; }
-  float max_steps() const { return max_steps_; }
+  int max_steps() const { return max_steps_; }
 
  private:
   void ClearPhysicsData(const entity::EntityRef& entity);

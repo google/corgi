@@ -50,7 +50,7 @@ struct ComponentIdLookup {};
   namespace entity {                                      \
   template <>                                             \
   struct ComponentIdLookup<DataType> {                    \
-    static int component_id;                              \
+    static ComponentId component_id;                      \
   };                                                      \
   }                                                       \
   }
@@ -58,11 +58,11 @@ struct ComponentIdLookup {};
 // This macro handles defining the storage location for the component ID for
 // a given data type. It should be placed at the top of the .cpp file for that
 // component, after the includes but before the namespaces.
-#define FPL_ENTITY_DEFINE_COMPONENT_ID_LOOKUP(DataType)              \
-  namespace fpl {                                                    \
-  namespace entity {                                                 \
-  int ComponentIdLookup<DataType>::component_id = kInvalidComponent; \
-  }                                                                  \
+#define FPL_ENTITY_DEFINE_COMPONENT_ID_LOOKUP(DataType)                      \
+  namespace fpl {                                                            \
+  namespace entity {                                                         \
+  ComponentId ComponentIdLookup<DataType>::component_id = kInvalidComponent; \
+  }                                                                          \
   }
 
 }  // entity
