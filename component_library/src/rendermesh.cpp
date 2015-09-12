@@ -141,7 +141,6 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
     const int num_bones = rendermesh_data->mesh->num_bones();
     const bool has_anim = anim_data != nullptr && anim_data->motivator.Valid();
     const bool has_one_bone_anim = has_anim && num_bones <= 1;
-    const bool has_rigged_anim = has_anim && num_bones > 1;
     const mat4 world_transform =
         has_one_bone_anim
             ? transform_data->world_transform *
@@ -156,9 +155,16 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
     renderer.model_view_projection() = mvp;
     renderer.color() = rendermesh_data->tint;
     renderer.model() = world_transform;
-    renderer.SetBoneTransforms(
-        has_rigged_anim ? anim_data->motivator.GlobalTransforms() : nullptr,
-        has_rigged_anim ? num_bones : 0);
+
+    // If the mesh has a skeleton, we need to update the bone positions.
+    // The positions are normally supplied by the animation, but if they are
+    // not, use the default pose in the RenderMesh.
+    if (num_bones > 1) {
+      const mat4* bone_transforms =
+          has_anim ? anim_data->motivator.GlobalTransforms()
+                   : rendermesh_data->mesh->bone_global_transforms();
+      renderer.SetBoneTransforms(bone_transforms, num_bones);
+    }
 
     if (!shader_override && rendermesh_data->shader) {
       rendermesh_data->shader->Set(renderer);
