@@ -24,6 +24,9 @@
 #include "fplbase/utilities.h"
 
 namespace fpl {
+namespace editor {
+class WorldEditor;
+}
 namespace component_library {
 
 // Data for scene object components.
@@ -40,12 +43,13 @@ class CommonServicesComponent : public entity::Component<CommonServicesData> {
 
   void Initialize(AssetManager* asset_manager, EntityFactory* entity_factory,
                   event::EventManager* event_manager, InputSystem* input_system,
-                  Renderer* renderer) {
+                  Renderer* renderer, editor::WorldEditor* world_editor) {
     asset_manager_ = asset_manager;
     entity_factory_ = entity_factory;
     event_manager_ = event_manager;
     input_system_ = input_system;
     renderer_ = renderer;
+    world_editor_ = world_editor;
   }
 
   AssetManager* asset_manager() { return asset_manager_; }
@@ -53,6 +57,7 @@ class CommonServicesComponent : public entity::Component<CommonServicesData> {
   InputSystem* input_system() { return input_system_; }
   EntityFactory* entity_factory() { return entity_factory_; }
   Renderer* renderer() { return renderer_; }
+  editor::WorldEditor* world_editor() { return world_editor_; }
 
   // This component should never be added to an entity.  It is only provided
   // as an interface for other components to access common resources.
@@ -70,6 +75,7 @@ class CommonServicesComponent : public entity::Component<CommonServicesData> {
   event::EventManager* event_manager_;
   InputSystem* input_system_;
   Renderer* renderer_;
+  editor::WorldEditor* world_editor_;
   bool export_force_defaults_;
 };
 
