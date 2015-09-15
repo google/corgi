@@ -160,9 +160,10 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
     // The positions are normally supplied by the animation, but if they are
     // not, use the default pose in the RenderMesh.
     if (num_bones > 1) {
+      const bool use_default_pose = has_anim && !rendermesh_data->default_pose;
       const mat4* bone_transforms =
-          has_anim ? anim_data->motivator.GlobalTransforms()
-                   : rendermesh_data->mesh->bone_global_transforms();
+          use_default_pose ? anim_data->motivator.GlobalTransforms()
+                           : rendermesh_data->mesh->bone_global_transforms();
       renderer.SetBoneTransforms(bone_transforms, num_bones);
     }
 
@@ -215,6 +216,7 @@ void RenderMeshComponent::AddFromRawData(entity::EntityRef& entity,
 
   rendermesh_data->default_hidden = rendermesh_def->hidden();
   rendermesh_data->currently_hidden = rendermesh_def->hidden();
+  rendermesh_data->default_pose = rendermesh_def->default_pose();
 
   rendermesh_data->pass_mask = 0;
   if (rendermesh_def->render_pass() != nullptr) {

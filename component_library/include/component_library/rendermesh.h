@@ -43,7 +43,8 @@ struct RenderMeshData {
         culling_mask(0),
         pass_mask(0),
         default_hidden(false),
-        currently_hidden(false) {}
+        currently_hidden(false),
+        default_pose(false) {}
   Mesh* mesh;
   Shader* shader;
   mathfu::vec4 tint;
@@ -54,6 +55,7 @@ struct RenderMeshData {
   unsigned char pass_mask;
   bool default_hidden;
   bool currently_hidden;
+  bool default_pose;
 };
 
 // Struct used for keeping track of and sorting our render lists:
