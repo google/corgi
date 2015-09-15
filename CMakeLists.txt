@@ -136,10 +136,10 @@ if (entity_build_component_library)
           -I ${dependencies_fplbase_dir}/schemas
           -c ${flatbuffers_schema}
       DEPENDS flatc ${flatbuffers_schema})
-    list(APPEND FLATBUFFERS_GENERATED_INCLUDES ${flatbuffers_include})
+    list(APPEND COMPONENT_LIBRARY_GENERATED_INCLUDES ${flatbuffers_include})
   endforeach()
   add_custom_target(component_library_generated_includes
-    DEPENDS ${FLATBUFFERS_GENERATED_INCLUDES})
+    DEPENDS ${COMPONENT_LIBRARY_GENERATED_INCLUDES})
 
   include_directories(${COMPONENT_COLLECTION_DIR}/include)
   include_directories(${FPLBASE_FLATBUFFERS_GENERATED_INCLUDES_DIR})
