@@ -68,6 +68,7 @@ table RenderMeshDef {
 table PhysicsDef {
   shapes:[BulletShapeDef];
   kinematic:bool = false;
+  on_collision:[string];
 }
 
 table AnimationDef {

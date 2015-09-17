@@ -19,8 +19,8 @@
 #include "component_library/component_utils.h"
 #include "component_library/rendermesh.h"
 #include "component_library/transform.h"
-#include "event/event_manager.h"
-#include "events/collision.h"
+#include "event/event.h"
+#include "event/graph_state.h"
 #include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/reflection.h"
 #include "fplbase/flatbuffer_utils.h"
@@ -35,6 +35,8 @@ using mathfu::quat;
 FPL_ENTITY_DEFINE_COMPONENT(fpl::component_library::PhysicsComponent,
                             fpl::component_library::PhysicsData)
 
+FPL_EVENT_DEFINE_EVENT(fpl::component_library::kCollisionEventId)
+
 namespace fpl {
 namespace component_library {
 
@@ -46,8 +48,6 @@ static void BulletTickCallback(btDynamicsWorld* world, btScalar time_step);
 static const char* kPhysicsShader = "shaders/color";
 
 void PhysicsComponent::Init() {
-  event_manager_ =
-      entity_manager_->GetComponent<CommonServicesComponent>()->event_manager();
   AssetManager* asset_manager =
       entity_manager_->GetComponent<CommonServicesComponent>()->asset_manager();
 
@@ -175,6 +175,18 @@ void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
       bullet_world_->addRigidBody(rb_data->rigid_body.get(),
                                   rb_data->collision_type,
                                   rb_data->collides_with);
+    }
+  }
+
+  // Prepare the on_collision graphs by storing the filenames to load.
+  physics_data->on_collision.clear();
+  if (physics_def->on_collision()) {
+    for (size_t i = 0; i < physics_def->on_collision()->size(); ++i) {
+      auto filename = physics_def->on_collision()->Get(i);
+      physics_data->on_collision.push_back(SerializableGraphState());
+      physics_data->on_collision.back().graph_state.reset(
+          new event::GraphState);
+      physics_data->on_collision.back().filename = filename->c_str();
     }
   }
 
@@ -346,11 +358,48 @@ void PhysicsComponent::UpdateAllEntities(entity::WorldTime delta_time) {
   }
 }
 
+void PhysicsComponent::PostLoadFixup() {
+  auto* common = entity_manager_->GetComponent<CommonServicesComponent>();
+
+  // Initialize each graph.
+  for (auto iter = component_data_.begin(); iter != component_data_.end();
+       ++iter) {
+    PhysicsData* physics_data = Data<PhysicsData>(iter->entity);
+    for (auto iter = physics_data->on_collision.begin();
+         iter != physics_data->on_collision.end(); ++iter) {
+      const char* filename = iter->filename.c_str();
+      event::Graph* graph = common->graph_factory()->LoadGraph(filename);
+      if (graph && !iter->graph_state->IsInitialized()) {
+        iter->graph_state->Initialize(graph);
+      }
+    }
+  }
+}
+
 static void BulletTickCallback(btDynamicsWorld* world,
                                btScalar /* time_step */) {
   PhysicsComponent* pc =
       static_cast<PhysicsComponent*>(world->getWorldUserInfo());
   pc->ProcessBulletTickCallback();
+}
+
+static void ExecuteGraphs(
+    CollisionData* collision_data, PhysicsData* this_physics_data,
+    entity::EntityRef this_entity, const mathfu::vec3& this_position,
+    const std::string& this_tag, entity::EntityRef other_entity,
+    const mathfu::vec3& other_position, const std::string& other_tag) {
+  collision_data->this_entity = this_entity;
+  collision_data->this_position = this_position;
+  collision_data->this_tag = this_tag;
+  collision_data->other_entity = other_entity;
+  collision_data->other_position = other_position;
+  collision_data->other_tag = other_tag;
+  for (size_t i = 0; i < this_physics_data->on_collision.size(); ++i) {
+    SerializableGraphState& state = this_physics_data->on_collision[i];
+    if (state.graph_state->IsInitialized()) {
+      state.graph_state->Execute();
+    }
+  }
 }
 
 void PhysicsComponent::ProcessBulletTickCallback() {
@@ -387,17 +436,29 @@ void PhysicsComponent::ProcessBulletTickCallback() {
         for (int i = 0; i < physics_a->body_count; i++) {
           if (physics_a->rigid_bodies[i].rigid_body.get() == body_a) {
             tag_a = physics_a->rigid_bodies[i].user_tag;
+            break;
           }
         }
         auto physics_b = Data<PhysicsData>(entity_b);
         for (int i = 0; i < physics_b->body_count; i++) {
           if (physics_b->rigid_bodies[i].rigid_body.get() == body_b) {
             tag_b = physics_b->rigid_bodies[i].user_tag;
+            break;
           }
         }
 
-        event_manager_->BroadcastEvent(CollisionPayload(
-            entity_a, position_a, tag_a, entity_b, position_b, tag_b));
+        // Broadcast that a collision event has occured, and then execute all
+        // collision graphs on both entities involved in the collision.
+        broadcaster_.BroadcastEvent(kCollisionEventId);
+        ExecuteGraphs(&collision_data_, physics_a, entity_a, position_a,
+                      tag_a, entity_b, position_b, tag_b);
+        ExecuteGraphs(&collision_data_, physics_b, entity_b, position_b,
+                      tag_b, entity_a, position_a, tag_a);
+
+        // If a collision callback has been registered, call that as well.
+        if (collision_callback_) {
+          collision_callback_(&collision_data_, collision_user_data_);
+        }
       }
     }
   }

@@ -17,7 +17,7 @@
 
 #include "component_library/entity_factory.h"
 #include "entity/component.h"
-#include "event/event_manager.h"
+#include "event/graph_factory.h"
 #include "fplbase/asset_manager.h"
 #include "fplbase/input.h"
 #include "fplbase/renderer.h"
@@ -39,17 +39,17 @@ class CommonServicesComponent : public entity::Component<CommonServicesData> {
   CommonServicesComponent() : export_force_defaults_(false) {}
 
   void Initialize(AssetManager* asset_manager, EntityFactory* entity_factory,
-                  event::EventManager* event_manager, InputSystem* input_system,
+                  event::GraphFactory* graph_factory, InputSystem* input_system,
                   Renderer* renderer) {
     asset_manager_ = asset_manager;
     entity_factory_ = entity_factory;
-    event_manager_ = event_manager;
+    graph_factory_ = graph_factory;
     input_system_ = input_system;
     renderer_ = renderer;
   }
 
   AssetManager* asset_manager() { return asset_manager_; }
-  event::EventManager* event_manager() { return event_manager_; }
+  event::GraphFactory* graph_factory() { return graph_factory_; }
   InputSystem* input_system() { return input_system_; }
   EntityFactory* entity_factory() { return entity_factory_; }
   Renderer* renderer() { return renderer_; }
@@ -67,7 +67,7 @@ class CommonServicesComponent : public entity::Component<CommonServicesData> {
  private:
   AssetManager* asset_manager_;
   EntityFactory* entity_factory_;
-  event::EventManager* event_manager_;
+  event::GraphFactory* graph_factory_;
   InputSystem* input_system_;
   Renderer* renderer_;
   bool export_force_defaults_;

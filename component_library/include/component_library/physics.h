@@ -15,11 +15,14 @@
 #ifndef COMPONENT_LIBRARY_PHYSICS_H_
 #define COMPONENT_LIBRARY_PHYSICS_H_
 
+#include <memory>
+#include <vector>
 #include "component_library/bullet_physics.h"
 #include "entity/component.h"
-#include "event/event_manager.h"
-#include "fplbase/asset_manager.h"
+#include "event/event.h"
+#include "event/graph_state.h"
 #include "flatbuffers/reflection.h"
+#include "fplbase/asset_manager.h"
 #include "fplbase/renderer.h"
 #include "fplbase/shader.h"
 #include "library_components_generated.h"
@@ -28,7 +31,23 @@
 namespace fpl {
 namespace component_library {
 
-const int kMaxPhysicsBodies = 5;
+FPL_EVENT_DECLARE_EVENT(kCollisionEventId)
+
+static const int kMaxPhysicsBodies = 5;
+
+// Data describing which entities were involed in a collision and where.
+struct CollisionData {
+  entity::EntityRef this_entity;
+  mathfu::vec3 this_position;
+  std::string this_tag;
+
+  entity::EntityRef other_entity;
+  mathfu::vec3 other_position;
+  std::string other_tag;
+};
+
+typedef void (*CollisionCallback)(CollisionData* collision_data,
+                                  void* user_data);
 
 // Data describing a single Bullet rigid body shape.
 struct RigidBodyData {
@@ -87,6 +106,11 @@ static inline mathfu::quat BtToMathfuQuat(const btQuaternion& q) {
   return mathfu::quat(q.getW(), -q.getX(), -q.getY(), -q.getZ());
 }
 
+struct SerializableGraphState {
+  std::string filename;
+  std::unique_ptr<event::GraphState> graph_state;
+};
+
 // Data for scene object components.
 struct PhysicsData {
  public:
@@ -119,6 +143,9 @@ struct PhysicsData {
     *max = BtToMathfuVec3(bt_max);
   }
 
+  // The list of graphs to evaluate on each collision event.
+  std::vector<SerializableGraphState> on_collision;
+
   // The rigid bodies associated with the entity. Note that only the first one
   // can be set to not be kinematic, all subsequent ones are forced to be.
   RigidBodyData rigid_bodies[kMaxPhysicsBodies];
@@ -127,12 +154,7 @@ struct PhysicsData {
   bool enabled;
 
   PhysicsData(PhysicsData&& src) {
-    body_count = std::move(src.body_count);
-    enabled = std::move(src.enabled);
-    triangle_mesh = std::move(src.triangle_mesh);
-    for (size_t i = 0; i < kMaxPhysicsBodies; i++) {
-      rigid_bodies[i] = std::move(src.rigid_bodies[i]);
-    }
+    *this = std::move(src);
   }
   PhysicsData& operator=(PhysicsData&& src) {
     body_count = std::move(src.body_count);
@@ -141,6 +163,7 @@ struct PhysicsData {
     for (size_t i = 0; i < kMaxPhysicsBodies; i++) {
       rigid_bodies[i] = std::move(src.rigid_bodies[i]);
     }
+    on_collision = std::move(src.on_collision);
     return *this;
   }
 
@@ -189,6 +212,9 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   virtual void InitEntity(entity::EntityRef& /*entity*/);
   virtual void CleanupEntity(entity::EntityRef& entity);
   virtual void UpdateAllEntities(entity::WorldTime delta_time);
+
+  // Initialize the graphs. This must occur after all entities have been loaded.
+  void PostLoadFixup();
 
   void ProcessBulletTickCallback();
 
@@ -240,12 +266,28 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   void set_max_steps(int max_steps) { max_steps_ = max_steps; }
   int max_steps() const { return max_steps_; }
 
+  CollisionData& collision_data() { return collision_data_; }
+  event::NodeEventBroadcaster& broadcaster() { return broadcaster_; }
+
+  void set_collision_callback(CollisionCallback callback, void* user_data) {
+    collision_callback_ = callback;
+    collision_user_data_ = user_data;
+  }
+
  private:
   void ClearPhysicsData(const entity::EntityRef& entity);
   void UpdatePhysicsObjectsTransform(const entity::EntityRef& entity,
                                      bool kinematic_only);
 
-  event::EventManager* event_manager_;
+  // Collision data is cached so that the event graphs can operate on it.
+  CollisionData collision_data_;
+  // Used to notify the collision event that it needs to update.
+  event::NodeEventBroadcaster broadcaster_;
+
+  // An event callback to call when a collision occurs. If a callback is
+  // registered, it is called in addition to evaluating the graph.
+  CollisionCallback collision_callback_;
+  void* collision_user_data_;
 
   std::unique_ptr<btDiscreteDynamicsWorld> bullet_world_;
   std::unique_ptr<btBroadphaseInterface> broadphase_;
