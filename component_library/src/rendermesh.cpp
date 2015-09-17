@@ -138,9 +138,12 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
 
     // TODO: anim_data will set uniforms for an array of matricies. Each
     //       matrix represents one bone position.
-    const int num_bones = rendermesh_data->mesh->num_bones();
     const bool has_anim = anim_data != nullptr && anim_data->motivator.Valid();
-    const bool has_one_bone_anim = has_anim && num_bones <= 1;
+    const int num_mesh_bones = rendermesh_data->mesh->num_bones();
+    const int num_anim_bones =
+        has_anim ? anim_data->motivator.DefiningAnim()->NumBones() : 0;
+    const bool has_one_bone_anim =
+        has_anim && (num_mesh_bones <= 1 || num_anim_bones == 1);
     const mat4 world_transform =
         has_one_bone_anim
             ? transform_data->world_transform *
@@ -159,12 +162,13 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
     // If the mesh has a skeleton, we need to update the bone positions.
     // The positions are normally supplied by the animation, but if they are
     // not, use the default pose in the RenderMesh.
-    if (num_bones > 1) {
-      const bool use_default_pose = has_anim && !rendermesh_data->default_pose;
+    if (num_mesh_bones > 1) {
+      const bool use_default_pose = num_anim_bones != num_mesh_bones ||
+                                    rendermesh_data->default_pose;
       const mat4* bone_transforms =
-          use_default_pose ? anim_data->motivator.GlobalTransforms()
-                           : rendermesh_data->mesh->bone_global_transforms();
-      renderer.SetBoneTransforms(bone_transforms, num_bones);
+          use_default_pose ? rendermesh_data->mesh->bone_global_transforms()
+                           : anim_data->motivator.GlobalTransforms();
+      renderer.SetBoneTransforms(bone_transforms, num_mesh_bones);
     }
 
     if (!shader_override && rendermesh_data->shader) {
