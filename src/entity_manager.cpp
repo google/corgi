@@ -27,7 +27,7 @@ EntityManager::EntityManager()
 }
 
 EntityRef EntityManager::AllocateNewEntity() {
-  return std::move(EntityRef(entities_.GetNewElement(kAddToBack)));
+  return EntityRef(entities_.GetNewElement(kAddToBack));
 }
 
 // Note: This function doesn't actually delete the entity immediately -
