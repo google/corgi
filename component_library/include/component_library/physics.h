@@ -17,10 +17,10 @@
 
 #include <memory>
 #include <vector>
+#include "breadboard/event.h"
+#include "breadboard/graph_state.h"
 #include "component_library/bullet_physics.h"
 #include "entity/component.h"
-#include "event/event.h"
-#include "event/graph_state.h"
 #include "flatbuffers/reflection.h"
 #include "fplbase/asset_manager.h"
 #include "fplbase/renderer.h"
@@ -31,7 +31,7 @@
 namespace fpl {
 namespace component_library {
 
-FPL_EVENT_DECLARE_EVENT(kCollisionEventId)
+BREADBOARD_DECLARE_EVENT(kCollisionEventId)
 
 static const int kMaxPhysicsBodies = 5;
 
@@ -108,7 +108,7 @@ static inline mathfu::quat BtToMathfuQuat(const btQuaternion& q) {
 
 struct SerializableGraphState {
   std::string filename;
-  std::unique_ptr<event::GraphState> graph_state;
+  std::unique_ptr<breadboard::GraphState> graph_state;
 };
 
 // Data for scene object components.
@@ -267,7 +267,7 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   int max_steps() const { return max_steps_; }
 
   CollisionData& collision_data() { return collision_data_; }
-  event::NodeEventBroadcaster& broadcaster() { return broadcaster_; }
+  breadboard::NodeEventBroadcaster& broadcaster() { return broadcaster_; }
 
   void set_collision_callback(CollisionCallback callback, void* user_data) {
     collision_callback_ = callback;
@@ -282,7 +282,7 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   // Collision data is cached so that the event graphs can operate on it.
   CollisionData collision_data_;
   // Used to notify the collision event that it needs to update.
-  event::NodeEventBroadcaster broadcaster_;
+  breadboard::NodeEventBroadcaster broadcaster_;
 
   // An event callback to call when a collision occurs. If a callback is
   // registered, it is called in addition to evaluating the graph.

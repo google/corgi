@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "component_library/animation.h"
 #include "component_library/rendermesh.h"
+#include "component_library/animation.h"
 #include "component_library/common_services.h"
 #include "component_library/transform.h"
 #include "library_components_generated.h"

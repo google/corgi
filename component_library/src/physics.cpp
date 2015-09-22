@@ -14,13 +14,13 @@
 
 #include <cfloat>
 #include <cmath>
-#include "component_library/physics.h"
+#include "breadboard/event.h"
+#include "breadboard/graph_state.h"
 #include "component_library/common_services.h"
 #include "component_library/component_utils.h"
+#include "component_library/physics.h"
 #include "component_library/rendermesh.h"
 #include "component_library/transform.h"
-#include "event/event.h"
-#include "event/graph_state.h"
 #include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/reflection.h"
 #include "fplbase/flatbuffer_utils.h"
@@ -35,7 +35,7 @@ using mathfu::quat;
 FPL_ENTITY_DEFINE_COMPONENT(fpl::component_library::PhysicsComponent,
                             fpl::component_library::PhysicsData)
 
-FPL_EVENT_DEFINE_EVENT(fpl::component_library::kCollisionEventId)
+BREADBOARD_DEFINE_EVENT(fpl::component_library::kCollisionEventId)
 
 namespace fpl {
 namespace component_library {
@@ -185,7 +185,7 @@ void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
       auto filename = physics_def->on_collision()->Get(i);
       physics_data->on_collision.push_back(SerializableGraphState());
       physics_data->on_collision.back().graph_state.reset(
-          new event::GraphState);
+          new breadboard::GraphState);
       physics_data->on_collision.back().filename = filename->c_str();
     }
   }
@@ -368,7 +368,7 @@ void PhysicsComponent::PostLoadFixup() {
     for (auto iter = physics_data->on_collision.begin();
          iter != physics_data->on_collision.end(); ++iter) {
       const char* filename = iter->filename.c_str();
-      event::Graph* graph = common->graph_factory()->LoadGraph(filename);
+      breadboard::Graph* graph = common->graph_factory()->LoadGraph(filename);
       if (graph && !iter->graph_state->IsInitialized()) {
         iter->graph_state->Initialize(graph);
       }
@@ -450,10 +450,10 @@ void PhysicsComponent::ProcessBulletTickCallback() {
         // Broadcast that a collision event has occured, and then execute all
         // collision graphs on both entities involved in the collision.
         broadcaster_.BroadcastEvent(kCollisionEventId);
-        ExecuteGraphs(&collision_data_, physics_a, entity_a, position_a,
-                      tag_a, entity_b, position_b, tag_b);
-        ExecuteGraphs(&collision_data_, physics_b, entity_b, position_b,
-                      tag_b, entity_a, position_a, tag_a);
+        ExecuteGraphs(&collision_data_, physics_a, entity_a, position_a, tag_a,
+                      entity_b, position_b, tag_b);
+        ExecuteGraphs(&collision_data_, physics_b, entity_b, position_b, tag_b,
+                      entity_a, position_a, tag_a);
 
         // If a collision callback has been registered, call that as well.
         if (collision_callback_) {

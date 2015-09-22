@@ -15,17 +15,17 @@
 #ifndef COMPONENT_LIBRARY_RENDERMESH_H_
 #define COMPONENT_LIBRARY_RENDERMESH_H_
 
+#include "component_library/camera_interface.h"
 #include "component_library/transform.h"
 #include "entity/component.h"
-#include "component_library/camera_interface.h"
-#include "library_components_generated.h"
-#include "mathfu/constants.h"
-#include "mathfu/glsl_mappings.h"
-#include "mathfu/matrix_4x4.h"
 #include "fplbase/asset_manager.h"
 #include "fplbase/mesh.h"
 #include "fplbase/renderer.h"
 #include "fplbase/shader.h"
+#include "library_components_generated.h"
+#include "mathfu/constants.h"
+#include "mathfu/glsl_mappings.h"
+#include "mathfu/matrix_4x4.h"
 
 namespace fpl {
 namespace component_library {

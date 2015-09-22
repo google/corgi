@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include "component_library/entity_factory.h"
-
 #include <set>
 #include "component_library/meta.h"
 #include "fplbase/utilities.h"
