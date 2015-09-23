@@ -168,7 +168,11 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
       const mat4* bone_transforms =
           use_default_pose ? rendermesh_data->mesh->bone_global_transforms()
                            : anim_data->motivator.GlobalTransforms();
-      renderer.SetBoneTransforms(bone_transforms, num_mesh_bones);
+      rendermesh_data->mesh->GatherShaderTransforms(
+          bone_transforms, &rendermesh_data->shader_transforms[0]);
+      renderer.SetBoneTransforms(
+          &rendermesh_data->shader_transforms[0],
+          static_cast<int>(rendermesh_data->shader_transforms.size()));
     }
 
     if (!shader_override && rendermesh_data->shader) {
@@ -213,6 +217,9 @@ void RenderMeshComponent::AddFromRawData(entity::EntityRef& entity,
   rendermesh_data->mesh =
       asset_manager_->LoadMesh(rendermesh_def->source_file()->c_str());
   assert(rendermesh_data->mesh != nullptr);
+
+  rendermesh_data->shader_transforms.resize(
+      rendermesh_data->mesh->num_shader_bones());
 
   rendermesh_data->shader =
       asset_manager_->LoadShader(rendermesh_def->shader()->c_str());

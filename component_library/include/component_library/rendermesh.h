@@ -56,6 +56,7 @@ struct RenderMeshData {
   bool default_hidden;
   bool currently_hidden;
   bool default_pose;
+  std::vector<mathfu::mat4> shader_transforms;
 };
 
 // Struct used for keeping track of and sorting our render lists:
