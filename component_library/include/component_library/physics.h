@@ -107,8 +107,22 @@ static inline mathfu::quat BtToMathfuQuat(const btQuaternion& q) {
 }
 
 struct SerializableGraphState {
+  SerializableGraphState() {}
+  SerializableGraphState(SerializableGraphState&& src) {
+    *this = std::move(src);
+  }
+  SerializableGraphState& operator=(SerializableGraphState&& src) {
+    filename = std::move(src.filename);
+    graph_state = std::move(src.graph_state);
+    return *this;
+  }
+
   std::string filename;
   std::unique_ptr<breadboard::GraphState> graph_state;
+
+private:
+  SerializableGraphState(const SerializableGraphState&);
+  SerializableGraphState& operator=(const SerializableGraphState&);
 };
 
 // Data for scene object components.
