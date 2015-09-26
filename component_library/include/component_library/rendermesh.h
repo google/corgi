@@ -44,7 +44,37 @@ struct RenderMeshData {
         pass_mask(0),
         default_hidden(false),
         currently_hidden(false),
-        default_pose(false) {}
+        default_pose(false),
+        num_shader_transforms(0),
+        shader_transforms(nullptr) {}
+  ~RenderMeshData() {
+    delete[] shader_transforms;
+    shader_transforms = nullptr;
+  }
+
+  // Implement move operator to avoid reallocating shader_transforms.
+  RenderMeshData(RenderMeshData&& other) {
+    *this = std::move(other);
+  }
+  RenderMeshData& operator=(RenderMeshData&& other) {
+    mesh = std::move(other.mesh);
+    shader = std::move(other.shader);
+    tint = std::move(other.tint);
+    mesh_filename = std::move(other.mesh_filename);
+    shader_filename = std::move(other.shader_filename);
+    z_depth = std::move(other.z_depth);
+    culling_mask = std::move(other.culling_mask);
+    pass_mask = std::move(other.pass_mask);
+    default_hidden = std::move(other.default_hidden);
+    currently_hidden = std::move(other.currently_hidden);
+    default_pose = std::move(other.default_pose);
+    num_shader_transforms = other.num_shader_transforms;
+    shader_transforms = other.shader_transforms;
+    other.shader_transforms = nullptr;
+    other.num_shader_transforms = 0;
+    return *this;
+  }
+
   Mesh* mesh;
   Shader* shader;
   mathfu::vec4 tint;
@@ -56,7 +86,13 @@ struct RenderMeshData {
   bool default_hidden;
   bool currently_hidden;
   bool default_pose;
-  std::vector<mathfu::mat4> shader_transforms;
+  uint8_t num_shader_transforms;
+  mathfu::mat4* shader_transforms;
+
+ private:
+  // Disallow copies. They're inefficient with the shader_transforms array.
+  RenderMeshData(const RenderMeshData&);
+  RenderMeshData& operator=(const RenderMeshData&);
 };
 
 // Struct used for keeping track of and sorting our render lists:

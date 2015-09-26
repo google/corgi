@@ -169,10 +169,10 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
           use_default_pose ? rendermesh_data->mesh->bone_global_transforms()
                            : anim_data->motivator.GlobalTransforms();
       rendermesh_data->mesh->GatherShaderTransforms(
-          bone_transforms, &rendermesh_data->shader_transforms[0]);
+          bone_transforms, rendermesh_data->shader_transforms);
       renderer.SetBoneTransforms(
-          &rendermesh_data->shader_transforms[0],
-          static_cast<int>(rendermesh_data->shader_transforms.size()));
+          rendermesh_data->shader_transforms,
+          rendermesh_data->num_shader_transforms);
     }
 
     if (!shader_override && rendermesh_data->shader) {
@@ -218,8 +218,17 @@ void RenderMeshComponent::AddFromRawData(entity::EntityRef& entity,
       asset_manager_->LoadMesh(rendermesh_def->source_file()->c_str());
   assert(rendermesh_data->mesh != nullptr);
 
-  rendermesh_data->shader_transforms.resize(
-      rendermesh_data->mesh->num_shader_bones());
+  // Allocate the array to hold shader default pose's transforms.
+  assert(rendermesh_data->shader_transforms == nullptr);
+  const uint8_t num_shader_transforms =
+      rendermesh_data->mesh->num_shader_bones();
+  rendermesh_data->num_shader_transforms = num_shader_transforms;
+  if (num_shader_transforms > 0) {
+    rendermesh_data->shader_transforms = new mat4[num_shader_transforms];
+    for (uint8_t i = 0; i < num_shader_transforms; ++i) {
+      rendermesh_data->shader_transforms[i] = mat4::Identity();
+    }
+  }
 
   rendermesh_data->shader =
       asset_manager_->LoadShader(rendermesh_def->shader()->c_str());
