@@ -18,6 +18,7 @@
 #include "breadboard/graph_state.h"
 #include "component_library/common_services.h"
 #include "component_library/component_utils.h"
+#include "component_library/graph.h"
 #include "component_library/physics.h"
 #include "component_library/rendermesh.h"
 #include "component_library/transform.h"
@@ -25,7 +26,6 @@
 #include "flatbuffers/reflection.h"
 #include "fplbase/flatbuffer_utils.h"
 #include "fplbase/mesh.h"
-#include "fplbase/utilities.h"
 #include "mathfu/glsl_mappings.h"
 #include "mathfu/vector.h"
 
@@ -175,18 +175,6 @@ void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
       bullet_world_->addRigidBody(rb_data->rigid_body.get(),
                                   rb_data->collision_type,
                                   rb_data->collides_with);
-    }
-  }
-
-  // Prepare the on_collision graphs by storing the filenames to load.
-  physics_data->on_collision.clear();
-  if (physics_def->on_collision()) {
-    for (size_t i = 0; i < physics_def->on_collision()->size(); ++i) {
-      auto filename = physics_def->on_collision()->Get(i);
-      physics_data->on_collision.push_back(SerializableGraphState());
-      physics_data->on_collision.back().graph_state.reset(
-          new breadboard::GraphState);
-      physics_data->on_collision.back().filename = filename->c_str();
     }
   }
 
@@ -358,24 +346,6 @@ void PhysicsComponent::UpdateAllEntities(entity::WorldTime delta_time) {
   }
 }
 
-void PhysicsComponent::PostLoadFixup() {
-  auto* common = entity_manager_->GetComponent<CommonServicesComponent>();
-
-  // Initialize each graph.
-  for (auto iter = component_data_.begin(); iter != component_data_.end();
-       ++iter) {
-    PhysicsData* physics_data = Data<PhysicsData>(iter->entity);
-    for (auto iter = physics_data->on_collision.begin();
-         iter != physics_data->on_collision.end(); ++iter) {
-      const char* filename = iter->filename.c_str();
-      breadboard::Graph* graph = common->graph_factory()->LoadGraph(filename);
-      if (graph && !iter->graph_state->IsInitialized()) {
-        iter->graph_state->Initialize(graph);
-      }
-    }
-  }
-}
-
 static void BulletTickCallback(btDynamicsWorld* world,
                                btScalar /* time_step */) {
   PhysicsComponent* pc =
@@ -384,7 +354,7 @@ static void BulletTickCallback(btDynamicsWorld* world,
 }
 
 static void ExecuteGraphs(
-    CollisionData* collision_data, PhysicsData* this_physics_data,
+    CollisionData* collision_data, GraphData* this_graph_data,
     entity::EntityRef this_entity, const mathfu::vec3& this_position,
     const std::string& this_tag, entity::EntityRef other_entity,
     const mathfu::vec3& other_position, const std::string& other_tag) {
@@ -394,11 +364,8 @@ static void ExecuteGraphs(
   collision_data->other_entity = other_entity;
   collision_data->other_position = other_position;
   collision_data->other_tag = other_tag;
-  for (size_t i = 0; i < this_physics_data->on_collision.size(); ++i) {
-    SerializableGraphState& state = this_physics_data->on_collision[i];
-    if (state.graph_state->IsInitialized()) {
-      state.graph_state->Execute();
-    }
+  if (this_graph_data) {
+    this_graph_data->broadcaster.BroadcastEvent(kCollisionEventId);
   }
 }
 
@@ -433,6 +400,7 @@ void PhysicsComponent::ProcessBulletTickCallback() {
         std::string tag_a;
         std::string tag_b;
         auto physics_a = Data<PhysicsData>(entity_a);
+        auto graph_a = Data<GraphData>(entity_a);
         for (int i = 0; i < physics_a->body_count; i++) {
           if (physics_a->rigid_bodies[i].rigid_body.get() == body_a) {
             tag_a = physics_a->rigid_bodies[i].user_tag;
@@ -440,6 +408,7 @@ void PhysicsComponent::ProcessBulletTickCallback() {
           }
         }
         auto physics_b = Data<PhysicsData>(entity_b);
+        auto graph_b = Data<GraphData>(entity_b);
         for (int i = 0; i < physics_b->body_count; i++) {
           if (physics_b->rigid_bodies[i].rigid_body.get() == body_b) {
             tag_b = physics_b->rigid_bodies[i].user_tag;
@@ -449,10 +418,9 @@ void PhysicsComponent::ProcessBulletTickCallback() {
 
         // Broadcast that a collision event has occured, and then execute all
         // collision graphs on both entities involved in the collision.
-        broadcaster_.BroadcastEvent(kCollisionEventId);
-        ExecuteGraphs(&collision_data_, physics_a, entity_a, position_a, tag_a,
+        ExecuteGraphs(&collision_data_, graph_a, entity_a, position_a, tag_a,
                       entity_b, position_b, tag_b);
-        ExecuteGraphs(&collision_data_, physics_b, entity_b, position_b, tag_b,
+        ExecuteGraphs(&collision_data_, graph_b, entity_b, position_b, tag_b,
                       entity_a, position_a, tag_a);
 
         // If a collision callback has been registered, call that as well.

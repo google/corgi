@@ -18,7 +18,6 @@
 #include <memory>
 #include <vector>
 #include "breadboard/event.h"
-#include "breadboard/graph_state.h"
 #include "component_library/bullet_physics.h"
 #include "entity/component.h"
 #include "flatbuffers/reflection.h"
@@ -106,25 +105,6 @@ static inline mathfu::quat BtToMathfuQuat(const btQuaternion& q) {
   return mathfu::quat(q.getW(), -q.getX(), -q.getY(), -q.getZ());
 }
 
-struct SerializableGraphState {
-  SerializableGraphState() {}
-  SerializableGraphState(SerializableGraphState&& src) {
-    *this = std::move(src);
-  }
-  SerializableGraphState& operator=(SerializableGraphState&& src) {
-    filename = std::move(src.filename);
-    graph_state = std::move(src.graph_state);
-    return *this;
-  }
-
-  std::string filename;
-  std::unique_ptr<breadboard::GraphState> graph_state;
-
-private:
-  SerializableGraphState(const SerializableGraphState&);
-  SerializableGraphState& operator=(const SerializableGraphState&);
-};
-
 // Data for scene object components.
 struct PhysicsData {
  public:
@@ -157,9 +137,6 @@ struct PhysicsData {
     *max = BtToMathfuVec3(bt_max);
   }
 
-  // The list of graphs to evaluate on each collision event.
-  std::vector<SerializableGraphState> on_collision;
-
   // The rigid bodies associated with the entity. Note that only the first one
   // can be set to not be kinematic, all subsequent ones are forced to be.
   RigidBodyData rigid_bodies[kMaxPhysicsBodies];
@@ -167,9 +144,7 @@ struct PhysicsData {
   int body_count;
   bool enabled;
 
-  PhysicsData(PhysicsData&& src) {
-    *this = std::move(src);
-  }
+  PhysicsData(PhysicsData&& src) { *this = std::move(src); }
   PhysicsData& operator=(PhysicsData&& src) {
     body_count = std::move(src.body_count);
     enabled = std::move(src.enabled);
@@ -177,7 +152,6 @@ struct PhysicsData {
     for (size_t i = 0; i < kMaxPhysicsBodies; i++) {
       rigid_bodies[i] = std::move(src.rigid_bodies[i]);
     }
-    on_collision = std::move(src.on_collision);
     return *this;
   }
 
@@ -226,9 +200,6 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   virtual void InitEntity(entity::EntityRef& /*entity*/);
   virtual void CleanupEntity(entity::EntityRef& entity);
   virtual void UpdateAllEntities(entity::WorldTime delta_time);
-
-  // Initialize the graphs. This must occur after all entities have been loaded.
-  void PostLoadFixup();
 
   void ProcessBulletTickCallback();
 
@@ -281,7 +252,6 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   int max_steps() const { return max_steps_; }
 
   CollisionData& collision_data() { return collision_data_; }
-  breadboard::NodeEventBroadcaster& broadcaster() { return broadcaster_; }
 
   void set_collision_callback(CollisionCallback callback, void* user_data) {
     collision_callback_ = callback;
@@ -295,8 +265,6 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
 
   // Collision data is cached so that the event graphs can operate on it.
   CollisionData collision_data_;
-  // Used to notify the collision event that it needs to update.
-  breadboard::NodeEventBroadcaster broadcaster_;
 
   // An event callback to call when a collision occurs. If a callback is
   // registered, it is called in addition to evaluating the graph.

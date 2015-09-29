@@ -68,7 +68,6 @@ table RenderMeshDef {
 table PhysicsDef {
   shapes:[BulletShapeDef];
   kinematic:bool = false;
-  on_collision:[string];
 }
 
 table AnimationDef {
@@ -81,3 +80,6 @@ table AnimationDef {
   anim_table_start_idx:int;
 }
 
+table GraphDef {
+  filename_list:[string];
+}

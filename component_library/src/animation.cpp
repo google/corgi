@@ -14,6 +14,8 @@
 
 #include "component_library/animation.h"
 #include "component_library/common_services.h"
+#include "component_library/graph.h"
+#include "component_library/meta.h"
 #include "component_library/rendermesh.h"
 #include "motive/anim.h"
 #include "motive/init.h"
@@ -21,12 +23,33 @@
 FPL_ENTITY_DEFINE_COMPONENT(fpl::component_library::AnimationComponent,
                             fpl::component_library::AnimationData)
 
+BREADBOARD_DEFINE_EVENT(fpl::component_library::kAnimationCompleteEventId)
+
 using fpl::entity::EntityRef;
+using motive::MotiveTime;
 using motive::RigAnim;
 using motive::RigInit;
 
 namespace fpl {
 namespace component_library {
+
+void AnimationComponent::UpdateAllEntities(entity::WorldTime delta_time) {
+  engine_.AdvanceFrame(delta_time);
+  for (auto iter = component_data_.begin(); iter != component_data_.end();
+       ++iter) {
+    AnimationData* animation_data = GetComponentData(iter->entity);
+    if (animation_data->motivator.Valid()) {
+      MotiveTime time_remaining = animation_data->motivator.TimeRemaining();
+      if (time_remaining <= 0 && animation_data->previous_time_remaining > 0) {
+        GraphData* graph_data = Data<GraphData>(iter->entity);
+        if (graph_data) {
+          graph_data->broadcaster.BroadcastEvent(kAnimationCompleteEventId);
+        }
+      }
+      animation_data->previous_time_remaining = time_remaining;
+    }
+  }
+}
 
 void AnimationComponent::AddFromRawData(entity::EntityRef& entity,
                                         const void* raw_data) {

@@ -37,6 +37,8 @@ DEPENDENCIES_FPLUTIL_DIR?=$(FPL_ROOT)/fplutil
 DEPENDENCIES_GTEST_DIR?=$(FPL_ROOT)/googletest
 # Location of the MathFu library.
 DEPENDENCIES_MATHFU_DIR?=$(FPL_ROOT)/mathfu
+# Location of the Breadboard library.
+DEPENDENCIES_BREADBOARD_DIR?=$(FPL_ROOT)/breadboard
 # Location of the MathFu library.
 DEPENDENCIES_MOTIVE_DIR?=$(FPL_ROOT)/motive
 # Location of the Bullet Physics library.

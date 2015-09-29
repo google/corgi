@@ -18,7 +18,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := component_library
 LOCAL_ARM_MODE := arm
-LOCAL_STATIC_LIBRARIES := libfplbase libbullet
+LOCAL_STATIC_LIBRARIES := libbreadboard libfplbase libbullet
 LOCAL_SHARED_LIBRARIES :=
 
 COMPONENTS_RELATIVE_DIR := ..
@@ -45,13 +45,14 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_SRC_FILES := \
   $(COMPONENTS_RELATIVE_DIR)/src/animation.cpp \
-	$(COMPONENTS_RELATIVE_DIR)/src/common_services.cpp \
+  $(COMPONENTS_RELATIVE_DIR)/src/common_services.cpp \
   $(COMPONENTS_RELATIVE_DIR)/src/component_utils.cpp \
-	$(COMPONENTS_RELATIVE_DIR)/src/meta.cpp \
-	$(COMPONENTS_RELATIVE_DIR)/src/entity_factory.cpp \
-	$(COMPONENTS_RELATIVE_DIR)/src/physics.cpp \
-	$(COMPONENTS_RELATIVE_DIR)/src/rendermesh.cpp \
-	$(COMPONENTS_RELATIVE_DIR)/src/transform.cpp
+  $(COMPONENTS_RELATIVE_DIR)/src/entity_factory.cpp \
+  $(COMPONENTS_RELATIVE_DIR)/src/graph.cpp \
+  $(COMPONENTS_RELATIVE_DIR)/src/meta.cpp \
+  $(COMPONENTS_RELATIVE_DIR)/src/physics.cpp \
+  $(COMPONENTS_RELATIVE_DIR)/src/rendermesh.cpp \
+  $(COMPONENTS_RELATIVE_DIR)/src/transform.cpp
 
 COMPONENTS_SCHEMA_DIR := $(COMPONENTS_DIR)/schemas
 COMPONENTS_SCHEMA_INCLUDE_DIRS := $(DEPENDENCIES_FPLBASE_DIR)/schemas
@@ -75,8 +76,10 @@ include $(BUILD_STATIC_LIBRARY)
 $(call import-add-path,$(DEPENDENCIES_FLATBUFFERS_DIR)/..)
 $(call import-add-path,$(DEPENDENCIES_FPLBASE_DIR)/..)
 $(call import-add-path,$(DEPENDENCIES_MATHFU_DIR)/..)
+$(call import-add-path,$(DEPENDENCIES_BREADBOARD_DIR)/..)
 
 $(call import-module,flatbuffers/android/jni)
 $(call import-module,fplbase/jni)
 $(call import-module,mathfu/jni)
+$(call import-module,breadboard/jni)
 $(call import-module,android/cpufeatures)

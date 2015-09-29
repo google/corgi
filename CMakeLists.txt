@@ -94,18 +94,20 @@ if (entity_build_component_library)
       ${COMPONENT_COLLECTION_DIR}/include/component_library/camera_interface.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/common_services.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/component_utils.h
-      ${COMPONENT_COLLECTION_DIR}/include/component_library/meta.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/entity_factory.h
+      ${COMPONENT_COLLECTION_DIR}/include/component_library/graph.h
+      ${COMPONENT_COLLECTION_DIR}/include/component_library/meta.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/physics.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/rendermesh.h
       ${COMPONENT_COLLECTION_DIR}/include/component_library/transform.h
       ${COMPONENT_COLLECTION_DIR}/src/animation.cpp
       ${COMPONENT_COLLECTION_DIR}/src/common_services.cpp
       ${COMPONENT_COLLECTION_DIR}/src/component_utils.cpp
-      ${COMPONENT_COLLECTION_DIR}/src/meta.cpp
       ${COMPONENT_COLLECTION_DIR}/src/entity_factory.cpp
-      ${COMPONENT_COLLECTION_DIR}/src/rendermesh.cpp
+      ${COMPONENT_COLLECTION_DIR}/src/graph.cpp
+      ${COMPONENT_COLLECTION_DIR}/src/meta.cpp
       ${COMPONENT_COLLECTION_DIR}/src/physics.cpp
+      ${COMPONENT_COLLECTION_DIR}/src/rendermesh.cpp
       ${COMPONENT_COLLECTION_DIR}/src/transform.cpp
   )
   # The component library uses a bunch of Flatbuffers, so we should build them.

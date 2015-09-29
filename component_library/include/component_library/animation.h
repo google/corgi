@@ -15,10 +15,11 @@
 #ifndef COMPONENT_LIBRARY_ANIMATION_H_
 #define COMPONENT_LIBRARY_ANIMATION_H_
 
+#include "breadboard/event.h"
 #include "entity/component.h"
 #include "motive/anim_table.h"
-#include "motive/motivator.h"
 #include "motive/engine.h"
+#include "motive/motivator.h"
 
 namespace motive {
 class RigAnim;
@@ -27,9 +28,13 @@ class RigAnim;
 namespace fpl {
 namespace component_library {
 
-struct AnimationData;
+BREADBOARD_DECLARE_EVENT(kAnimationCompleteEventId)
 
 struct AnimationData {
+  AnimationData()
+      : anim_table_object(-1),
+        previous_time_remaining(motive::kMotiveTimeEndless) {}
+
   // Holds and processes the animation. Call motivator.GlobalTransforms()
   // to get an array of matrices: one for each bone in the animation.
   motive::RigMotivator motivator;
@@ -38,16 +43,15 @@ struct AnimationData {
   // specifies the query parameters for the anim_table_.
   int anim_table_object;
 
-  AnimationData() : anim_table_object(-1) {}
+  // The previous time remaining. Used for firing animation events.
+  motive::MotiveTime previous_time_remaining;
 };
 
 class AnimationComponent : public entity::Component<AnimationData> {
  public:
   // Update all motivators in AnimationData, and any other motivators that
   // were initialized with `engine_`.
-  virtual void UpdateAllEntities(entity::WorldTime delta_time) {
-    engine_.AdvanceFrame(delta_time);
-  }
+  virtual void UpdateAllEntities(entity::WorldTime delta_time);
 
   // Serialize and deserialize.
   virtual void AddFromRawData(entity::EntityRef& entity, const void* data);
