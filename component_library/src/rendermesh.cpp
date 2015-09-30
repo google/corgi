@@ -32,7 +32,7 @@ namespace component_library {
 // Offset the frustrum by this many world-units.  As long as no objects are
 // larger than this number, they should still all draw, even if their
 // registration points technically fall outside our frustrum.
-static const float kFrustrumOffset = 50.0f;
+static const float kFrustrumOffset = 10.0f;
 
 void RenderMeshComponent::Init() {
   asset_manager_ =
