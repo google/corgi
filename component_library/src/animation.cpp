@@ -105,13 +105,15 @@ void AnimationComponent::Animate(const EntityRef& entity, const RigAnim& anim) {
   data->motivator.BlendToAnim(anim);
 }
 
-void AnimationComponent::AnimateFromTable(const entity::EntityRef& entity,
+bool AnimationComponent::AnimateFromTable(const entity::EntityRef& entity,
                                           int anim_idx) {
   const AnimationData* data = Data<AnimationData>(entity);
   const motive::RigAnim* anim =
       anim_table_.Query(data->anim_table_object, anim_idx);
-  assert(anim != nullptr);
+  if (anim == nullptr) return false;
+
   Animate(entity, *anim);
+  return true;
 }
 
 }  // component_library

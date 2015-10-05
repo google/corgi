@@ -63,7 +63,9 @@ class AnimationComponent : public entity::Component<AnimationData> {
   void Animate(const entity::EntityRef& entity, const motive::RigAnim& anim);
 
   // Query the anim_table for an animation, then play it.
-  void AnimateFromTable(const entity::EntityRef& entity, int anim_idx);
+  // Returns true if new animation was started. False if animation could not
+  // be found in anim_table.
+  bool AnimateFromTable(const entity::EntityRef& entity, int anim_idx);
 
   // Return true if an animation exists in the AnimTable for `anim_idx`.
   bool HasAnim(const entity::EntityRef& entity, int anim_idx) const {
