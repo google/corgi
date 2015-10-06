@@ -53,9 +53,7 @@ struct RenderMeshData {
   }
 
   // Implement move operator to avoid reallocating shader_transforms.
-  RenderMeshData(RenderMeshData&& other) {
-    *this = std::move(other);
-  }
+  RenderMeshData(RenderMeshData&& other) { *this = std::move(other); }
   RenderMeshData& operator=(RenderMeshData&& other) {
     mesh = std::move(other.mesh);
     shader = std::move(other.shader);
@@ -115,8 +113,9 @@ class RenderMeshComponent : public entity::Component<RenderMeshData> {
  public:
   static const int kDefaultCullDist = 80;
 
-  RenderMeshComponent() : asset_manager_(nullptr),
-    culling_distance_squared(kDefaultCullDist * kDefaultCullDist) {}
+  RenderMeshComponent()
+      : asset_manager_(nullptr),
+        culling_distance_squared_(kDefaultCullDist * kDefaultCullDist) {}
 
   virtual void Init();
   virtual void AddFromRawData(entity::EntityRef& entity, const void* raw_data);
@@ -161,7 +160,12 @@ class RenderMeshComponent : public entity::Component<RenderMeshData> {
   }
 
   void SetCullDistance(float distance) {
-    culling_distance_squared = distance * distance;
+    culling_distance_squared_ = distance * distance;
+  }
+
+  float culling_distance_squared() const { return culling_distance_squared_; }
+  void set_culling_distance_squared(float culling_distance_squared) {
+    culling_distance_squared_ = culling_distance_squared;
   }
 
  private:
@@ -171,10 +175,10 @@ class RenderMeshComponent : public entity::Component<RenderMeshData> {
   // these.)
   mathfu::vec3 light_position_;
   AssetManager* asset_manager_;
-  float culling_distance_squared;
+  float culling_distance_squared_;
   // An array of vectors we use for keeping track of things we're going
   // to render.
-  std::vector<RenderlistEntry> pass_render_list[RenderPass_Count];
+  std::vector<RenderlistEntry> pass_render_list_[RenderPass_Count];
 };
 
 }  // component_library

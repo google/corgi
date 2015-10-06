@@ -46,7 +46,7 @@ void RenderMeshComponent::InitEntity(entity::EntityRef& entity) {
 
 void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
   for (int pass = 0; pass < RenderPass_Count; pass++) {
-    pass_render_list[pass].clear();
+    pass_render_list_[pass].clear();
   }
   for (auto iter = component_data_.begin(); iter != component_data_.end();
        ++iter) {
@@ -88,19 +88,19 @@ void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
         // Are we culling this object based on view distance?  If so,
         // is it far enough away that we should skip it?
         if ((rendermesh_data->culling_mask & (1 << CullingTest_Distance)) &&
-            rendermesh_data->z_depth > culling_distance_squared) {
+            rendermesh_data->z_depth > culling_distance_squared()) {
           continue;
         }
 
-        pass_render_list[pass].push_back(
+        pass_render_list_[pass].push_back(
             RenderlistEntry(iter->entity, &iter->data));
       }
     }
   }
-  std::sort(pass_render_list[RenderPass_Opaque].begin(),
-            pass_render_list[RenderPass_Opaque].end());
-  std::sort(pass_render_list[RenderPass_Alpha].begin(),
-            pass_render_list[RenderPass_Alpha].end(),
+  std::sort(pass_render_list_[RenderPass_Opaque].begin(),
+            pass_render_list_[RenderPass_Opaque].end());
+  std::sort(pass_render_list_[RenderPass_Alpha].begin(),
+            pass_render_list_[RenderPass_Alpha].end(),
             std::greater<RenderlistEntry>());
 }
 
@@ -127,8 +127,8 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
                                      const Shader* shader_override) {
   mat4 camera_vp = camera.GetTransformMatrix();
 
-  for (size_t i = 0; i < pass_render_list[pass_id].size(); i++) {
-    entity::EntityRef& entity = pass_render_list[pass_id][i].entity;
+  for (size_t i = 0; i < pass_render_list_[pass_id].size(); i++) {
+    entity::EntityRef& entity = pass_render_list_[pass_id][i].entity;
 
     RenderMeshData* rendermesh_data = Data<RenderMeshData>(entity);
 
@@ -163,16 +163,15 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
     // The positions are normally supplied by the animation, but if they are
     // not, use the default pose in the RenderMesh.
     if (num_mesh_bones > 1) {
-      const bool use_default_pose = num_anim_bones != num_mesh_bones ||
-                                    rendermesh_data->default_pose;
+      const bool use_default_pose =
+          num_anim_bones != num_mesh_bones || rendermesh_data->default_pose;
       const mat4* bone_transforms =
           use_default_pose ? rendermesh_data->mesh->bone_global_transforms()
                            : anim_data->motivator.GlobalTransforms();
       rendermesh_data->mesh->GatherShaderTransforms(
           bone_transforms, rendermesh_data->shader_transforms);
-      renderer.SetBoneTransforms(
-          rendermesh_data->shader_transforms,
-          rendermesh_data->num_shader_transforms);
+      renderer.SetBoneTransforms(rendermesh_data->shader_transforms,
+                                 rendermesh_data->num_shader_transforms);
     }
 
     if (!shader_override && rendermesh_data->shader) {
