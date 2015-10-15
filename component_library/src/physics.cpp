@@ -712,7 +712,7 @@ void PhysicsComponent::GenerateRaycastShape(entity::EntityRef& entity,
 
 void PhysicsComponent::DebugDrawWorld(Renderer* renderer,
                                       const mathfu::mat4& camera_transform) {
-  renderer->model_view_projection() = camera_transform;
+  renderer->set_model_view_projection(camera_transform);
   debug_drawer_.set_renderer(renderer);
   bullet_world_->debugDrawWorld();
 }
@@ -725,7 +725,7 @@ void PhysicsComponent::DebugDrawObject(Renderer* renderer,
   if (physics_data == nullptr) {
     return;
   }
-  renderer->model_view_projection() = camera_transform;
+  renderer->set_model_view_projection(camera_transform);
   debug_drawer_.set_renderer(renderer);
   for (int i = 0; i < physics_data->body_count; i++) {
     auto rb_data = &physics_data->rigid_bodies[i];
@@ -737,7 +737,7 @@ void PhysicsComponent::DebugDrawObject(Renderer* renderer,
 void PhysicsDebugDrawer::drawLine(const btVector3& from, const btVector3& to,
                                   const btVector3& color) {
   if (renderer_ != nullptr) {
-    renderer_->color() = vec4(color.x(), color.y(), color.z(), 1.0f);
+    renderer_->set_color(vec4(color.x(), color.y(), color.z(), 1.0f));
     if (shader_ != nullptr) {
       shader_->Set(*renderer_);
     }

@@ -153,11 +153,11 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
     const mat4 mvp = camera_vp * world_transform;
     const mat4 world_matrix_inverse = world_transform.Inverse();
 
-    renderer.camera_pos() = world_matrix_inverse * camera.position();
-    renderer.light_pos() = world_matrix_inverse * light_position_;
-    renderer.model_view_projection() = mvp;
-    renderer.color() = rendermesh_data->tint;
-    renderer.model() = world_transform;
+    renderer.set_camera_pos(world_matrix_inverse * camera.position());
+    renderer.set_light_pos(world_matrix_inverse * light_position_);
+    renderer.set_model_view_projection(mvp);
+    renderer.set_color(rendermesh_data->tint);
+    renderer.set_model(world_transform);
 
     // If the mesh has a skeleton, we need to update the bone positions.
     // The positions are normally supplied by the animation, but if they are
