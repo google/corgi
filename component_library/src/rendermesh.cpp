@@ -92,8 +92,8 @@ void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
           continue;
         }
 
-        pass_render_list_[pass].push_back(
-            RenderlistEntry(iter->entity, &iter->data));
+        pass_render_list_[pass]
+            .push_back(RenderlistEntry(iter->entity, &iter->data));
       }
     }
   }
@@ -145,17 +145,13 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
     const bool has_one_bone_anim =
         has_anim && (num_mesh_bones <= 1 || num_anim_bones == 1);
     const mat4 world_transform =
-        has_one_bone_anim
-            ? transform_data->world_transform *
-                  anim_data->motivator.GlobalTransforms()[0]
-            : transform_data->world_transform;
+        has_one_bone_anim ? transform_data->world_transform *
+                                anim_data->motivator.GlobalTransforms()[0]
+                          : transform_data->world_transform;
 
     const mat4 mvp = camera_vp * world_transform;
     const mat4 world_matrix_inverse = world_transform.Inverse();
-
-    renderer.set_camera_pos(world_matrix_inverse * camera.position());
     renderer.set_light_pos(world_matrix_inverse * light_position_);
-    renderer.set_model_view_projection(mvp);
     renderer.set_color(rendermesh_data->tint);
     renderer.set_model(world_transform);
 
@@ -174,12 +170,32 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
                                  rendermesh_data->num_shader_transforms);
     }
 
-    if (!shader_override && rendermesh_data->shader) {
-      rendermesh_data->shader->Set(renderer);
+    if (!camera.IsStereo()) {
+      renderer.set_camera_pos(world_matrix_inverse * camera.position());
+      renderer.set_model_view_projection(mvp);
+
+      if (!shader_override && rendermesh_data->shader) {
+        rendermesh_data->shader->Set(renderer);
+      } else {
+        shader_override->Set(renderer);
+      }
+
+      rendermesh_data->mesh->Render(renderer);
     } else {
-      shader_override->Set(renderer);
+      const Shader* shader = nullptr;
+      if (!shader_override && rendermesh_data->shader) {
+        shader = rendermesh_data->shader;
+      } else {
+        shader = shader_override;
+      }
+      vec4i viewport[2] = {camera.viewport(0), camera.viewport(1)};
+      mat4 camera_vp_stereo = camera.GetTransformMatrix(1);
+      mat4 mvp_matrices[2] = {mvp, camera_vp_stereo * world_transform};
+      vec3 camera_positions[2] = {world_matrix_inverse * camera.position(0),
+                                  world_matrix_inverse * camera.position(1)};
+      rendermesh_data->mesh->RenderStereo(renderer, shader, viewport,
+                                          mvp_matrices, camera_positions);
     }
-    rendermesh_data->mesh->Render(renderer);
   }
 }
 

@@ -27,11 +27,12 @@ class CameraInterface {
  public:
   virtual ~CameraInterface() {}
 
-  virtual mathfu::mat4 GetTransformMatrix() const = 0;
-  virtual mathfu::mat4 GetViewMatrix() const = 0;
+  virtual mathfu::mat4 GetTransformMatrix(int32_t index = 0) const = 0;
+  virtual mathfu::mat4 GetViewMatrix(int32_t index = 0) const = 0;
 
-  virtual mathfu::vec3 position() const = 0;
+  virtual mathfu::vec3 position(int32_t index = 0) const = 0;
   virtual void set_position(const mathfu::vec3& position) = 0;
+  virtual void set_position(int32_t index, const mathfu::vec3& position) = 0;
 
   virtual const mathfu::vec3& facing() const = 0;
   virtual void set_facing(const mathfu::vec3& facing) = 0;
@@ -49,6 +50,11 @@ class CameraInterface {
   virtual float viewport_near_plane() const = 0;
   virtual void set_viewport_far_plane(float viewport_far_plane) = 0;
   virtual float viewport_far_plane() const = 0;
+
+  virtual void set_viewport(int32_t index, const mathfu::vec4i& viewport) = 0;
+  virtual const mathfu::vec4i& viewport(int32_t index) const = 0;
+  virtual bool IsStereo() const = 0;
+  virtual void set_stereo(bool b) = 0;
 };
 
 }  // fpl
