@@ -25,28 +25,55 @@
 namespace fpl {
 namespace entity {
 
-// Component class.
-// All components should should extend this class.  The type T is used to
-// specify the structure of the data that needs to be associated with each
-// entity.
-//
-// Note: On some of the API, EntityRef& parameters are non-const so that
-//       the referenced entity can be changed. The EntityRef itself is
-//       never modified.
+/// @file
+/// @class Component
+/// @brief A Component is an object that encapsulates all data and logic
+/// for Entities of a particular type.
+///
+/// @note On some of the API, EntityRef& parameters are non-const so that
+/// the referenced Entity can be changed. The EntityRef itself is never
+/// modified.
+///
+/// @tparam T The structure of data that needs to be associated with each
+/// Entity.
 template <typename T>
 class Component : public ComponentInterface {
  public:
-  // Structure associated with each entity.
-  // Contains the template struct, as well as a pointer back to the
-  // entity that owns this data.
+  /// @struct ComponentData
+  /// @brief A structure of data that is associated with each Entity.
+  ///
+  /// It contains the template struct, as well as a pointer back to the
+  /// Entity that owns this data.
   struct ComponentData {
+    /// @brief The default constructor for an empty ComponentData.
     ComponentData() {}
+
+    /// @var entity
+    ///
+    /// @brief The Entity associated with this data.
     EntityRef entity;
+
+    /// @var data
+    ///
+    /// @brief The data to associate with the Entity.
     T data;
+
+    /// @brief Construct a new ComponentData from an existing ComponentData.
+    ///
+    /// @param[in] src An existing ComponentData whose data should be moved
+    /// into the new ComponentData.
     ComponentData(ComponentData&& src) {
       entity = std::move(src.entity);
       data = std::move(src.data);
     }
+
+    /// @brief Move a referenced ComponentData into this ComponentData.
+    ///
+    /// Move operators are efficient since they allow referenced data to
+    /// be moved instead of copied.
+    ///
+    /// @param[in] src A referenced ComponentData to be moved into this
+    /// ComponentData.
     ComponentData& operator=(ComponentData&& src) {
       entity = std::move(src.entity);
       data = std::move(src.data);
@@ -57,24 +84,47 @@ class Component : public ComponentInterface {
     ComponentData(const ComponentData&);
     ComponentData& operator=(const ComponentData&);
   };
+
+  /// @typedef EntityIterator
+  ///
+  /// @brief An iterator to iterate through all of the Entities in the
+  /// Component.
   typedef typename VectorPool<ComponentData>::Iterator EntityIterator;
+
+  /// @typedef value_type
+  ///
+  /// @brief The templated data type stored by this Component.
   typedef T value_type;
 
+  /// @brief Construct a Component without an EntityManager.
   Component() : entity_manager_(nullptr) {}
 
+  /// @brief Destructor for a Component.
   virtual ~Component() {}
 
-  // AddEntity is a much better function, but we can't have it in the
-  // interface class, since it needs to know about type T for the return
-  // value.  This provides an alternate way to add things if you don't
-  // care about the returned data structure, and you don't feel like
-  // casting the BaseComponent into something more specific.
+  /// @brief Provides an alternate way to add Entities if you do not
+  /// care about the returned data structure, and if you do not feel like
+  /// casting the BaseComponent into something more specific.
+  ///
+  /// @note AddEntity is a much better function, except we cannot have it in
+  /// the interface class, since it needs to know about type T for the return
+  /// value.
+  ///
+  /// @param[in] entity An EntityRef reference used to add an Entity.
   virtual void AddEntityGenerically(EntityRef& entity) { AddEntity(entity); }
 
-  // Adds an entity to the list of things this component is tracking.
-  // Returns the data structure associated with the component.
-  // Note that if we're already registered for this component, this
-  // will just return a reference to the existing data and not change anything.
+  /// @brief Adds an Entity to the list that this Component is tracking.
+  ///
+  /// @param[in] entity An EntityRef reference used to add an Entity to the
+  /// list of Entities that this Component keeps track of.
+  /// @param[in] alloc_location An Enum that specifies whether to allocate from
+  /// the beginning or end of the memory pool.
+  ///
+  /// @return Returns the data structure associated with the Component.
+  ///
+  /// @note If you have already registered for this Component, this
+  /// will just return a reference to the existing data and will not change
+  /// anything.
   T* AddEntity(EntityRef& entity, AllocationLocation alloc_location) {
     if (entity->IsRegisteredForComponent(GetComponentId())) {
       return GetComponentData(entity);
@@ -89,19 +139,42 @@ class Component : public ComponentInterface {
     return &(component_data->data);
   }
 
+  /// @brief Adds an Entity to the list that this Component is tracking.
+  ///
+  /// @note Entities added through this function allocate from the back of the
+  /// memory pool.
+  ///
+  /// @param[in] entity An EntityRef reference used to add an Entity to the
+  /// list of Entities that this Component keeps track of.
+  ///
+  /// @return Returns the data structure associated with the Component.
   T* AddEntity(EntityRef& entity) { return AddEntity(entity, kAddToBack); }
 
-  // Removes an entity from our list of entities, marks the entity as not using
-  // this component anymore, calls the destructor on the data, and returns
-  // the memory to the memory pool.
+  /// @brief Removes an Entity from the list of Entities.
+  ///
+  /// This is done by marking the Entity as no longer using this Component,
+  /// calling the destructor on the data, and returning the memory to the
+  /// memory pool.
+  ///
+  /// @param[in] entity An EntityRef reference used to remove an Entity
+  /// from the list of Entities that this Component keeps track of.
   virtual void RemoveEntity(EntityRef& entity) {
     RemoveEntityInternal(entity);
     component_data_.FreeElement(GetComponentDataIndex(entity));
     entity->SetComponentDataIndex(GetComponentId(), kUnusedComponentIndex);
   }
 
-  // Same as RemoveEntity() above, but returns an iterator to the entity after
-  // the one we've just removed.
+  /// @brief Removes an Entity from the list of Entities.
+  ///
+  /// This is done by marking the Entity as no longer using this Component,
+  /// calling the destructor on the data, and returning the memory to the
+  /// memory pool.
+  ///
+  /// @param[in] iter An EntityIterator that references an Entity that should
+  /// be removed.
+  ///
+  /// @return Returns an iterator to the next Entity after the one that was
+  /// just removed.
   virtual EntityIterator RemoveEntity(EntityIterator iter) {
     EntityRef entity = iter->entity;
     RemoveEntityInternal(entity);
@@ -110,28 +183,72 @@ class Component : public ComponentInterface {
     return new_iter;
   }
 
-  // Gets an iterator that will iterate over every entity in the component.
+  /// @brief Gets an iterator that will iterate over every Entity associated
+  /// with the Component, starting from the beginning.
+  ///
+  /// @return Returns an iterator in the style of std that points to the first
+  /// Entity in the list of all Entities in the Component.
   virtual EntityIterator begin() { return component_data_.begin(); }
 
-  // Gets an iterator which points to the end of the list of all entities in the
-  // component.
+  /// @brief Gets an iterator that points to the end of the list of all entites
+  /// in the Component.
+  ///
+  /// @return Returns an iterator in the style of std that points to the last
+  /// Entity in the list of all Entities in the Component.
   virtual EntityIterator end() { return component_data_.end(); }
 
-  // Updates all entities.  Normally called by EntityManager, once per frame.
+  /// @brief Updates all Entities. This is normally called, once per frame,
+  /// by the EntityManager.
   virtual void UpdateAllEntities(WorldTime /*delta_time*/) {}
 
-  // Returns the data for an entity as a void pointer.  The calling function
-  // is expected to know what to do with it.
-  // Returns null if the data does not exist.
+  /// @brief Gets the data for a given Entity as a void pointer.
+  ///
+  /// @note When using GetComponentDataAsVoid, the calling function is expected
+  /// to know how to handle the data (since it is returned as a void pointer).
+  ///
+  /// @warning This pointer is NOT stable in memory. Calls to AddEntity and
+  /// AddEntityGenerically may force the storage class to resize,
+  /// shuffling around the location of this data.
+  ///
+  /// @param[in] entity An EntityRef reference to the Entity whose data should
+  /// be returned.
+  ///
+  /// @return Returns the Entity's data as a void pointer, or returns a nullptr
+  /// if the data does not exist.
   virtual void* GetComponentDataAsVoid(const EntityRef& entity) {
     return GetComponentData(entity);
   }
+
+  /// @brief Gets the data for a given Entity as a const void pointer.
+  ///
+  /// @note When using GetComponentDataAsVoid, the calling function is expected
+  /// to know how to handle the data (since it is returned as a const
+  /// void pointer).
+  ///
+  /// @warning This pointer is NOT stable in memory. Calls to AddEntity and
+  /// AddEntityGenerically may force the storage class to resize,
+  /// shuffling around the location of this data.
+  ///
+  /// @param[in] entity An EntityRef reference to the Entity whose data should
+  /// be returned.
+  ///
+  /// @return Returns the Entity's data as a const void pointer, or returns a
+  /// nullptr if the data does not exist.
   virtual const void* GetComponentDataAsVoid(const EntityRef& entity) const {
     return GetComponentData(entity);
   }
 
-  // Return the data we have stored at a given index.
-  // Returns null if data_index indicates this component isn't present.
+  /// @brief Gets the Component data stored at a given index.
+  ///
+  /// @warning This pointer is NOT stable in memory. Calls to AddEntity and
+  /// AddEntityGenerically may force the storage class to resize,
+  /// shuffling around the location of this data.
+  ///
+  /// @param[in] data_index A size_t representing the index of the desired
+  /// Component data.
+  ///
+  /// @return Returns a pointer of the data structure associated with the
+  /// Component data, or returns a nullptr if given an invalid data_index.
   T* GetComponentData(size_t data_index) {
     if (data_index == kUnusedComponentIndex) {
       return nullptr;
@@ -140,8 +257,18 @@ class Component : public ComponentInterface {
     return (element_data != nullptr) ? &(element_data->data) : nullptr;
   }
 
-  // Return the data we have stored at a given index.
-  // Returns null if data_index indicates this component isn't present.
+  /// @brief Gets the data for a given Entity.
+  ///
+  /// @warning This pointer is NOT stable in memory. Calls to AddEntity and
+  /// AddEntityGenerically may force the storage class to resize,
+  /// shuffling around the location of this data.
+  ///
+  /// @param[in] entity An EntityRef reference to the Entity whose data should
+  /// be returned.
+  ///
+  /// @return Returns the Entity's data as a pointer of the data structure
+  /// associated with the Component data, or returns a nullptr if the data
+  /// does not exist.
   T* GetComponentData(const EntityRef& entity) {
     size_t data_index = GetComponentDataIndex(entity);
     if (data_index >= component_data_.Size()) {
@@ -150,45 +277,84 @@ class Component : public ComponentInterface {
     return GetComponentData(data_index);
   }
 
-  // Return the data we have stored at a given index.
-  // Returns null if the data does not exist.
-  // WARNING: This pointer is NOT stable in memory.  Calls to AddEntity and
-  // AddEntityGenerically may force the storage class to resize,
-  // shuffling around the location of this data.
+  /// @brief Gets the Component data stored at a given index.
+  ///
+  /// @warning This pointer is NOT stable in memory. Calls to AddEntity and
+  /// AddEntityGenerically may force the storage class to resize,
+  /// shuffling around the location of this data.
+  ///
+  /// @param[in] data_index A size_t representing the index of the desired
+  /// Component data.
+  ///
+  /// @return Returns a const pointer of the data structure associated with the
+  /// Component data, or returns a nullptr if given an invalid data_index.
   const T* GetComponentData(size_t data_index) const {
     return const_cast<Component*>(this)->GetComponentData(data_index);
   }
 
-  // Return our data for a given entity.
-  // Returns null if the data does not exist.
-  // WARNING: This pointer is NOT stable in memory.  Calls to AddEntity and
-  // AddEntityGenerically may force the storage class to resize,
-  // shuffling around the location of this data.
+  /// @brief Gets the data for a given Entity.
+  ///
+  /// @warning This pointer is NOT stable in memory. Calls to AddEntity and
+  /// AddEntityGenerically may force the storage class to resize,
+  /// shuffling around the location of this data.
+  ///
+  /// @param[in] entity An EntityRef reference to the Entity whose data should
+  /// be returned.
+  ///
+  /// @return Returns the Entity's data as a const pointer of the data
+  /// structure associated with the Component data, or returns a nullptr
+  /// if the data does not exist.
   const T* GetComponentData(const EntityRef& entity) const {
     return const_cast<Component*>(this)->GetComponentData(entity);
   }
 
-  // Clears all tracked component data.
+  /// @brief Clears all tracked Component data.
   void virtual ClearComponentData() {
     for (auto iter = component_data_.begin(); iter != component_data_.end();
          iter = RemoveEntity(iter)) {
     }
   }
 
-  // Utility function for getting the component data for a specific component.
+  /// @brief A utility function for retrieving the Component data for an
+  /// Entity from a specific Component.
+  ///
+  /// @tparam ComponentDataType The data type of the Component whose data
+  /// is returned for the given Entity.
+  ///
+  /// @param[in] entity An EntityRef reference to the Entity whose Component
+  /// data should be returned.
+  ///
+  /// @return Returns a pointer to the data for the Component of the given
+  /// Entity or returns null if the Entity is not registered with the
+  /// Component.
   template <typename ComponentDataType>
   ComponentDataType* Data(const EntityRef& entity) {
     return entity_manager_->GetComponentData<ComponentDataType>(entity);
   }
 
-  // Utility function for getting the component data for a specific component.
+  /// @brief A utility function for retrieving the Component data for an
+  /// Entity from a specific Component.
+  ///
+  /// @tparam ComponentDataType The data type of the Component whose data
+  /// is returned for the given Entity.
+  ///
+  /// @param[in] entity An EntityRef reference to the Entity whose Component
+  /// data should be returned.
+  ///
+  /// @return Returns a pointer to the data for the Component of the given
+  /// Entity or returns null if the Entity is not registered with the
+  /// Component.
   template <typename ComponentDataType>
   ComponentDataType* Data(const EntityRef& entity) const {
     return entity_manager_->GetComponentData<ComponentDataType>(entity);
   }
 
-
-  // Utility function for getting the component object for a specific component.
+  /// @brief A utility function for retrieving a reference to a specific
+  /// Component object, by type.
+  ///
+  /// @tparam ComponentDataType The data type of the Component.
+  ///
+  /// @return Returns a pointer to the data for a specific Component.
   template <typename ComponentDataType>
   ComponentDataType* GetComponent() {
     return static_cast<ComponentDataType*>(entity_manager_->GetComponent(
@@ -197,58 +363,94 @@ class Component : public ComponentInterface {
 
   // Virtual methods we inherited from component_interface:
 
-  // Override this with any code that we want to execute when the component
-  // is added to the entity manager.  (i. e. once, at the beginning of the
-  // game, before any entities are added.)
+  /// @brief Override this function with code that should be executed when
+  /// the Component is added to the EntityManager. (This typically
+  /// happens once, at the beginning of the game before any Entities are
+  /// added.)
   virtual void Init() {}
 
-  // Override this with code that we want to execute when an entity is added.
+  /// @brief Override this function with code that should be executed when an
+  /// Entity is added to the Component.
   virtual void InitEntity(EntityRef& /*entity*/) {}
 
-  // By default, components don't support this functionality. If you do
-  // support it, override this to return raw data that you can read back later.
+  /// @brief Override this function to return raw data that can be read back
+  /// later.
+  ///
+  /// @warning By default, Components do not support this functionality. If you
+  /// wish to support this, you will need to override this function.
+  ///
+  /// @return By default, this returns a nullptr.
   virtual RawDataUniquePtr ExportRawData(const EntityRef& /*unused*/) const {
     return nullptr;
   }
 
-  // Override this with code that executes when this component is removed from
-  // the entity manager.  (i. e. usually when the game/state is over and
-  // everythingis shutting down.)
+  /// @brief Override this function with any code that executes when this
+  /// Component is removed from the EntityManager. (i.e. Usually when the
+  /// game/state is over and everything is shutting down.)
   virtual void Cleanup() {}
 
-  // Override this with any code that needs to execute when an entity is
-  // removed from this component.
+  /// @brief Override this function with any code that needs to be executed
+  /// when an Entity is removed from this Component.
   virtual void CleanupEntity(EntityRef& /*entity*/) {}
 
-  // Set the entity manager for this component.  (used as the main point of
-  // contact for components that need to talk to other things.)
+  /// @brief Set the EntityManager for this Component.
+  ///
+  /// @note The EntityManager is used as the main point of contact
+  /// for Components that need to talk to other things.
+  ///
+  /// @param[in] entity_manager A pointer to an EntityManager to associate
+  /// with this Component.
   virtual void SetEntityManager(EntityManager* entity_manager) {
     entity_manager_ = entity_manager;
   }
 
-  // Returns the ID of this component.
+  /// @brief Get the ID for this Component.
+  ///
+  /// @return Returns the Component ID for this Component.
   static ComponentId GetComponentId() {
     return static_cast<ComponentId>(ComponentIdLookup<T>::component_id);
   }
 
-  // Called by the entity manager; sets the component ID on the data type.
-  // The entity manager handles setting the component ID on the component type.
+  /// @brief Sets the Component ID on the data type.
+  ///
+  /// @note This is usually only called by the EntityManager.
+  ///
+  /// @param[in] id The Component ID to set on the data type.
   virtual void SetComponentIdOnDataType(ComponentId id) {
     ComponentIdLookup<T>::component_id = id;
   }
 
  private:
+  /// @brief Allows Components to handle any per-Entity clean up that may
+  /// be needed.
+  ///
+  /// @param[in] entity An EntityRef reference to the Entity that is being
+  /// removed and may need to be cleaned up.
   void RemoveEntityInternal(EntityRef& entity) {
-    // Allow components to handle any per-entity cleanup that it needs to do.
     CleanupEntity(entity);
   }
 
  protected:
+  /// @brief Get the index of the Component data for a given Entity.
+  ///
+  /// @param[in] entity An EntityRef reference to the Entity whose data
+  /// index will be returned.
+  ///
+  /// @return Returns a size_t corresponding to the index of the
+  /// Component data.
   size_t GetComponentDataIndex(const EntityRef& entity) const {
     return entity->GetComponentDataIndex(GetComponentId());
   }
 
+  /// @var component_data_
+  ///
+  /// @brief Storage for all of the data for the Component.
   VectorPool<ComponentData> component_data_;
+
+  /// @var entity_manager_
+  ///
+  /// @brief A pointer to the EntityManager for this Component. This is the
+  /// main point of contact for Components that need to talk to other things.
   EntityManager* entity_manager_;
 };
 
