@@ -79,7 +79,12 @@ class GraphComponent : public entity::Component<GraphData> {
  public:
   // Once entities themselves have been initialized, initialize the graphs. This
   // must be done after because graphs may reference entities.
+  //
+  // PostLoadFixup will fix up all loaded entities. If you create single
+  // entities later, individual calls to EntityPostLoadFixup are required on a
+  // per-entity basis.
   void PostLoadFixup();
+  void EntityPostLoadFixup(entity::EntityRef& entity);
 
   // Gets the broadcaster for an entity, even if that entity does not yet have
   // one.

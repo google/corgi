@@ -220,7 +220,8 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   // Generates a static mesh shape and adds it to the world, based on the
   // previously added static mesh triangles.
   void FinalizeStaticMesh(const entity::EntityRef& entity, short collision_type,
-                          short collides_with, float mass, float restitution);
+                          short collides_with, float mass, float restitution,
+                          const std::string& user_tag);
 
   // Generate an AABB based on the rendermesh that collides with the raycast
   // layer. Note, if the entity already collides with the raycast layer, no
