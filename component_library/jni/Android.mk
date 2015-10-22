@@ -68,7 +68,9 @@ $(call flatbuffers_header_build_rules, \
   $(COMPONENTS_SCHEMA_DIR), \
   $(COMPONENTS_GENERATED_OUTPUT_DIR), \
   $(COMPONENTS_SCHEMA_INCLUDE_DIRS), \
-  $(LOCAL_SRC_FILES))
+  $(LOCAL_SRC_FILES),\
+  component_library_generated_includes,\
+  fplbase_generated_includes)
 endif
 
 include $(BUILD_STATIC_LIBRARY)
