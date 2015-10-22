@@ -57,12 +57,10 @@ void GraphComponent::AddFromRawData(entity::EntityRef& entity,
   }
 }
 
-void GraphComponent::PostLoadFixup() {
-  for (auto iter = component_data_.begin(); iter != component_data_.end();
-       ++iter) {
-    entity::EntityRef& entity = iter->entity;
-    graph_entity_ = entity;
-    GraphData* graph_data = Data<GraphData>(entity);
+void GraphComponent::EntityPostLoadFixup(entity::EntityRef& entity) {
+  graph_entity_ = entity;
+  GraphData* graph_data = Data<GraphData>(entity);
+  if (graph_data) {
     for (auto graph_iter = graph_data->graphs.begin();
          graph_iter != graph_data->graphs.end(); ++graph_iter) {
       breadboard::Graph* graph =
@@ -71,6 +69,13 @@ void GraphComponent::PostLoadFixup() {
         graph_iter->graph_state->Initialize(graph);
       }
     }
+  }
+}
+
+void GraphComponent::PostLoadFixup() {
+  for (auto iter = component_data_.begin(); iter != component_data_.end();
+       ++iter) {
+    EntityPostLoadFixup(iter->entity);
   }
 }
 

@@ -563,7 +563,8 @@ void PhysicsComponent::AddStaticMeshTriangle(const entity::EntityRef& entity,
 void PhysicsComponent::FinalizeStaticMesh(const entity::EntityRef& entity,
                                           short collision_type,
                                           short collides_with, float mass,
-                                          float restitution) {
+                                          float restitution,
+                                          const std::string& user_tag) {
   PhysicsData* data = GetComponentData(entity);
   assert(data != nullptr && data->triangle_mesh.get() != nullptr);
 
@@ -606,6 +607,7 @@ void PhysicsComponent::FinalizeStaticMesh(const entity::EntityRef& entity,
   rb_data->rigid_body->setCollisionFlags(
       rb_data->rigid_body->getCollisionFlags() |
       btCollisionObject::CF_KINEMATIC_OBJECT);
+  rb_data->user_tag = user_tag;
   bullet_world_->addRigidBody(rb_data->rigid_body.get(),
                               rb_data->collision_type, rb_data->collides_with);
   data->enabled = true;
