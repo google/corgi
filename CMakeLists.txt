@@ -105,29 +105,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${C_FLAGS_WARNINGS}")
 set(CMAKE_CXX_FLAGS_DEFAULT "${CMAKE_CXX_FLAGS}")
 set(CMAKE_C_FLAGS_DEFAULT "${CMAKE_C_FLAGS}")
 
-# Disable warnings as when building Bullet.
-function(bullet_cflags)
-  if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
-     CMAKE_COMPILER_IS_CLANGXX)
-    string(REPLACE "-Werror" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    string(REPLACE "-Werror" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-  endif()
-  if(APPLE)
-    # These additional flags are needed because of Bullet's btSolverBody.h
-    # and btConvexHullShape.h causing warnings with the Apple build
-    set(CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS} -Wno-ignored-qualifiers -Wno-overloaded-virtual")
-  endif()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" PARENT_SCOPE)
-endfunction()
-
-# Use default CFLAGS.
-function(default_cflags)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_DEFAULT}" PARENT_SCOPE)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_DEFAULT}" PARENT_SCOPE)
-endfunction()
-
 # Library targets.
 add_library(entity ${entity_SRCS})
 
@@ -171,8 +148,12 @@ if (entity_build_component_library)
     add_subdirectory("${dependencies_breadboard_dir}" ${tmp_dir}/breadboard)
   endif()
 
+  if(NOT TARGET fplbase)
+    add_subdirectory("${dependencies_fplbase_dir}" ${tmp_dir}/fplbase)
+  endif()
+
   if(NOT TARGET LinearMath)
-    bullet_cflags()
+    set_compiler_flags_for_external_libraries()
     set(BUILD_CPU_DEMOS OFF CACHE BOOL "")
     set(BUILD_BULLET2_DEMOS OFF CACHE BOOL "")
     set(BUILD_BULLET3 OFF CACHE BOOL "")
@@ -181,11 +162,7 @@ if (entity_build_component_library)
     set(USE_MSVC_RUNTIME_LIBRARY_DLL ON)
     add_subdirectory("${dependencies_bulletphysics_distr_dir}"
                      ${tmp_dir}/bulletphysics)
-    default_cflags()
-  endif()
-
-  if(NOT TARGET fplbase)
-    add_subdirectory("${dependencies_fplbase_dir}" ${tmp_dir}/fplbase)
+    restore_compiler_flags()
   endif()
 
   set(mathfu_build_benchmarks OFF CACHE BOOL "")
@@ -241,7 +218,7 @@ if (entity_build_component_library)
   include_directories(${dependencies_mathfu_dir}/include)
   include_directories(${dependencies_pindrop_dir}/include)
 
-  bullet_cflags()
+  set_compiler_flags_for_external_libraries()
   add_library(component_library ${component_library_SRCS})
   add_dependencies(component_library
                    entity
@@ -250,4 +227,5 @@ if (entity_build_component_library)
   target_link_libraries(component_library LINK_INTERFACE_LIBRARIES
                         BulletDynamics BulletCollision LinearMath)
   mathfu_configure_flags(component_library)
+  restore_compiler_flags()
 endif()  # entity_build_component_library

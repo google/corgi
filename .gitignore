@@ -2,3 +2,9 @@ CMakeFiles/*
 component_library/CMakeFiles/*
 component_library/gen
 *~
+CMakeCache.txt
+Makefile
+assets/
+bin/
+cmake_install.cmake
+obj/

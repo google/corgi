@@ -16,6 +16,12 @@
 #define COMPONENT_LIBRARY_BULLET_PHYSICS_H_
 
 // Suppress warnings in the Bullet header files.
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverloaded-virtual"
+#pragma clang diagnostic ignored "-Wignored-qualifiers"
+#endif // defined(__clang__)
+
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable : 4127)  // conditional expression is constant
@@ -36,5 +42,9 @@
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif  // defined(_MSC_VER)
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif // defined(__clang__)
 
 #endif  // COMPONENT_LIBRARY_BULLET_PHYSICS_H_
