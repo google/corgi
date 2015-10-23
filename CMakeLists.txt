@@ -23,7 +23,6 @@ option(entity_build_component_library
 set(entity_DEBUG ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
-get_directory_property(entity_has_parent PARENT_DIRECTORY)
 
 # Directory which contains the source for 3rd party libraries.
 if(NOT DEFINED third_party_root)
@@ -86,8 +85,125 @@ set(entity_SRCS
 # Includes for this project.
 include_directories(src include)
 
+# Detect clang
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  set(CMAKE_COMPILER_IS_CLANGXX 1)
+endif()
+
+# Compiler flags.
+set(C_FLAGS_WARNINGS "")
+if(MSVC)
+  set(C_FLAGS_WARNINGS
+      "/W4 /WX /wd4065 /wd4355 /wd4127 /wd4244 /wd4512 /wd4800")
+elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
+       CMAKE_COMPILER_IS_CLANGXX)
+  set(CMAKE_CXX_FLAGS
+      "${CMAKE_CXX_FLAGS} -std=c++0x -Wall -pedantic -Werror -Wextra")
+endif()
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS_WARNINGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${C_FLAGS_WARNINGS}")
+set(CMAKE_CXX_FLAGS_DEFAULT "${CMAKE_CXX_FLAGS}")
+set(CMAKE_C_FLAGS_DEFAULT "${CMAKE_C_FLAGS}")
+
+# Disable warnings as when building Bullet.
+function(bullet_cflags)
+  if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
+     CMAKE_COMPILER_IS_CLANGXX)
+    string(REPLACE "-Werror" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    string(REPLACE "-Werror" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+  endif()
+  if(APPLE)
+    # These additional flags are needed because of Bullet's btSolverBody.h
+    # and btConvexHullShape.h causing warnings with the Apple build
+    set(CMAKE_CXX_FLAGS
+        "${CMAKE_CXX_FLAGS} -Wno-ignored-qualifiers -Wno-overloaded-virtual")
+  endif()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" PARENT_SCOPE)
+endfunction()
+
+# Use default CFLAGS.
+function(default_cflags)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_DEFAULT}" PARENT_SCOPE)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_DEFAULT}" PARENT_SCOPE)
+endfunction()
+
+# Library targets.
+add_library(entity ${entity_SRCS})
+
 if (entity_build_component_library)
   set(COMPONENT_COLLECTION_DIR ${CMAKE_CURRENT_SOURCE_DIR}/component_library)
+  # The component library uses a bunch of Flatbuffers, so we should build them.
+  # Generate source files for all FlatBuffers schema files under the src
+  # directory.
+  set(COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR
+     ${COMPONENT_COLLECTION_DIR}/${CMAKE_FILES_DIRECTORY}/include)
+  file(GLOB_RECURSE
+    COMPONENT_LIBRARY_FLATBUFFERS_SCHEMAS
+    ${COMPONENT_COLLECTION_DIR}/schemas/*.fbs)
+
+  # Generate rules to build the set of output files from the set of input
+  # schema files.
+  unset(COMPONENT_LIBRARY_GENERATED_INCLUDES)
+  foreach(flatbuffers_schema ${COMPONENT_LIBRARY_FLATBUFFERS_SCHEMAS})
+    get_filename_component(filename ${flatbuffers_schema} NAME_WE)
+    set(flatbuffers_include
+      ${COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR}/${filename}_generated.h)
+    file(COPY ${flatbuffers_schema}
+         DESTINATION ${CMAKE_BINARY_DIR}/assets/flatbufferschemas/)
+    add_custom_command(
+      OUTPUT ${flatbuffers_include}
+      COMMAND flatc --gen-mutable
+          -o ${COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR}
+          -I ${dependencies_fplbase_dir}/schemas
+          -c ${flatbuffers_schema}
+      DEPENDS flatc ${flatbuffers_schema})
+    list(APPEND COMPONENT_LIBRARY_GENERATED_INCLUDES ${flatbuffers_include})
+  endforeach()
+  add_custom_target(component_library_generated_includes
+    DEPENDS ${COMPONENT_LIBRARY_GENERATED_INCLUDES})
+  set_property(TARGET component_library_generated_includes
+               PROPERTY COMPONENT_LIBRARY_DIR
+               ${COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR})
+
+  # Include dependencies for the component library.
+  if(NOT TARGET breadboard)
+    add_subdirectory("${dependencies_breadboard_dir}" ${tmp_dir}/breadboard)
+  endif()
+
+  if(NOT TARGET LinearMath)
+    bullet_cflags()
+    set(BUILD_CPU_DEMOS OFF CACHE BOOL "")
+    set(BUILD_BULLET2_DEMOS OFF CACHE BOOL "")
+    set(BUILD_BULLET3 OFF CACHE BOOL "")
+    set(BUILD_EXTRAS OFF CACHE BOOL "")
+    set(BUILD_UNIT_TESTS OFF CACHE BOOL "")
+    set(USE_MSVC_RUNTIME_LIBRARY_DLL ON)
+    add_subdirectory("${dependencies_bulletphysics_distr_dir}"
+                     ${tmp_dir}/bulletphysics)
+    default_cflags()
+  endif()
+
+  if(NOT TARGET fplbase)
+    add_subdirectory("${dependencies_fplbase_dir}" ${tmp_dir}/fplbase)
+  endif()
+
+  set(mathfu_build_benchmarks OFF CACHE BOOL "")
+  set(mathfu_build_tests OFF CACHE BOOL "")
+  add_subdirectory(${dependencies_mathfu_dir} ${tmp_dir}/mathfu)
+
+  if (NOT TARGET motive)
+    set(motive_build_samples OFF CACHE BOOL "")
+    set(motive_build_tests OFF CACHE BOOL "")
+    add_subdirectory("${dependencies_motive_dir}" ${tmp_dir}/motive)
+  endif()
+
+  if(NOT TARGET pindrop)
+    set(pindrop_build_demo OFF CACHE BOOL "")
+    set(pindrop_build_tests OFF CACHE BOOL "")
+    add_subdirectory("${dependencies_pindrop_dir}" ${tmp_dir}/pindrop)
+  endif()
+
   # component library source files.
   set(component_library_SRCS
       ${COMPONENT_COLLECTION_DIR}/include/component_library/animation.h
@@ -108,42 +224,11 @@ if (entity_build_component_library)
       ${COMPONENT_COLLECTION_DIR}/src/meta.cpp
       ${COMPONENT_COLLECTION_DIR}/src/physics.cpp
       ${COMPONENT_COLLECTION_DIR}/src/rendermesh.cpp
-      ${COMPONENT_COLLECTION_DIR}/src/transform.cpp
-  )
-  # The component library uses a bunch of Flatbuffers, so we should build them.
-  # Generate source files for all FlatBuffers schema files under the src
-  # directory.
-  set(COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR
-     ${COMPONENT_COLLECTION_DIR}/${CMAKE_FILES_DIRECTORY}/include)
-  if(entity_has_parent)
-    set(COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR
-        ${COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR} PARENT_SCOPE)
-  endif()
-  file(GLOB_RECURSE
-    COMPONENT_LIBRARY_FLATBUFFERS_SCHEMAS
-    ${COMPONENT_COLLECTION_DIR}/schemas/*.fbs)
-
-  # Generate rules to build the set of output files from the set of input
-  # schema files.
-  foreach(flatbuffers_schema ${COMPONENT_LIBRARY_FLATBUFFERS_SCHEMAS})
-    get_filename_component(filename ${flatbuffers_schema} NAME_WE)
-    set(flatbuffers_include
-      ${COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR}/${filename}_generated.h)
-    file(COPY ${flatbuffers_schema}
-         DESTINATION ${CMAKE_BINARY_DIR}/assets/flatbufferschemas/)
-    add_custom_command(
-      OUTPUT ${flatbuffers_include}
-      COMMAND flatc --gen-includes --gen-mutable
-          -o ${COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR}
-          -I ${dependencies_fplbase_dir}/schemas
-          -c ${flatbuffers_schema}
-      DEPENDS flatc ${flatbuffers_schema})
-    list(APPEND COMPONENT_LIBRARY_GENERATED_INCLUDES ${flatbuffers_include})
-  endforeach()
-  add_custom_target(component_library_generated_includes
-    DEPENDS ${COMPONENT_LIBRARY_GENERATED_INCLUDES})
+      ${COMPONENT_COLLECTION_DIR}/src/transform.cpp)
 
   include_directories(${COMPONENT_COLLECTION_DIR}/include)
+  get_property(FPLBASE_FLATBUFFERS_GENERATED_INCLUDES_DIR
+               TARGET fplbase_generated_includes PROPERTY FPLBASE_DIR)
   include_directories(${FPLBASE_FLATBUFFERS_GENERATED_INCLUDES_DIR})
   include_directories(${COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR})
   include_directories(${dependencies_bulletphysics_distr_dir}/src)
@@ -155,40 +240,14 @@ if (entity_build_component_library)
   include_directories(${dependencies_motive_dir}/include)
   include_directories(${dependencies_mathfu_dir}/include)
   include_directories(${dependencies_pindrop_dir}/include)
-endif()  # entity_build_component_library
 
-# Detect clang
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  set(CMAKE_COMPILER_IS_CLANGXX 1)
-endif()
-
-# Compiler flags.
-set(C_FLAGS_WARNINGS "")
-if(MSVC)
-  set(C_FLAGS_WARNINGS "/W4 /WX /wd4065 /wd4355 /wd4127 /wd4244 /wd4512 /wd4800")
-elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
-       CMAKE_COMPILER_IS_CLANGXX)
-  add_definitions(-g)
-  set(CMAKE_CXX_FLAGS
-    "${CMAKE_CXX_FLAGS} -std=c++0x -Wall -pedantic -Werror -Wextra")
-endif()
-if(APPLE)
-  set(CMAKE_CXX_FLAGS
-    "${CMAKE_CXX_FLAGS} -Wno-ignored-qualifiers -Wno-overloaded-virtual")
-  # These additional flags are needed because of Bullet's btSolverBody.h and
-  # btConvexHullShape.h causing warnings with the Apple build
-endif()
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS_WARNINGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${C_FLAGS_WARNINGS}")
-
-# Library targets.
-add_library(entity ${entity_SRCS})
-
-if (entity_build_component_library)
+  bullet_cflags()
   add_library(component_library ${component_library_SRCS})
-  add_dependencies(component_library component_library_generated_includes)
-  add_dependencies(component_library mathfu_generated_includes)
-  add_dependencies(component_library fplbase_generated_includes)
+  add_dependencies(component_library
+                   entity
+                   component_library_generated_includes
+                   fplbase_generated_includes)
+  target_link_libraries(component_library LINK_INTERFACE_LIBRARIES
+                        BulletDynamics BulletCollision LinearMath)
   mathfu_configure_flags(component_library)
 endif()  # entity_build_component_library
-
