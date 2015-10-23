@@ -16,6 +16,7 @@
 #include <cmath>
 #include "breadboard/event.h"
 #include "breadboard/graph_state.h"
+#include "component_library/bullet_physics.h"
 #include "component_library/common_services.h"
 #include "component_library/component_utils.h"
 #include "component_library/graph.h"
@@ -47,11 +48,129 @@ static void BulletTickCallback(btDynamicsWorld* world, btScalar time_step);
 
 static const char* kPhysicsShader = "shaders/color";
 
+static inline btVector3 ToBtVector3(const mathfu::vec3& v) {
+  return btVector3(v.x(), v.y(), v.z());
+}
+
+static inline btVector3 ToBtVector3(const fpl::Vec3& v) {
+  return btVector3(v.x(), v.y(), v.z());
+}
+
+static inline fpl::Vec3 BtToFlatVec3(const btVector3& v) {
+  return fpl::Vec3(v.x(), v.y(), v.z());
+}
+
+static inline mathfu::vec3 BtToMathfuVec3(const btVector3& v) {
+  return mathfu::vec3(v.x(), v.y(), v.z());
+}
+
+static inline btQuaternion ToBtQuaternion(const mathfu::quat& q) {
+  // Bullet assumes a right handed system, while mathfu is left, so the axes
+  // need to be negated.
+  return btQuaternion(-q.vector().x(), -q.vector().y(), -q.vector().z(),
+                      q.scalar());
+}
+
+static inline mathfu::quat BtToMathfuQuat(const btQuaternion& q) {
+  // As above, the axes need to be negated.
+  return mathfu::quat(q.getW(), -q.getX(), -q.getY(), -q.getZ());
+}
+
+// These functions require bullet_physics.h, so define here.
+RigidBodyData::RigidBodyData() {}
+RigidBodyData::~RigidBodyData() {}
+RigidBodyData& RigidBodyData::operator=(RigidBodyData&& src) {
+  offset = std::move(src.offset);
+  collision_type = std::move(src.collision_type);
+  collides_with = std::move(src.collides_with);
+  user_tag = std::move(src.user_tag);
+  shape = std::move(src.shape);
+  motion_state = std::move(src.motion_state);
+  rigid_body = std::move(src.rigid_body);
+  should_export = std::move(src.should_export);
+  return *this;
+}
+
+// These functions require bullet_physics.h, so define here.
+PhysicsData::PhysicsData() : body_count_(0), enabled_(false) {}
+PhysicsData::~PhysicsData() {}
+PhysicsData::PhysicsData(PhysicsData&& src) { *this = std::move(src); }
+
+PhysicsData& PhysicsData::operator=(PhysicsData&& src) {
+  body_count_ = std::move(src.body_count_);
+  enabled_ = std::move(src.enabled_);
+  triangle_mesh_ = std::move(src.triangle_mesh_);
+  for (size_t i = 0; i < kMaxPhysicsBodies; i++) {
+    rigid_bodies_[i] = std::move(src.rigid_bodies_[i]);
+  }
+  return *this;
+}
+
+mathfu::vec3 PhysicsData::Velocity() const {
+  // Only the first body can be non-kinematic, and thus use velocity.
+  return BtToMathfuVec3(rigid_bodies_[0].rigid_body->getLinearVelocity());
+}
+
+void PhysicsData::SetVelocity(const mathfu::vec3& velocity) {
+  rigid_bodies_[0].rigid_body->setLinearVelocity(ToBtVector3(velocity));
+}
+
+mathfu::vec3 PhysicsData::AngularVelocity() const {
+  return BtToMathfuVec3(rigid_bodies_[0].rigid_body->getAngularVelocity());
+}
+
+void PhysicsData::SetAngularVelocity(const mathfu::vec3& velocity) {
+  rigid_bodies_[0].rigid_body->setAngularVelocity(ToBtVector3(velocity));
+}
+
+int PhysicsData::RigidBodyIndex(const std::string& user_tag) const {
+  for (int i = 0; i < body_count_; ++i) {
+    if (user_tag == rigid_bodies_[i].user_tag) return i;
+  }
+  return -1;
+}
+
+void PhysicsData::GetAabb(int rigid_body_idx, mathfu::vec3* min, mathfu::vec3* max) const {
+  btVector3 bt_min;
+  btVector3 bt_max;
+  rigid_bodies_[rigid_body_idx].rigid_body->getAabb(bt_min, bt_max);
+  *min = BtToMathfuVec3(bt_min);
+  *max = BtToMathfuVec3(bt_max);
+}
+
+// Used by Bullet to render the physics scene as a wireframe.
+class PhysicsDebugDrawer : public btIDebugDraw {
+ public:
+  virtual void drawLine(const btVector3& from, const btVector3& to,
+                        const btVector3& color);
+  virtual int getDebugMode() const { return DBG_DrawWireframe; }
+
+  virtual void drawContactPoint(const btVector3& /*pointOnB*/,
+                                const btVector3& /*normalOnB*/,
+                                btScalar /*distance*/, int /*lifeTime*/,
+                                const btVector3& /*color*/) {}
+  virtual void reportErrorWarning(const char* /*warningString*/) {}
+  virtual void draw3dText(const btVector3& /*location*/,
+                          const char* /*textString*/) {}
+  virtual void setDebugMode(int /*debugMode*/) {}
+
+  Shader* shader() { return shader_; }
+  void set_shader(Shader* shader) { shader_ = shader; }
+
+  Renderer* renderer() { return renderer_; }
+  void set_renderer(Renderer* renderer) { renderer_ = renderer; }
+
+ private:
+  Shader* shader_;
+  Renderer* renderer_;
+};
+
 void PhysicsComponent::Init() {
   AssetManager* asset_manager =
       entity_manager_->GetComponent<CommonServicesComponent>()->asset_manager();
 
   broadphase_.reset(new btDbvtBroadphase());
+  debug_drawer_.reset(new PhysicsDebugDrawer());
   collision_configuration_.reset(new btDefaultCollisionConfiguration());
   collision_dispatcher_.reset(
       new btCollisionDispatcher(collision_configuration_.get()));
@@ -60,12 +179,13 @@ void PhysicsComponent::Init() {
       collision_dispatcher_.get(), broadphase_.get(), constraint_solver_.get(),
       collision_configuration_.get()));
   bullet_world_->setGravity(btVector3(0.0f, 0.0f, gravity()));
-  bullet_world_->setDebugDrawer(&debug_drawer_);
+  bullet_world_->setDebugDrawer(debug_drawer_.get());
   bullet_world_->setInternalTickCallback(BulletTickCallback,
                                          static_cast<void*>(this));
-  debug_drawer_.set_shader(asset_manager->LoadShader(kPhysicsShader));
+  debug_drawer_->set_shader(asset_manager->LoadShader(kPhysicsShader));
 }
 
+PhysicsComponent::PhysicsComponent() {}
 PhysicsComponent::~PhysicsComponent() { ClearComponentData(); }
 
 void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
@@ -82,10 +202,10 @@ void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
     int shape_count = physics_def->shapes()->Length() > kMaxPhysicsBodies
                           ? kMaxPhysicsBodies
                           : physics_def->shapes()->Length();
-    physics_data->body_count = shape_count;
+    physics_data->body_count_ = shape_count;
     for (int index = 0; index < shape_count; ++index) {
       auto shape_def = physics_def->shapes()->Get(index);
-      auto rb_data = &physics_data->rigid_bodies[index];
+      auto rb_data = &physics_data->rigid_bodies_[index];
       switch (shape_def->data_type()) {
         case BulletShapeUnion_BulletSphereDef: {
           auto sphere_data =
@@ -178,7 +298,7 @@ void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
     }
   }
 
-  physics_data->enabled = true;
+  physics_data->enabled_ = true;
   UpdatePhysicsFromTransform(entity);
 }
 
@@ -193,10 +313,10 @@ entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
   fbb.ForceDefaults(defaults);
   std::vector<flatbuffers::Offset<fpl::BulletShapeDef>> shape_vector;
   bool kinematic = true;
-  if (data->body_count > 0) {
-    kinematic = data->rigid_bodies[0].rigid_body->isKinematicObject();
-    for (int index = 0; index < data->body_count; ++index) {
-      const RigidBodyData& body = data->rigid_bodies[index];
+  if (data->body_count_ > 0) {
+    kinematic = data->rigid_bodies_[0].rigid_body->isKinematicObject();
+    for (int index = 0; index < data->body_count_; ++index) {
+      const RigidBodyData& body = data->rigid_bodies_[index];
       // Skip shapes that are set not to export.
       if (!body.should_export) {
         continue;
@@ -326,18 +446,18 @@ void PhysicsComponent::UpdateAllEntities(entity::WorldTime delta_time) {
     PhysicsData* physics_data = Data<PhysicsData>(iter->entity);
     TransformData* transform_data = Data<TransformData>(iter->entity);
 
-    if (physics_data->body_count == 0 || !physics_data->enabled) {
+    if (physics_data->body_count_ == 0 || !physics_data->enabled_) {
       continue;
     }
-    if (!physics_data->rigid_bodies[0].rigid_body->isKinematicObject()) {
+    if (!physics_data->rigid_bodies_[0].rigid_body->isKinematicObject()) {
       auto trans =
-          physics_data->rigid_bodies[0].rigid_body->getWorldTransform();
+          physics_data->rigid_bodies_[0].rigid_body->getWorldTransform();
       // The quaternion needs to be normalized, as the provided one is not.
       transform_data->orientation = BtToMathfuQuat(trans.getRotation());
       transform_data->orientation.Normalize();
 
       vec3 local_offset = vec3::HadamardProduct(
-          transform_data->scale, physics_data->rigid_bodies[0].offset);
+          transform_data->scale, physics_data->rigid_bodies_[0].offset);
       vec3 offset = transform_data->orientation.Inverse() * local_offset;
       transform_data->position = BtToMathfuVec3(trans.getOrigin()) - offset;
     }
@@ -401,17 +521,17 @@ void PhysicsComponent::ProcessBulletTickCallback() {
         std::string tag_b;
         auto physics_a = Data<PhysicsData>(entity_a);
         auto graph_a = Data<GraphData>(entity_a);
-        for (int i = 0; i < physics_a->body_count; i++) {
-          if (physics_a->rigid_bodies[i].rigid_body.get() == body_a) {
-            tag_a = physics_a->rigid_bodies[i].user_tag;
+        for (int i = 0; i < physics_a->body_count_; i++) {
+          if (physics_a->rigid_bodies_[i].rigid_body.get() == body_a) {
+            tag_a = physics_a->rigid_bodies_[i].user_tag;
             break;
           }
         }
         auto physics_b = Data<PhysicsData>(entity_b);
         auto graph_b = Data<GraphData>(entity_b);
-        for (int i = 0; i < physics_b->body_count; i++) {
-          if (physics_b->rigid_bodies[i].rigid_body.get() == body_b) {
-            tag_b = physics_b->rigid_bodies[i].user_tag;
+        for (int i = 0; i < physics_b->body_count_; i++) {
+          if (physics_b->rigid_bodies_[i].rigid_body.get() == body_b) {
+            tag_b = physics_b->rigid_bodies_[i].user_tag;
             break;
           }
         }
@@ -443,10 +563,10 @@ void PhysicsComponent::CleanupEntity(entity::EntityRef& entity) {
 
 void PhysicsComponent::EnablePhysics(const entity::EntityRef& entity) {
   PhysicsData* physics_data = Data<PhysicsData>(entity);
-  if (physics_data != nullptr && !physics_data->enabled) {
-    physics_data->enabled = true;
-    for (int i = 0; i < physics_data->body_count; i++) {
-      auto rb_data = &physics_data->rigid_bodies[i];
+  if (physics_data != nullptr && !physics_data->enabled_) {
+    physics_data->enabled_ = true;
+    for (int i = 0; i < physics_data->body_count_; i++) {
+      auto rb_data = &physics_data->rigid_bodies_[i];
       bullet_world_->addRigidBody(rb_data->rigid_body.get(),
                                   rb_data->collision_type,
                                   rb_data->collides_with);
@@ -456,10 +576,10 @@ void PhysicsComponent::EnablePhysics(const entity::EntityRef& entity) {
 
 void PhysicsComponent::DisablePhysics(const entity::EntityRef& entity) {
   PhysicsData* physics_data = Data<PhysicsData>(entity);
-  if (physics_data != nullptr && physics_data->enabled) {
-    physics_data->enabled = false;
-    for (int i = 0; i < physics_data->body_count; i++) {
-      auto rb_data = &physics_data->rigid_bodies[i];
+  if (physics_data != nullptr && physics_data->enabled_) {
+    physics_data->enabled_ = false;
+    for (int i = 0; i < physics_data->body_count_; i++) {
+      auto rb_data = &physics_data->rigid_bodies_[i];
       bullet_world_->removeRigidBody(rb_data->rigid_body.get());
     }
   }
@@ -469,13 +589,13 @@ void PhysicsComponent::ClearPhysicsData(const entity::EntityRef& entity) {
   PhysicsData* physics_data = Data<PhysicsData>(entity);
   if (physics_data != nullptr) {
     DisablePhysics(entity);
-    for (int i = 0; i < physics_data->body_count; ++i) {
-      auto rb_data = &physics_data->rigid_bodies[i];
+    for (int i = 0; i < physics_data->body_count_; ++i) {
+      auto rb_data = &physics_data->rigid_bodies_[i];
       rb_data->motion_state.reset();
       rb_data->shape.reset();
       rb_data->rigid_body.reset();
     }
-    physics_data->body_count = 0;
+    physics_data->body_count_ = 0;
   }
 }
 
@@ -495,8 +615,8 @@ void PhysicsComponent::UpdatePhysicsObjectsTransform(
   TransformData* transform_data = Data<TransformData>(entity);
   btQuaternion orientation = ToBtQuaternion(transform_data->orientation);
 
-  for (int i = 0; i < physics_data->body_count; i++) {
-    auto rb_data = &physics_data->rigid_bodies[i];
+  for (int i = 0; i < physics_data->body_count_; i++) {
+    auto rb_data = &physics_data->rigid_bodies_[i];
     if (kinematic_only && !rb_data->rigid_body->isKinematicObject()) {
       continue;
     }
@@ -516,8 +636,8 @@ void PhysicsComponent::UpdatePhysicsScale(const entity::EntityRef& entity) {
   PhysicsData* physics_data = Data<PhysicsData>(entity);
   TransformData* transform_data = Data<TransformData>(entity);
 
-  for (int i = 0; i < physics_data->body_count; i++) {
-    auto rb_data = &physics_data->rigid_bodies[i];
+  for (int i = 0; i < physics_data->body_count_; i++) {
+    auto rb_data = &physics_data->rigid_bodies_[i];
     const btVector3& localScale = rb_data->shape->getLocalScaling();
     // Bullet doesn't handle a negative scale, so prevent any from being set.
     const btVector3 newScale(fabs(transform_data->scale.x()),
@@ -547,16 +667,16 @@ void PhysicsComponent::InitStaticMesh(entity::EntityRef& entity) {
   PhysicsData* data = AddEntity(entity);
   // Instantiate a holder for the triangle data. Note that the reset clears any
   // previous data that might have been created.
-  data->triangle_mesh.reset(new btTriangleMesh());
+  data->triangle_mesh_.reset(new btTriangleMesh());
 }
 
 void PhysicsComponent::AddStaticMeshTriangle(const entity::EntityRef& entity,
                                              const vec3& pt0, const vec3& pt1,
                                              const vec3& pt2) {
   PhysicsData* data = GetComponentData(entity);
-  assert(data != nullptr && data->triangle_mesh.get() != nullptr);
+  assert(data != nullptr && data->triangle_mesh_.get() != nullptr);
 
-  data->triangle_mesh->addTriangle(ToBtVector3(pt0), ToBtVector3(pt1),
+  data->triangle_mesh_->addTriangle(ToBtVector3(pt0), ToBtVector3(pt1),
                                    ToBtVector3(pt2));
 }
 
@@ -566,32 +686,32 @@ void PhysicsComponent::FinalizeStaticMesh(const entity::EntityRef& entity,
                                           float restitution,
                                           const std::string& user_tag) {
   PhysicsData* data = GetComponentData(entity);
-  assert(data != nullptr && data->triangle_mesh.get() != nullptr);
+  assert(data != nullptr && data->triangle_mesh_.get() != nullptr);
 
   // If there are no triangles, there is nothing to add.
-  if (data->triangle_mesh->getNumTriangles() == 0) {
+  if (data->triangle_mesh_->getNumTriangles() == 0) {
     return;
   }
 
   // If a static mesh was already defined, replace it.
   // Otherwise a new shape needs to be added for it.
   RigidBodyData* rb_data = nullptr;
-  for (int i = 0; i < data->body_count; i++) {
-    if (data->rigid_bodies[i].shape.get() != nullptr &&
-        data->rigid_bodies[i].shape->getShapeType() ==
+  for (int i = 0; i < data->body_count_; i++) {
+    if (data->rigid_bodies_[i].shape.get() != nullptr &&
+        data->rigid_bodies_[i].shape->getShapeType() ==
             TRIANGLE_MESH_SHAPE_PROXYTYPE) {
-      rb_data = &data->rigid_bodies[i];
+      rb_data = &data->rigid_bodies_[i];
       bullet_world_->removeRigidBody(rb_data->rigid_body.get());
       break;
     }
   }
   if (rb_data == nullptr) {
-    assert(data->body_count < kMaxPhysicsBodies);
-    rb_data = &data->rigid_bodies[data->body_count++];
+    assert(data->body_count_ < kMaxPhysicsBodies);
+    rb_data = &data->rigid_bodies_[data->body_count_++];
   }
 
   rb_data->shape.reset(
-      new btBvhTriangleMeshShape(data->triangle_mesh.get(), false));
+      new btBvhTriangleMeshShape(data->triangle_mesh_.get(), false));
   rb_data->collision_type = collision_type;
   rb_data->collides_with = collides_with;
   rb_data->should_export = false;
@@ -610,7 +730,7 @@ void PhysicsComponent::FinalizeStaticMesh(const entity::EntityRef& entity,
   rb_data->user_tag = user_tag;
   bullet_world_->addRigidBody(rb_data->rigid_body.get(),
                               rb_data->collision_type, rb_data->collides_with);
-  data->enabled = true;
+  data->enabled_ = true;
 }
 
 entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
@@ -657,12 +777,12 @@ entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
 void PhysicsComponent::GenerateRaycastShape(entity::EntityRef& entity,
                                             bool result_exportable) {
   PhysicsData* data = GetComponentData(entity);
-  if (data == nullptr || data->body_count == kMaxPhysicsBodies) {
+  if (data == nullptr || data->body_count_ == kMaxPhysicsBodies) {
     return;
   }
   // If the entity is already raycastable, there isn't a need to do anything
-  for (int index = 0; index < data->body_count; ++index) {
-    auto shape = &data->rigid_bodies[index];
+  for (int index = 0; index < data->body_count_; ++index) {
+    auto shape = &data->rigid_bodies_[index];
     if (shape->collides_with & BulletCollisionType_Raycast) {
       return;
     }
@@ -678,7 +798,7 @@ void PhysicsComponent::GenerateRaycastShape(entity::EntityRef& entity,
     max /= transform_data->scale;
     min /= transform_data->scale;
   }
-  auto rb_data = &data->rigid_bodies[data->body_count++];
+  auto rb_data = &data->rigid_bodies_[data->body_count_++];
   // Make sure it is at least one unit in each direction
   vec3 extents = vec3::Max(max - min, mathfu::kOnes3f);
   btVector3 bt_extents = ToBtVector3(extents);
@@ -709,13 +829,13 @@ void PhysicsComponent::GenerateRaycastShape(entity::EntityRef& entity,
   rb_data->should_export = result_exportable;
   bullet_world_->addRigidBody(rb_data->rigid_body.get(),
                               rb_data->collision_type, rb_data->collides_with);
-  data->enabled = true;
+  data->enabled_ = true;
 }
 
 void PhysicsComponent::DebugDrawWorld(Renderer* renderer,
                                       const mathfu::mat4& camera_transform) {
   renderer->set_model_view_projection(camera_transform);
-  debug_drawer_.set_renderer(renderer);
+  debug_drawer_->set_renderer(renderer);
   bullet_world_->debugDrawWorld();
 }
 
@@ -728,9 +848,9 @@ void PhysicsComponent::DebugDrawObject(Renderer* renderer,
     return;
   }
   renderer->set_model_view_projection(camera_transform);
-  debug_drawer_.set_renderer(renderer);
-  for (int i = 0; i < physics_data->body_count; i++) {
-    auto rb_data = &physics_data->rigid_bodies[i];
+  debug_drawer_->set_renderer(renderer);
+  for (int i = 0; i < physics_data->body_count_; i++) {
+    auto rb_data = &physics_data->rigid_bodies_[i];
     bullet_world_->debugDrawObject(rb_data->rigid_body->getWorldTransform(),
                                    rb_data->shape.get(), ToBtVector3(color));
   }

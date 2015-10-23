@@ -18,7 +18,6 @@
 #include <memory>
 #include <vector>
 #include "breadboard/event.h"
-#include "component_library/bullet_physics.h"
 #include "entity/component.h"
 #include "flatbuffers/reflection.h"
 #include "fplbase/asset_manager.h"
@@ -27,10 +26,23 @@
 #include "library_components_generated.h"
 #include "mathfu/glsl_mappings.h"
 
+class btBroadphaseInterface;
+class btCollisionDispatcher;
+class btCollisionShape;
+class btDefaultCollisionConfiguration;
+class btDiscreteDynamicsWorld;
+class btMotionState;
+class btRigidBody;
+class btSequentialImpulseConstraintSolver;
+class btTriangleMesh;
+
 namespace fpl {
 namespace component_library {
 
 BREADBOARD_DECLARE_EVENT(kCollisionEventId)
+
+class PhysicsComponent;
+class PhysicsDebugDrawer;
 
 static const int kMaxPhysicsBodies = 5;
 
@@ -50,7 +62,8 @@ typedef void (*CollisionCallback)(CollisionData* collision_data,
 
 // Data describing a single Bullet rigid body shape.
 struct RigidBodyData {
-  RigidBodyData() {}
+  RigidBodyData();
+  ~RigidBodyData();
   mathfu::vec3 offset;
   short collision_type;
   short collides_with;
@@ -60,136 +73,48 @@ struct RigidBodyData {
   std::unique_ptr<btRigidBody> rigid_body;
   bool should_export;  // Whether the shape should be included on export.
 
-  RigidBodyData& operator=(RigidBodyData&& src) {
-    offset = std::move(src.offset);
-    collision_type = std::move(src.collision_type);
-    collides_with = std::move(src.collides_with);
-    user_tag = std::move(src.user_tag);
-    shape = std::move(src.shape);
-    motion_state = std::move(src.motion_state);
-    rigid_body = std::move(src.rigid_body);
-    should_export = std::move(src.should_export);
-    return *this;
-  }
+  RigidBodyData& operator=(RigidBodyData&& src);
 
  private:
   RigidBodyData& operator=(const RigidBodyData&);
   RigidBodyData(const RigidBodyData&);
 };
 
-static inline btVector3 ToBtVector3(const mathfu::vec3& v) {
-  return btVector3(v.x(), v.y(), v.z());
-}
-
-static inline btVector3 ToBtVector3(const fpl::Vec3& v) {
-  return btVector3(v.x(), v.y(), v.z());
-}
-
-static inline fpl::Vec3 BtToFlatVec3(const btVector3& v) {
-  return fpl::Vec3(v.x(), v.y(), v.z());
-}
-
-static inline mathfu::vec3 BtToMathfuVec3(const btVector3& v) {
-  return mathfu::vec3(v.x(), v.y(), v.z());
-}
-
-static inline btQuaternion ToBtQuaternion(const mathfu::quat& q) {
-  // Bullet assumes a right handed system, while mathfu is left, so the axes
-  // need to be negated.
-  return btQuaternion(-q.vector().x(), -q.vector().y(), -q.vector().z(),
-                      q.scalar());
-}
-
-static inline mathfu::quat BtToMathfuQuat(const btQuaternion& q) {
-  // As above, the axes need to be negated.
-  return mathfu::quat(q.getW(), -q.getX(), -q.getY(), -q.getZ());
-}
-
 // Data for scene object components.
 struct PhysicsData {
+  friend PhysicsComponent;
+
  public:
-  PhysicsData() : body_count(0), enabled(false) {}
+  PhysicsData();
+  ~PhysicsData();
+  PhysicsData(PhysicsData&& src);
+  PhysicsData& operator=(PhysicsData&& src);
 
-  mathfu::vec3 Velocity() const {
-    // Only the first body can be non-kinematic, and thus use velocity.
-    return BtToMathfuVec3(rigid_bodies[0].rigid_body->getLinearVelocity());
-  }
-  void SetVelocity(const mathfu::vec3& velocity) {
-    rigid_bodies[0].rigid_body->setLinearVelocity(ToBtVector3(velocity));
-  }
-  mathfu::vec3 AngularVelocity() const {
-    return BtToMathfuVec3(rigid_bodies[0].rigid_body->getAngularVelocity());
-  }
-  void SetAngularVelocity(const mathfu::vec3& velocity) {
-    rigid_bodies[0].rigid_body->setAngularVelocity(ToBtVector3(velocity));
-  }
-  int RigidBodyIndex(const std::string& user_tag) const {
-    for (int i = 0; i < body_count; ++i) {
-      if (user_tag == rigid_bodies[i].user_tag) return i;
-    }
-    return -1;
-  }
-  void GetAabb(int rigid_body_idx, mathfu::vec3* min, mathfu::vec3* max) const {
-    btVector3 bt_min;
-    btVector3 bt_max;
-    rigid_bodies[rigid_body_idx].rigid_body->getAabb(bt_min, bt_max);
-    *min = BtToMathfuVec3(bt_min);
-    *max = BtToMathfuVec3(bt_max);
-  }
+  mathfu::vec3 Velocity() const;
+  void SetVelocity(const mathfu::vec3& velocity);
+  mathfu::vec3 AngularVelocity() const;
+  void SetAngularVelocity(const mathfu::vec3& velocity);
+  int RigidBodyIndex(const std::string& user_tag) const;
+  void GetAabb(int rigid_body_idx, mathfu::vec3* min, mathfu::vec3* max) const;
 
-  // The rigid bodies associated with the entity. Note that only the first one
-  // can be set to not be kinematic, all subsequent ones are forced to be.
-  RigidBodyData rigid_bodies[kMaxPhysicsBodies];
-  std::unique_ptr<btTriangleMesh> triangle_mesh;
-  int body_count;
-  bool enabled;
-
-  PhysicsData(PhysicsData&& src) { *this = std::move(src); }
-  PhysicsData& operator=(PhysicsData&& src) {
-    body_count = std::move(src.body_count);
-    enabled = std::move(src.enabled);
-    triangle_mesh = std::move(src.triangle_mesh);
-    for (size_t i = 0; i < kMaxPhysicsBodies; i++) {
-      rigid_bodies[i] = std::move(src.rigid_bodies[i]);
-    }
-    return *this;
-  }
+  bool enabled() const { return enabled_; }
+  int body_count() const { return body_count_; }
 
  private:
   PhysicsData(const PhysicsData&);
   PhysicsData& operator=(const PhysicsData&);
-};
 
-// Used by Bullet to render the physics scene as a wireframe.
-class PhysicsDebugDrawer : public btIDebugDraw {
- public:
-  virtual void drawLine(const btVector3& from, const btVector3& to,
-                        const btVector3& color);
-  virtual int getDebugMode() const { return DBG_DrawWireframe; }
-
-  virtual void drawContactPoint(const btVector3& /*pointOnB*/,
-                                const btVector3& /*normalOnB*/,
-                                btScalar /*distance*/, int /*lifeTime*/,
-                                const btVector3& /*color*/) {}
-  virtual void reportErrorWarning(const char* /*warningString*/) {}
-  virtual void draw3dText(const btVector3& /*location*/,
-                          const char* /*textString*/) {}
-  virtual void setDebugMode(int /*debugMode*/) {}
-
-  Shader* shader() { return shader_; }
-  void set_shader(Shader* shader) { shader_ = shader; }
-
-  Renderer* renderer() { return renderer_; }
-  void set_renderer(Renderer* renderer) { renderer_ = renderer; }
-
- private:
-  Shader* shader_;
-  Renderer* renderer_;
+  // The rigid bodies associated with the entity. Note that only the first one
+  // can be set to not be kinematic, all subsequent ones are forced to be.
+  RigidBodyData rigid_bodies_[kMaxPhysicsBodies];
+  std::unique_ptr<btTriangleMesh> triangle_mesh_;
+  int body_count_;
+  bool enabled_;
 };
 
 class PhysicsComponent : public entity::Component<PhysicsData> {
  public:
-  PhysicsComponent() {}
+  PhysicsComponent();
   virtual ~PhysicsComponent();
 
   virtual void AddFromRawData(entity::EntityRef& entity, const void* raw_data);
@@ -278,7 +203,7 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   std::unique_ptr<btCollisionDispatcher> collision_dispatcher_;
   std::unique_ptr<btSequentialImpulseConstraintSolver> constraint_solver_;
 
-  PhysicsDebugDrawer debug_drawer_;
+  std::unique_ptr<PhysicsDebugDrawer> debug_drawer_;
 
   float gravity_;
   int max_steps_;
