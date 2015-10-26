@@ -42,8 +42,7 @@ struct RenderMeshData {
         z_depth(0),
         culling_mask(0),
         pass_mask(0),
-        default_hidden(false),
-        currently_hidden(false),
+        visible(true),
         default_pose(false),
         num_shader_transforms(0),
         shader_transforms(nullptr) {}
@@ -63,8 +62,7 @@ struct RenderMeshData {
     z_depth = std::move(other.z_depth);
     culling_mask = std::move(other.culling_mask);
     pass_mask = std::move(other.pass_mask);
-    default_hidden = std::move(other.default_hidden);
-    currently_hidden = std::move(other.currently_hidden);
+    visible = std::move(other.visible);
     default_pose = std::move(other.default_pose);
     num_shader_transforms = other.num_shader_transforms;
     shader_transforms = other.shader_transforms;
@@ -81,8 +79,7 @@ struct RenderMeshData {
   float z_depth;
   unsigned char culling_mask;
   unsigned char pass_mask;
-  bool default_hidden;
-  bool currently_hidden;
+  bool visible;
   bool default_pose;
   uint8_t num_shader_transforms;
   mathfu::mat4* shader_transforms;
@@ -149,7 +146,7 @@ class RenderMeshComponent : public entity::Component<RenderMeshData> {
   void RenderAllEntities(Renderer& renderer, const CameraInterface& camera);
 
   // Recursively sets the hidden-ness of the entity and all children.
-  void SetHiddenRecursively(const entity::EntityRef& entity, bool hidden);
+  void SetVisibilityRecursively(const entity::EntityRef& entity, bool visible);
 
   // Get and set the light position.  This is a special uniform that is sent
   // to all shaders without having to declare it explicitly in the

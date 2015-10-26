@@ -61,7 +61,7 @@ void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
     // planning on participating in.
     for (int pass = 0; pass < RenderPass_Count; pass++) {
       if (rendermesh_data->pass_mask & (1 << pass)) {
-        if (rendermesh_data->currently_hidden) continue;
+        if (!rendermesh_data->visible) continue;
 
         // Check to make sure objects are inside the frustrum of our
         // view-cone before we draw:
@@ -199,17 +199,17 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
   }
 }
 
-void RenderMeshComponent::SetHiddenRecursively(const entity::EntityRef& entity,
-                                               bool hidden) {
+void RenderMeshComponent::SetVisibilityRecursively(
+    const entity::EntityRef& entity, bool visible) {
   RenderMeshData* rendermesh_data = Data<RenderMeshData>(entity);
   TransformData* transform_data = Data<TransformData>(entity);
   if (transform_data) {
     if (rendermesh_data) {
-      rendermesh_data->currently_hidden = hidden;
+      rendermesh_data->visible = visible;
     }
     for (auto iter = transform_data->children.begin();
          iter != transform_data->children.end(); ++iter) {
-      SetHiddenRecursively(iter->owner, hidden);
+      SetVisibilityRecursively(iter->owner, visible);
     }
   }
 }
@@ -249,8 +249,7 @@ void RenderMeshComponent::AddFromRawData(entity::EntityRef& entity,
       asset_manager_->LoadShader(rendermesh_def->shader()->c_str());
   assert(rendermesh_data->shader != nullptr);
 
-  rendermesh_data->default_hidden = rendermesh_def->hidden();
-  rendermesh_data->currently_hidden = rendermesh_def->hidden();
+  rendermesh_data->visible = rendermesh_def->visible();
   rendermesh_data->default_pose = rendermesh_def->default_pose();
 
   rendermesh_data->pass_mask = 0;
