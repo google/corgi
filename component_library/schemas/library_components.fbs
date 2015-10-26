@@ -78,6 +78,12 @@ table AnimationDef {
   // To play additional animations after this one, call
   // AnimationComponent::AnimateFromTable().
   anim_table_start_idx:int;
+
+  // If true, output animation values for every scale, rotate, and translate,
+  // on every bone for this entity. It's a lot of information, but can be
+  // piped into a .csv (comma separated values) file and opened in a
+  // spreadsheet.
+  debug:bool = false;
 }
 
 table GraphDef {

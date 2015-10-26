@@ -34,11 +34,30 @@ namespace fpl {
 namespace component_library {
 
 void AnimationComponent::UpdateAllEntities(entity::WorldTime delta_time) {
-  engine_.AdvanceFrame(delta_time);
+  // Pre-update loop.
   for (auto iter = component_data_.begin(); iter != component_data_.end();
        ++iter) {
     AnimationData* animation_data = GetComponentData(iter->entity);
     if (animation_data->motivator.Valid()) {
+      // Log debug info. Only log the header the first time.
+      if (animation_data->debug_state == kAnimationDebug_OutputHeaderAndState) {
+        LogInfo(animation_data->motivator.CsvHeaderForDebugging().c_str());
+        animation_data->debug_state = kAnimationDebug_OutputState;
+      }
+      if (animation_data->debug_state != kAnimationDebug_Inactive) {
+        LogInfo(animation_data->motivator.CsvValuesForDebugging().c_str());
+      }
+    }
+  }
+
+  engine_.AdvanceFrame(delta_time);
+
+  // Post-update loop.
+  for (auto iter = component_data_.begin(); iter != component_data_.end();
+       ++iter) {
+    AnimationData* animation_data = GetComponentData(iter->entity);
+    if (animation_data->motivator.Valid()) {
+      // Broadcast when animations complete.
       MotiveTime time_remaining = animation_data->motivator.TimeRemaining();
       if (time_remaining <= 0 && animation_data->previous_time_remaining > 0) {
         GraphData* graph_data = Data<GraphData>(iter->entity);
@@ -56,6 +75,9 @@ void AnimationComponent::AddFromRawData(entity::EntityRef& entity,
   auto animation_def = static_cast<const AnimationDef*>(raw_data);
   AnimationData* animation_data = AddEntity(entity);
   animation_data->anim_table_object = animation_def->anim_table_object();
+  animation_data->debug_state =
+      animation_def->debug() ? kAnimationDebug_OutputHeaderAndState
+                             : kAnimationDebug_Inactive;
   AnimateFromTable(entity, animation_def->anim_table_start_idx());
 }
 
@@ -69,7 +91,9 @@ entity::ComponentInterface::RawDataUniquePtr AnimationComponent::ExportRawData(
                       ->export_force_defaults();
   fbb.ForceDefaults(defaults);
 
-  auto anim_def = CreateAnimationDef(fbb, animation_data->anim_table_object, 0);
+  auto anim_def = CreateAnimationDef(
+      fbb, animation_data->anim_table_object, 0,
+      animation_data->debug_state != kAnimationDebug_Inactive);
   fbb.Finish(anim_def);
   return fbb.ReleaseBufferPointer();
 }
