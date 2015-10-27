@@ -30,10 +30,17 @@ namespace component_library {
 
 BREADBOARD_DECLARE_EVENT(kAnimationCompleteEventId)
 
+enum AnimationDebugState {
+  kAnimationDebug_Inactive,
+  kAnimationDebug_OutputHeaderAndState,
+  kAnimationDebug_OutputState,
+};
+
 struct AnimationData {
   AnimationData()
       : anim_table_object(-1),
-        previous_time_remaining(motive::kMotiveTimeEndless) {}
+        previous_time_remaining(motive::kMotiveTimeEndless),
+        debug_state(kAnimationDebug_Inactive) {}
 
   // Holds and processes the animation. Call motivator.GlobalTransforms()
   // to get an array of matrices: one for each bone in the animation.
@@ -45,6 +52,9 @@ struct AnimationData {
 
   // The previous time remaining. Used for firing animation events.
   motive::MotiveTime previous_time_remaining;
+
+  // If true, output debug information every frame.
+  AnimationDebugState debug_state;
 };
 
 class AnimationComponent : public entity::Component<AnimationData> {
