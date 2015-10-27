@@ -27,8 +27,21 @@
 /// * CreateEntityList
 /// * LoadEntityData
 ///
-/// The FlatBuffers types that it uses should be defined in your schema as
-/// follows:
+/// This default entity factory assumes the following 4 generated FlatBuffers
+/// types defined for serialization of component data:
+///
+/// * ComponentDataUnion
+///     The union of the *Defs you are using in your game (e.g. TransformDef,
+///     RenderMeshDef, MyCustomComponentDef)
+/// * ComponentDefInstance
+///     A table containing one instance of the above union.
+/// * EntityDef
+///     A list of ComponentDefInstances, defining a single entity's components.
+/// * EntityListDef
+///     A list of EntityDefs, defining multiple entities.
+///
+/// These types should be defined in your FlatBuffers schema as follows:
+///
 /// union ComponentDataUnion {
 ///   MetaDef,
 ///   CommonServicesDef,
@@ -50,14 +63,35 @@
 /// }
 /// root_type EntityListDef;
 ///
-/// IMPORTANT: You must remember to include a "using" directive for the
-/// namespace your FlatBuffers data types are in before including this file.
+/// IMPORTANT: In the CPP file that includes this, you must remember to #define
+/// FACTORY_TYPE_NAMESPACE to the namespace your generated FlatBuffers data
+/// types are in before including this file, and to include the generated header
+/// file before including this file.
+///
+/// For example, your project's default_entity_factory.cpp file should look
+/// something like this:
+///
+/// /* default_entity_factory.cpp */
+/// #include "mygame_components_generated.h"
+///
+/// #define FACTORY_TYPE_NAMESPACE mygame
+/// #include "component_library/default_entity_factory.inc"
+
+#ifndef FACTORY_TYPE_NAMESPACE
+#error You must #define FACTORY_TYPE_NAMESPACE to the namespace your generated \
+       FlatBuffers types are in before including this file.
+#endif
 
 #include "component_library/default_entity_factory.h"
 #include "flatbuffers/reflection.h"
 
 namespace fpl {
 namespace component_library {
+
+using FACTORY_TYPE_NAMESPACE::ComponentDataUnion;
+using FACTORY_TYPE_NAMESPACE::ComponentDefInstance;
+using FACTORY_TYPE_NAMESPACE::EntityDef;
+using FACTORY_TYPE_NAMESPACE::EntityListDef;
 
 bool DefaultEntityFactory::ReadEntityList(
     const void* entity_list, std::vector<const void*>* entity_defs) {
