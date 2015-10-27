@@ -33,6 +33,11 @@ using motive::RigInit;
 namespace fpl {
 namespace component_library {
 
+// TODO: Make these configurable per call, instead of const in the anim.
+static const float kAnimStartTime = 0.0f;
+static const float kAnimPlaybackRate = 1.0f;
+static const float kAnimBlendTime = 200.0f;
+
 void AnimationComponent::UpdateAllEntities(entity::WorldTime delta_time) {
   // Pre-update loop.
   for (auto iter = component_data_.begin(); iter != component_data_.end();
@@ -117,16 +122,19 @@ void AnimationComponent::InitializeMotivator(const EntityRef& entity) {
 
 void AnimationComponent::Animate(const EntityRef& entity, const RigAnim& anim) {
   AnimationData* data = Data<AnimationData>(entity);
+  fpl::SplinePlayback playback(kAnimStartTime, anim.repeat(), kAnimPlaybackRate,
+                               kAnimBlendTime);
 
   // We initialize the rig motivator only once, using the defining_anim so that
   // it can play back any animation for this object in the `anim_table_`.
   if (!data->motivator.Valid()) {
     InitializeMotivator(entity);
+    playback.blend_x = 0.0f;
   }
 
   // Instead of reinitializing the rig motivator, we perform a smooth transition
   // from the current state to the new animation `anim`.
-  data->motivator.BlendToAnim(anim);
+  data->motivator.BlendToAnim(anim, playback);
 }
 
 bool AnimationComponent::AnimateFromTable(const entity::EntityRef& entity,
