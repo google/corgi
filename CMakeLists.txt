@@ -18,6 +18,7 @@ project(entity)
 option(entity_build_component_library
   "Build a library of standard components along with the entity system"
   ON)
+option(entity_build_samples "Build samples for this project." ON)
 
 # Compile the game with the debug flag
 set(entity_DEBUG ON)
@@ -229,3 +230,7 @@ if (entity_build_component_library)
   mathfu_configure_flags(component_library)
   restore_compiler_flags()
 endif()  # entity_build_component_library
+
+if(entity_build_samples)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/samples)
+endif()
