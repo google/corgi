@@ -139,12 +139,13 @@ void AnimationComponent::Animate(const EntityRef& entity, const RigAnim& anim) {
 
 bool AnimationComponent::AnimateFromTable(const entity::EntityRef& entity,
                                           int anim_idx) {
-  const AnimationData* data = Data<AnimationData>(entity);
+  AnimationData* data = Data<AnimationData>(entity);
   const motive::RigAnim* anim =
       anim_table_.Query(data->anim_table_object, anim_idx);
   if (anim == nullptr) return false;
 
   Animate(entity, *anim);
+  data->last_anim_idx = anim_idx;
   return true;
 }
 

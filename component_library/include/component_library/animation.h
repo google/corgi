@@ -39,6 +39,7 @@ enum AnimationDebugState {
 struct AnimationData {
   AnimationData()
       : anim_table_object(-1),
+        last_anim_idx(-1),
         previous_time_remaining(motive::kMotiveTimeEndless),
         debug_state(kAnimationDebug_Inactive) {}
 
@@ -49,6 +50,10 @@ struct AnimationData {
   // If animation is set using the AnimationComponent's anim_table_,
   // specifies the query parameters for the anim_table_.
   int anim_table_object;
+
+  // Index of last animation to be played via AnimateFromTable(),
+  // or -1 if no animation has every been played using that function.
+  int last_anim_idx;
 
   // The previous time remaining. Used for firing animation events.
   motive::MotiveTime previous_time_remaining;
@@ -81,6 +86,13 @@ class AnimationComponent : public entity::Component<AnimationData> {
   bool HasAnim(const entity::EntityRef& entity, int anim_idx) const {
     const AnimationData* data = Data<AnimationData>(entity);
     return anim_table_.Query(data->anim_table_object, anim_idx) != nullptr;
+  }
+
+  // Returns the index of the last animation to be played via
+  // AnimateFromTable(), or -1 if no animation has every been played using
+  // that function.
+  int LastAnimIdx(const entity::EntityRef& entity) const {
+    return Data<AnimationData>(entity)->last_anim_idx;
   }
 
   // The engine can be used for external Motivators as well.
