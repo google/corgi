@@ -23,6 +23,8 @@
 FPL_ENTITY_DEFINE_COMPONENT(fpl::component_library::GraphComponent,
                             fpl::component_library::GraphData)
 
+BREADBOARD_DEFINE_EVENT(fpl::component_library::kAdvanceFrameEventId)
+
 namespace fpl {
 namespace component_library {
 
@@ -95,6 +97,11 @@ entity::ComponentInterface::RawDataUniquePtr GraphComponent::ExportRawData(
   }
   fbb.Finish(builder.Finish());
   return fbb.ReleaseBufferPointer();
+}
+
+void GraphComponent::UpdateAllEntities(entity::WorldTime /*delta_time*/) {
+  advance_frame_broadcaster_.BroadcastEvent(
+      fpl::component_library::kAdvanceFrameEventId);
 }
 
 }  // fpl_project

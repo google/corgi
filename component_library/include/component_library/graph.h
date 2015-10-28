@@ -25,6 +25,8 @@
 namespace fpl {
 namespace component_library {
 
+BREADBOARD_DECLARE_EVENT(kAdvanceFrameEventId)
+
 struct SerializableGraphState {
   std::string filename;
   std::unique_ptr<breadboard::GraphState> graph_state;
@@ -95,11 +97,17 @@ class GraphComponent : public entity::Component<GraphData> {
   virtual void AddFromRawData(entity::EntityRef& entity, const void* raw_data);
   virtual RawDataUniquePtr ExportRawData(const entity::EntityRef& entity) const;
   virtual void InitEntity(entity::EntityRef& /*entity*/) {}
+  virtual void UpdateAllEntities(entity::WorldTime delta_time);
 
   const entity::EntityRef& graph_entity() const { return graph_entity_; }
 
+  breadboard::NodeEventBroadcaster* advance_frame_broadcaster() {
+    return &advance_frame_broadcaster_;
+  }
+
  private:
   breadboard::GraphFactory* graph_factory_;
+  breadboard::NodeEventBroadcaster advance_frame_broadcaster_;
 
   // TODO: Remove this in favor of a more generic per-graph state interface.
   // b/24510652
