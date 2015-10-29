@@ -130,7 +130,8 @@ int PhysicsData::RigidBodyIndex(const std::string& user_tag) const {
   return -1;
 }
 
-void PhysicsData::GetAabb(int rigid_body_idx, mathfu::vec3* min, mathfu::vec3* max) const {
+void PhysicsData::GetAabb(int rigid_body_idx, mathfu::vec3* min,
+                          mathfu::vec3* max) const {
   btVector3 bt_min;
   btVector3 bt_max;
   rigid_bodies_[rigid_body_idx].rigid_body->getAabb(bt_min, bt_max);
@@ -185,7 +186,11 @@ void PhysicsComponent::Init() {
   debug_drawer_->set_shader(asset_manager->LoadShader(kPhysicsShader));
 }
 
-PhysicsComponent::PhysicsComponent() {}
+PhysicsComponent::PhysicsComponent()
+    : collision_callback_(nullptr),
+      collision_user_data_(nullptr),
+      gravity_(kDefaultPhysicsGravity),
+      max_steps_(kDefaultPhysicsMaxSteps) {}
 PhysicsComponent::~PhysicsComponent() { ClearComponentData(); }
 
 void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
@@ -677,7 +682,7 @@ void PhysicsComponent::AddStaticMeshTriangle(const entity::EntityRef& entity,
   assert(data != nullptr && data->triangle_mesh_.get() != nullptr);
 
   data->triangle_mesh_->addTriangle(ToBtVector3(pt0), ToBtVector3(pt1),
-                                   ToBtVector3(pt2));
+                                    ToBtVector3(pt2));
 }
 
 void PhysicsComponent::FinalizeStaticMesh(const entity::EntityRef& entity,
