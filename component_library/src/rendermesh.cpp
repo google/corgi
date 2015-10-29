@@ -147,7 +147,7 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
     const mat4 world_transform =
         has_one_bone_anim
             ? transform_data->world_transform *
-                  mat4(anim_data->motivator.GlobalTransforms()[0])
+                  mat4::FromAffineTransform(anim_data->motivator.GlobalTransforms()[0])
             : transform_data->world_transform;
 
     const mat4 mvp = camera_vp * world_transform;
