@@ -45,6 +45,8 @@ class PhysicsComponent;
 class PhysicsDebugDrawer;
 
 static const int kMaxPhysicsBodies = 5;
+static const float kDefaultPhysicsGravity = -9.8f;
+static const int kDefaultPhysicsMaxSteps = 5;
 
 // Data describing which entities were involed in a collision and where.
 struct CollisionData {
