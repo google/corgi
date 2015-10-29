@@ -668,6 +668,25 @@ void PhysicsComponent::UpdatePhysicsScale(const entity::EntityRef& entity) {
   }
 }
 
+void PhysicsComponent::AwakenEntity(const entity::EntityRef& entity) {
+  PhysicsData* physics_data = Data<PhysicsData>(entity);
+  if (physics_data != nullptr && physics_data->enabled_) {
+    for (int i = 0; i < physics_data->body_count_; i++) {
+      auto rb_data = &physics_data->rigid_bodies_[i];
+      if (!rb_data->rigid_body->isKinematicObject()) {
+        rb_data->rigid_body->activate();
+      }
+    }
+  }
+}
+
+void PhysicsComponent::AwakenAllEntities() {
+  for (auto iter = component_data_.begin(); iter != component_data_.end();
+       ++iter) {
+    AwakenEntity(iter->entity);
+  }
+}
+
 void PhysicsComponent::InitStaticMesh(entity::EntityRef& entity) {
   PhysicsData* data = AddEntity(entity);
   // Instantiate a holder for the triangle data. Note that the reset clears any

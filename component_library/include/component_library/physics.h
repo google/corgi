@@ -136,6 +136,9 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   void EnablePhysics(const entity::EntityRef& entity);
   void DisablePhysics(const entity::EntityRef& entity);
 
+  void AwakenEntity(const entity::EntityRef& entity);
+  void AwakenAllEntities();
+
   // Initialize the data needed to generate a static mesh. Adds the entity to
   // the physics component if necessary.
   void InitStaticMesh(entity::EntityRef& entity);
