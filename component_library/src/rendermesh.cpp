@@ -145,10 +145,9 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
     const bool has_one_bone_anim =
         has_anim && (num_mesh_bones <= 1 || num_anim_bones == 1);
     const mat4 world_transform =
-        has_one_bone_anim
-            ? transform_data->world_transform *
-                  mat4::FromAffineTransform(anim_data->motivator.GlobalTransforms()[0])
-            : transform_data->world_transform;
+        has_one_bone_anim ? transform_data->world_transform *
+                                anim_data->motivator.GlobalTransforms()[0]
+                          : transform_data->world_transform;
 
     const mat4 mvp = camera_vp * world_transform;
     const mat4 world_matrix_inverse = world_transform.Inverse();
@@ -162,7 +161,7 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
     if (num_mesh_bones > 1) {
       const bool use_default_pose =
           num_anim_bones != num_mesh_bones || rendermesh_data->default_pose;
-      const mathfu::AffineTransform* bone_transforms =
+      const mat4* bone_transforms =
           use_default_pose ? rendermesh_data->mesh->bone_global_transforms()
                            : anim_data->motivator.GlobalTransforms();
       rendermesh_data->mesh->GatherShaderTransforms(
@@ -240,10 +239,9 @@ void RenderMeshComponent::AddFromRawData(entity::EntityRef& entity,
       rendermesh_data->mesh->num_shader_bones();
   rendermesh_data->num_shader_transforms = num_shader_transforms;
   if (num_shader_transforms > 0) {
-    rendermesh_data->shader_transforms =
-        new mathfu::AffineTransform[num_shader_transforms];
+    rendermesh_data->shader_transforms = new mat4[num_shader_transforms];
     for (uint8_t i = 0; i < num_shader_transforms; ++i) {
-      rendermesh_data->shader_transforms[i] = mathfu::kAffineIdentity;
+      rendermesh_data->shader_transforms[i] = mat4::Identity();
     }
   }
 

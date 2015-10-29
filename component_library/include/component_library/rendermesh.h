@@ -82,7 +82,7 @@ struct RenderMeshData {
   bool visible;
   bool default_pose;
   uint8_t num_shader_transforms;
-  mathfu::AffineTransform* shader_transforms;
+  mathfu::mat4* shader_transforms;
 
  private:
   // Disallow copies. They're inefficient with the shader_transforms array.
