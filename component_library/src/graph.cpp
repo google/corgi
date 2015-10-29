@@ -91,9 +91,10 @@ entity::ComponentInterface::RawDataUniquePtr GraphComponent::ExportRawData(
   for (auto iter = data->graphs.begin(); iter != data->graphs.end(); ++iter) {
     filenames_vector.push_back(fbb.CreateString(iter->filename));
   }
+  auto filenames_vector_fb = fbb.CreateVector(filenames_vector);
   GraphDefBuilder builder(fbb);
   if (filenames_vector.size() > 0) {
-    builder.add_filename_list(fbb.CreateVector(filenames_vector));
+    builder.add_filename_list(filenames_vector_fb);
   }
   fbb.Finish(builder.Finish());
   return fbb.ReleaseBufferPointer();
