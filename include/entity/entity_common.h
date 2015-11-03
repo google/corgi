@@ -58,7 +58,7 @@ typedef uint32_t ComponentId;
 const ComponentId kInvalidComponent = 0;
 
 /// @cond CORGI_INTERNAL
-static const ComponentIdkMaxComponentCount = FPL_ENTITY_MAX_COMPONENT_COUNT;
+static const ComponentId kMaxComponentCount = FPL_ENTITY_MAX_COMPONENT_COUNT;
 /// @endcond
 
 /// @typedef WorldTime
