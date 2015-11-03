@@ -21,30 +21,69 @@
 namespace fpl {
 namespace entity {
 
-// Maximum number of components in the system.  This should be set with care,
-// because it affects the size of each entity.  Ideally this should be set
-// to something that is as close as possible to the actual number of components
-// used by the program.
+/// @file
+/// @def FPL_ENTITY_MAX_COMPONENT_COUNT
+///
+/// @brief The maximum number of components in the system.
+///
+/// Redefine this to fit however many Components your system needs.
+///
+/// @warning This should be set with care, because it affects the size of each
+/// Entity. Ideally this should be set to something that is as close as
+/// possible to the actual number of Components used by the program.
 #define FPL_ENTITY_MAX_COMPONENT_COUNT 30
 
-// Pick an index type based on the max number of components.
+/// @var ComponentId
+///
+/// @brief This represents the ID of a Component.
+///
+/// @note Depending on kMaxComponentCount, this value is either an uint8_t,
+/// uint16_t, or uint32_t. (However, if you need an uint32_t, you are
+/// probably doing something odd.)
+/// @{
 #if kMaxComponentCount <= 0xff
 typedef uint8_t ComponentId;
 #elif kMaxComponentCount <= 0xffff
 typedef uint16_t ComponentId;
 #else
-// if you hit this one, you are probably doing something really odd.
 typedef uint32_t ComponentId;
 #endif
+/// @}
 
-// Component IDs start at 1.
+/// @var kInvalidComponent
+///
+/// @brief A sentinel value to represent an invalid Component.
+///
+/// @note Component IDs start at 1.
 const ComponentId kInvalidComponent = 0;
 
-static const ComponentId kMaxComponentCount = FPL_ENTITY_MAX_COMPONENT_COUNT;
+/// @cond CORGI_INTERNAL
+static const ComponentIdkMaxComponentCount = FPL_ENTITY_MAX_COMPONENT_COUNT;
+/// @endcond
 
+/// @typedef WorldTime
+///
+/// @brief A typedef that represents time in the game.
 typedef int WorldTime;
+
+/// @cond CORGI_INTERNAL
 const int kMillisecondsPerSecond = 1000;
+/// @endcond
+
+/// @typedef ComponentIndex
+///
+/// @brief A ComponentIndex is a value used to represent the location of a piece
+/// of ComponentData, normally inside of a VectorPool.
 typedef uint16_t ComponentIndex;
+
+/// @var kUnusedComponentIndex
+///
+/// @brief A sentinel value to represent an invalid Component.
+///
+/// Since all Entities contain an array corresponding to every
+/// Component in the system, this value is used as a default value
+/// to indicate that a specific Component is not registered with
+/// a given Entity.
 static const ComponentIndex kUnusedComponentIndex =
     static_cast<ComponentIndex>(-1);
 

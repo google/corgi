@@ -20,38 +20,67 @@
 namespace fpl {
 namespace entity {
 
-// Basic entity class for the entity system.  Contains an array of index
-// values used by components for tracking their data associated with an entity
-// and a boolean for tracking if this entity is marked for deletion.
+/// @file
+/// @class Entity
+///
+/// @brief The basic Entity class for CORGI. It contains an array
+/// of index values, which are used by Components for tracking their data
+/// associated with an Entity. It also contains a boolean for tracking if
+/// this Entity has been marked for deletion.
 class Entity {
  public:
+  /// @brief Constructor for creating an Entity.
   Entity() : marked_for_deletion_(false) {
     for (int i = 0; i < kMaxComponentCount; i++) {
       componentDataIndex_[i] = kUnusedComponentIndex;
     }
   }
 
-  // Returns the index of the data in the corresponding component system.
+  /// @brief Gets the index of the data in the corresponding Component
+  /// system.
+  ///
+  /// @param[in] componentId The ID of the Component whose data
+  /// index will be returned.
+  ///
+  /// @return Returns an int index of the data in the corresponding
+  /// Component system.
   int GetComponentDataIndex(ComponentId componentId) const {
     return componentDataIndex_[componentId];
   }
 
-  // Sets the index for the data associated with this entity in the specified
-  // component.
+  /// @brief Sets the index for the data associated with this Entity in the
+  /// given Component.
+  ///
+  /// @param[in] componentId The ID of the Component whose data index will
+  /// be set.
+  /// @param[in] value The ComponentIndex value to set for the given Component.
   void SetComponentDataIndex(ComponentId componentId, ComponentIndex value) {
     componentDataIndex_[componentId] = value;
   }
 
-  // Utility function for checking if this entity is associated with a
-  // specific component.
+  /// @brief A utility function for checking if this Entity is associated
+  /// with a given Component.
+  ///
+  /// @param[in] componentId The ID of the Component to check whether or not
+  /// it is associated with this Entity.
+  ///
+  /// @return Returns a bool of whether or not this Entity is associated
+  /// with the given Component.
   bool IsRegisteredForComponent(ComponentId componentId) const {
     return componentDataIndex_[componentId] != kUnusedComponentIndex;
   }
 
-  // Member variable getter
+  /// @brief An accessor function to check if this Entity has been
+  /// marked for deletion.
+  ///
+  /// @return Returns a bool indicating whether or not this Entity
+  /// is marked for deletion.
   bool marked_for_deletion() const { return marked_for_deletion_; }
 
-  // Member variable setter
+  /// @brief A mutator function to set an Entity as marked for deletion.
+  ///
+  /// @param[in] marked_for_deletion A bool corresponding to whether the Entity
+  /// should be marked for deletion or not.
   void set_marked_for_deletion(bool marked_for_deletion) {
     marked_for_deletion_ = marked_for_deletion;
   }
