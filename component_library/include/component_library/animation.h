@@ -88,6 +88,16 @@ class AnimationComponent : public entity::Component<AnimationData> {
     return anim_table_.Query(data->anim_table_object, anim_idx) != nullptr;
   }
 
+  // Return the length of the animation at `anim_idx` for `entity`, if it
+  // exists, or 0 otherwise.
+  motive::MotiveTime AnimLength(const entity::EntityRef& entity,
+                                int anim_idx) const {
+    const AnimationData* data = Data<AnimationData>(entity);
+    const motive::RigAnim* anim = anim_table_.Query(data->anim_table_object,
+                                                    anim_idx);
+    return anim == nullptr ? 0 : anim->end_time();
+  }
+
   // Returns the index of the last animation to be played via
   // AnimateFromTable(), or -1 if no animation has every been played using
   // that function.
