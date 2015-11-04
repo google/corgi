@@ -68,8 +68,8 @@ class ComponentInterface {
   /// @note Usually you will want to use Component::AddEntity, since that
   /// returns a pointer to the data assigned to the Component.
   ///
-  /// @param[in] entity An EntityRef reference to the Entity being added to this
-  /// Component.
+  /// @param[in,out] entity An EntityRef reference to the Entity being added to
+  /// this Component.
   virtual void AddEntityGenerically(EntityRef& entity) = 0;
 
   /// @brief Remove an Entity from the Component's list.
@@ -135,7 +135,7 @@ class ComponentInterface {
   /// @brief Creates and populates an Entity from raw data. Components that want
   /// to be able to be constructed via the EntityFactory need to implement this.
   ///
-  /// @param[in] entity An EntityRef that points to an Entity that is being
+  /// @param[in,out] entity An EntityRef that points to an Entity that is being
   /// added from the raw data.
   /// @param[in] data A void pointer to the raw data.
   virtual void AddFromRawData(EntityRef& entity, const void* data) = 0;

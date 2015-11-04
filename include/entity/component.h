@@ -110,12 +110,12 @@ class Component : public ComponentInterface {
   /// the interface class, since it needs to know about type T for the return
   /// value.
   ///
-  /// @param[in] entity An EntityRef reference used to add an Entity.
+  /// @param[in,out] entity An EntityRef reference used to add an Entity.
   virtual void AddEntityGenerically(EntityRef& entity) { AddEntity(entity); }
 
   /// @brief Adds an Entity to the list that this Component is tracking.
   ///
-  /// @param[in] entity An EntityRef reference used to add an Entity to the
+  /// @param[in,out] entity An EntityRef reference used to add an Entity to the
   /// list of Entities that this Component keeps track of.
   /// @param[in] alloc_location An Enum that specifies whether to allocate from
   /// the beginning or end of the memory pool.
@@ -144,7 +144,7 @@ class Component : public ComponentInterface {
   /// @note Entities added through this function allocate from the back of the
   /// memory pool.
   ///
-  /// @param[in] entity An EntityRef reference used to add an Entity to the
+  /// @param[in,out] entity An EntityRef reference used to add an Entity to the
   /// list of Entities that this Component keeps track of.
   ///
   /// @return Returns the data structure associated with the Component.
@@ -156,7 +156,7 @@ class Component : public ComponentInterface {
   /// calling the destructor on the data, and returning the memory to the
   /// memory pool.
   ///
-  /// @param[in] entity An EntityRef reference used to remove an Entity
+  /// @param[in,out] entity An EntityRef reference used to remove an Entity
   /// from the list of Entities that this Component keeps track of.
   virtual void RemoveEntity(EntityRef& entity) {
     RemoveEntityInternal(entity);
@@ -170,7 +170,7 @@ class Component : public ComponentInterface {
   /// calling the destructor on the data, and returning the memory to the
   /// memory pool.
   ///
-  /// @param[in] iter An EntityIterator that references an Entity that should
+  /// @param[in,out] iter An EntityIterator that references an Entity that should
   /// be removed.
   ///
   /// @return Returns an iterator to the next Entity after the one that was

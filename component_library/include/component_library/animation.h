@@ -30,12 +30,34 @@ namespace component_library {
 
 BREADBOARD_DECLARE_EVENT(kAnimationCompleteEventId)
 
+/// @file
+///
+/// @enum AnimationDebugState
+///
+/// @brief `kAnimationDebug_Inactive` indicates that no debug information should
+/// be output. Both `kAnimationDebug_OutputHeaderAndState` and
+/// `kAnimationDebug_OutputState` indicate that debug information should be
+/// output on every frame.
+///
+/// `kAnimationDebug_OutputHeaderAndState` is used for the initial output, as
+/// it prints a header row, containing column labels for the table. After the
+/// header row is output, the state is automatically changed to
+/// `kAnimationDebug_OutputState`.
+///
+/// `kAnimationDebug_OutputState` is automatically used after the header row is
+/// output from `kAnimationDebug_OutputHeaderAndState`. It will only print out
+/// the animation data for each frame.
 enum AnimationDebugState {
   kAnimationDebug_Inactive,
   kAnimationDebug_OutputHeaderAndState,
   kAnimationDebug_OutputState,
 };
 
+/// @struct AnimationData
+///
+/// @brief The Component data structure that corresponds to each Entity that
+/// is registered with the AnimationComponent. It contains all the information
+/// for each Entity's animation.
 struct AnimationData {
   AnimationData()
       : anim_table_object(-1),
@@ -43,53 +65,119 @@ struct AnimationData {
         previous_time_remaining(motive::kMotiveTimeEndless),
         debug_state(kAnimationDebug_Inactive) {}
 
-  // Holds and processes the animation. Call motivator.GlobalTransforms()
-  // to get an array of matrices: one for each bone in the animation.
+  /// @var motivator
+  ///
+  /// @brief Holds and processes the animaton. Calls can be made to
+  /// `motivator.GlobalTransforms()` to get an array of matrices: one for
+  /// each bone in the animation.
   motive::RigMotivator motivator;
 
-  // If animation is set using the AnimationComponent's anim_table_,
-  // specifies the query parameters for the anim_table_.
+  /// @var anim_table_object
+  ///
+  /// @brief Specifies the object-type query parameter for the AnimTable,
+  /// which is used to index the first array of the AnimTable.
   int anim_table_object;
 
-  // Index of last animation to be played via AnimateFromTable(),
-  // or -1 if no animation has every been played using that function.
+  /// @var last_anim_idx
+  ///
+  /// @brief Tracks the index of the last animation that was played by
+  /// `AnimateFromTable()`.
   int last_anim_idx;
 
-  // The previous time remaining. Used for firing animation events.
+  /// @var previous_time_remaining
+  ///
+  /// @brief The amount of time remaning from the previous animation. This
+  /// can be used for firing animation events.
   motive::MotiveTime previous_time_remaining;
 
-  // If true, output debug information every frame.
+  /// @var debug_state
+  ///
+  /// @brief This variable can be thought of like a `bool`, where it is either
+  /// active or inactive. If it is inactive, then no debug information will be
+  /// printed. If it is active, then it will output debug information on every
+  /// frame.
   AnimationDebugState debug_state;
 };
 
+/// @class AnimationComponent
+///
+/// @brief A Component that provides an elegant way to handle Entity animation
+/// by interacting with the Motive animation library.
 class AnimationComponent : public entity::Component<AnimationData> {
  public:
-  // Update all motivators in AnimationData, and any other motivators that
-  // were initialized with `engine_`.
+  /// @brief Updates all Motivators in the AnimationData, as well as, any other
+  /// Motivators that were initialized with AnimationComponent's MotiveEngine.
+  ///
+  /// @param[in] delta_time An entity::WorldTime representing the delta time
+  /// since the last call to UpdateAllEntities.
   virtual void UpdateAllEntities(entity::WorldTime delta_time);
 
-  // Serialize and deserialize.
+  /// @brief Deserialize a flat binary buffer to create and populate an Entity
+  /// from raw data.
+  ///
+  /// @param[in,out] entity An EntityRef reference that points to an Entity that
+  /// is being added from the raw data.
+  /// @param[in] data A void pointer to the raw FlatBuffer data.
   virtual void AddFromRawData(entity::EntityRef& entity, const void* data);
+
+  /// @brief Serializes an AnimationComponent's data for a given Entity.
+  ///
+  /// @param[in] entity An EntityRef reference to an Entity whose corresponding
+  /// AnimationData will be serialized.
+  ///
+  /// @return Returns a RawDataUniquePtr to the start of the raw data in a
+  /// flat binary buffer.
   virtual RawDataUniquePtr ExportRawData(const entity::EntityRef& entity) const;
 
-  // Begin playback of `anim` on `entity`.
-  // Note that `entity` must also have a RenderMeshComponent in order for
-  // this animation to be applied.
+  /// @brief Begin playback of a given RigAnim on a given Entity.
+  ///
+  /// @param[in] entity A const EntityRef reference to an Entity that the
+  /// RigAnim `anim` should be applied on.
+  ///
+  /// @warning This method asserts that `entity` must also have a
+  /// RenderMeshComponent in order for the animation to be applied.
+  ///
+  /// @param[in] anim A const motive::RigAnim reference to the animation that
+  /// should be applied on `entity`.
   void Animate(const entity::EntityRef& entity, const motive::RigAnim& anim);
 
-  // Query the anim_table for an animation, then play it.
-  // Returns true if new animation was started. False if animation could not
-  // be found in anim_table.
+  /// @brief Query the AnimTable for an animation and then play it.
+  ///
+  /// @param[in] entity A const EntityRef reference to the Entity whose
+  /// corresponding animation should be started.
+  /// @param[in] anim_idx An int index of the animation that should be
+  /// started.
+  ///
+  /// @return Returns `true` if a new animation was successfully started.
+  /// Otherwise, it returns `false` if the animation could not be found in
+  /// the AnimTable.
   bool AnimateFromTable(const entity::EntityRef& entity, int anim_idx);
 
-  // Return true if an animation exists in the AnimTable for `anim_idx`.
+  /// @brief Check if a certain animation exists with a given index in the
+  /// AnimTable for a given Entity.
+  ///
+  /// @param[in] entity A const EntityRef reference to the Entity whose
+  /// corresponding animation should be checked.
+  /// @param[in] anim_idx An int index of the animation whose existence should
+  /// be checked.
+  ///
+  /// @return Returns `true` if the animation exists in the AnimTable with
+  /// `anim_idx`. Returns `false` if the animation is not found in the
+  /// AnimTable.
   bool HasAnim(const entity::EntityRef& entity, int anim_idx) const {
     const AnimationData* data = Data<AnimationData>(entity);
     return anim_table_.Query(data->anim_table_object, anim_idx) != nullptr;
   }
 
-  // Return the length of the animation at `anim_idx` for `entity`, if it
-  // exists, or 0 otherwise.
+  /// @brief Get the length of an Entity's animation, given an animation index.
+  ///
+  /// @param[in] entity A const EntityRef reference to the Entity whose
+  /// corresponding animation's length should be returned.
+  /// @param[in] anim_idx An int index of the animation whose length should be
+  /// returned.
+  ///
+  /// @return Returns the length of the animation, if it exists. Otherwise, it
+  /// returns 0.
   motive::MotiveTime AnimLength(const entity::EntityRef& entity,
                                 int anim_idx) const {
     const AnimationData* data = Data<AnimationData>(entity);
@@ -98,34 +186,63 @@ class AnimationComponent : public entity::Component<AnimationData> {
     return anim == nullptr ? 0 : anim->end_time();
   }
 
-  // Returns the index of the last animation to be played via
-  // AnimateFromTable(), or -1 if no animation has every been played using
-  // that function.
+  /// @brief Get the index of the last animation that was played.
+  ///
+  /// @param[in] entity A const EntityRef reference to the entity whose index
+  /// should be returned.
+  ///
+  /// @return Returns the index of the last animation that was played via
+  /// `AnimateFromTable()`, or returns -1 if no animation has ever been played
+  /// using that function.
   int LastAnimIdx(const entity::EntityRef& entity) const {
     return Data<AnimationData>(entity)->last_anim_idx;
   }
 
-  // The engine can be used for external Motivators as well.
-  // For the greatest efficiency, there should be only one MotiveEngine.
+  /// @brief Get a reference to the engine that can be used for external
+  /// Motivators as well. For the greatest efficiency, there should only be one
+  /// MotiveEngine.
+  ///
+  /// @return Returns a reference to the MotiveEngine for this
+  /// AnimationComponent.
   motive::MotiveEngine& engine() { return engine_; }
+
+  /// @brief Get a const reference to the engine that can be used for
+  /// external Motivators as well. For the greatest efficiency,
+  /// there should only be one MotiveEngine.
+  ///
+  /// @return Returns a const reference to the MotiveEngine for this
+  /// AnimationComponent.
   const motive::MotiveEngine& engine() const { return engine_; }
 
-  // The animation table is queried when AnimateFromTable() is called.
+  /// @brief Get a reference to the animation table that is queried when
+  /// `AnimateFromTable()` is called.
+  ///
+  /// @return Returns a reference to the AnimTable for this AnimationComponent.
   motive::AnimTable& anim_table() { return anim_table_; }
+
+  /// @brief Get a const reference to the animation table that is queried when
+  /// `AnimateFromTable()` is called.
+  ///
+  /// @return Returns a const reference to the AnimTable for this
+  /// AnimationComponent.
   const motive::AnimTable& anim_table() const { return anim_table_; }
 
  private:
-  // Set the motivator up for any of the animations on the `object`.
+  /// @brief Sets the motivator up for any of the animations on the `object`.
   void InitializeMotivator(const entity::EntityRef& entity);
 
-  // Holds MotiveProcessors that, in turn, hold the animation state.
-  // Calling AdvanceFrame() on this updates all the animations at once.
+  /// @var engine_
+  ///
+  /// @brief Holds MotiveProcessors that, in turn, hold the animation state.
+  /// Calling AdvanceFrame() on this updates all the animations at once.
   motive::MotiveEngine engine_;
 
-  // Holds a table of animations.
-  // AnimTable is a simple array of arrays. Top array is indexed by
-  // `anim_table_object` in AnimationData. Bottom array is indexed
-  // by `anim_idx` in the AnimateFromTable() call.
+  /// @var anim_table_
+  ///
+  /// @brief Holds a table of animations.
+  /// It is a simple array of arrays. The top array is indexed by
+  /// `anim_table_object` in `AnimationData`. The bottom array is indexed by
+  /// `anim_idx` in the `AnimateFromTable()` call.
   motive::AnimTable anim_table_;
 };
 
