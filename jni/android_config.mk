@@ -27,22 +27,8 @@ else
   THIRD_PARTY_ROOT:=$(FPL_ROOT)/../../../external
 endif
 
-COMPONENTS_GENERATED_OUTPUT_DIR := $(COMPONENTS_DIR)/gen/include
-
-# Location of the Flatbuffers library.
-DEPENDENCIES_FLATBUFFERS_DIR?=$(FPL_ROOT)/flatbuffers
-# Location of the fplutil library.
-DEPENDENCIES_FPLUTIL_DIR?=$(FPL_ROOT)/fplutil
-# Location of the fplbase library.
-DEPENDENCIES_FPLBASE_DIR?=$(FPL_ROOT)/fplbase
-# Location of the MathFu library.
-DEPENDENCIES_MATHFU_DIR?=$(FPL_ROOT)/mathfu
-# Location of the Breadboard library.
-DEPENDENCIES_BREADBOARD_DIR?=$(FPL_ROOT)/breadboard
-# Location of the MathFu library.
-DEPENDENCIES_MOTIVE_DIR?=$(FPL_ROOT)/motive
-# Location of the Bullet Physics library.
-DEPENDENCIES_BULLETPHYSICS_DIR?=$(THIRD_PARTY_ROOT)/bulletphysics
-# Location of the Entity library.
-DEPENDENCIES_ENTITY_DIR?=$(ENTITY_DIR)
-
+# Location of the CORGI library.
+# This intentionally overrides any prior setting.
+# NOTE: This is only required as the CORGI's component library and Breadboard's
+# entity library have a circular dependency.
+DEPENDENCIES_ENTITY_DIR:=$(ENTITY_DIR)

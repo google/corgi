@@ -58,14 +58,16 @@ set(dependencies_breadboard_dir "${fpl_root}/breadboard"
     CACHE PATH "Directory containing the breadboard library.")
 set(dependencies_fplbase_dir "${fpl_root}/fplbase"
     CACHE PATH "Directory containing the FPLBase library.")
-set(dependencies_entity_dir "${fpl_root}/entity"
-    CACHE PATH "Directory containing the Entity library.")
 set(dependencies_mathfu_dir "${fpl_root}/mathfu"
     CACHE PATH "Directory containing the MathFu library.")
 set(dependencies_motive_dir "${fpl_root}/motive"
     CACHE PATH "Directory containing the motive animation library.")
 set(dependencies_bulletphysics_distr_dir "${third_party_root}/bulletphysics"
     CACHE PATH "Directory containing the Bullet Physics distribution.")
+# NOTE: This is only required as the breadboard module library and CORGI's
+# component library have a circular dependency.
+set(dependencies_entity_dir "${CMAKE_CURRENT_SOURCE_DIR}"
+    CACHE PATH "Directory containing the Entity library.")
 
 # Temporary files (like object files) created while compiling projects.
 set(tmp_dir ${CMAKE_CURRENT_BINARY_DIR}/obj)
