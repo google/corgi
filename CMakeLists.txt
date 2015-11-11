@@ -56,8 +56,6 @@ set(dependencies_fplutil_dir "${fpl_root}/fplutil"
     CACHE PATH "Directory containing the fplutil library.")
 set(dependencies_breadboard_dir "${fpl_root}/breadboard"
     CACHE PATH "Directory containing the breadboard library.")
-set(dependencies_pindrop_dir "${fpl_root}/pindrop"
-    CACHE PATH "Directory containing the pindrop library.")
 set(dependencies_fplbase_dir "${fpl_root}/fplbase"
     CACHE PATH "Directory containing the FPLBase library.")
 set(dependencies_entity_dir "${fpl_root}/entity"
@@ -176,12 +174,6 @@ if (entity_build_component_library)
     add_subdirectory("${dependencies_motive_dir}" ${tmp_dir}/motive)
   endif()
 
-  if(NOT TARGET pindrop)
-    set(pindrop_build_demo OFF CACHE BOOL "")
-    set(pindrop_build_tests OFF CACHE BOOL "")
-    add_subdirectory("${dependencies_pindrop_dir}" ${tmp_dir}/pindrop)
-  endif()
-
   # component library source files.
   set(component_library_SRCS
       ${COMPONENT_COLLECTION_DIR}/include/component_library/animation.h
@@ -217,7 +209,6 @@ if (entity_build_component_library)
   include_directories(${dependencies_fplutil_dir}/libfplutil/include)
   include_directories(${dependencies_motive_dir}/include)
   include_directories(${dependencies_mathfu_dir}/include)
-  include_directories(${dependencies_pindrop_dir}/include)
 
   set_compiler_flags_for_external_libraries()
   add_library(component_library ${component_library_SRCS})

@@ -1,0 +1,73 @@
+{
+  "package": {
+    "name": "entity",
+    "url": "http://github.com/google/corgi.git",
+    "branch": "develop",
+    "is_library": 1,
+    "third_party": 0,
+    "push": 1
+  },
+  "dependencies": [
+    {
+      "name": "fplutil",
+      "url": "http://github.com/google/fplutil.git",
+      "branch": "develop",
+      "is_library": 1,
+      "third_party": 0,
+      "push": 0
+    },
+    {
+      "name": "flatbuffers",
+      "url": "http://github.com/google/flatbuffers.git",
+      "branch": "master",
+      "is_library": 1,
+      "third_party": 0,
+      "push": 0
+    },
+    {
+      "name": "mathfu",
+      "url": "http://github.com/google/mathfu.git",
+      "branch": "develop",
+      "is_library": 1,
+      "third_party": 0,
+      "push": 0,
+      "fetch_dependencies": 1
+    },
+    {
+      "name": "motive",
+      "url": "http://github.com/google/motive.git",
+      "branch": "develop",
+      "is_library": 1,
+      "third_party": 0,
+      "push": 0,
+      "fetch_dependencies": 1
+    },
+    {
+      "name": "fplbase",
+      "url": "http://github.com/google/fplbase.git",
+      "branch": "develop",
+      "is_library": 1,
+      "third_party": 0,
+      "push": 0,
+      "fetch_dependencies": 1
+    },
+    {
+      "name": "breadboard",
+      "url": "http://github.com/google/breadboard.git",
+      "branch": "develop",
+      "is_library": 1,
+      "third_party": 0,
+      "push": 0,
+      "fetch_dependencies": 1
+    },
+    {
+      "name": "bulletphysics",
+      "url": "http://github.com/bulletphysics/bullet3.git",
+      "branch": "master",
+      "revision": "30ebb322285809bde98959e10e73e5acb9981efc",
+      "is_library": 1,
+      "third_party": 1,
+      "push": 0
+    }
+  ]
+}
