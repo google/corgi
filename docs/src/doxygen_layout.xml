@@ -15,8 +15,28 @@
 <doxygenlayout version="1.0">
   <navindex>
     <tab type="mainpage" visible="no" title=""/>
+    <tab type="usergroup" url="" title="Programmer's Guide">
+      <tab type="user" url="@ref corgi_guide_introduction"
+          title="Introduction"/>
+      <tab type="usergroup" url="@ref corgi_guide_building"
+          title="Building">
+        <tab type="user" url="@ref corgi_guide_building_android"
+            title="Android"/>
+        <tab type="user" url="@ref corgi_guide_building_linux"
+            title="Linux"/>
+        <tab type="user" url="@ref corgi_guide_building_osx"
+            title="OS X"/>
+        <tab type="user" url="@ref corgi_guide_building_windows"
+            title="Windows"/>
+      </tab>
+      <tab type="user" url="@ref corgi_guide_component" title="Component"/>
+      <tab type="user" url="@ref corgi_guide_entity" title="Entity"/>
+      <tab type="user" url="@ref corgi_guide_entity_manager"
+          title="Entity Manager"/>
+    </tab>
     <tab type="usergroup" url="@ref corgi_api_reference"
         title="API reference">
+      <tab type="modules" visible="yes" title="" intro=""/>
       <tab type="classes" visible="yes" title="">
         <tab type="classlist" visible="yes" title="" intro=""/>
         <tab type="classindex" visible="$ALPHABETICAL_INDEX" title=""/>

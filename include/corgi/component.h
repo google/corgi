@@ -25,6 +25,9 @@
 namespace corgi {
 
 /// @file
+/// @addtogroup corgi_component
+/// @{
+///
 /// @class Component
 /// @brief A Component is an object that encapsulates all data and logic
 /// for Entities of a particular type.
@@ -451,6 +454,7 @@ class Component : public ComponentInterface {
   /// main point of contact for Components that need to talk to other things.
   EntityManager* entity_manager_;
 };
+/// @}
 
 }  // corgi
 

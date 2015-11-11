@@ -20,6 +20,9 @@
 namespace corgi {
 
 /// @file
+/// @addtogroup corgi_entity
+/// @{
+///
 /// @class Entity
 ///
 /// @brief The basic Entity class for CORGI. It contains an array
@@ -88,6 +91,7 @@ class Entity {
   ComponentIndex componentDataIndex_[kMaxComponentCount];
   bool marked_for_deletion_;
 };
+/// @}
 
 }  // corgi
 

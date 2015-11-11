@@ -28,6 +28,9 @@ namespace corgi {
 class EntityManager;
 
 /// @file
+/// @addtogroup corgi_component
+/// @{
+///
 /// @typedef EntityRef
 ///
 /// @brief A typedef that should be used as the primary way to reference
@@ -180,6 +183,7 @@ class ComponentInterface {
   /// @param[in] id The Component ID to set for the data type.
   virtual void SetComponentIdOnDataType(ComponentId id) = 0;
 };
+/// @}
 
 }  // corgi
 

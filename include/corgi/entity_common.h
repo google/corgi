@@ -21,6 +21,9 @@
 namespace corgi {
 
 /// @file
+/// @addtogroup corgi_entity
+/// @{
+///
 /// @def CORGI_MAX_COMPONENT_COUNT
 ///
 /// @brief The maximum number of components in the system.
@@ -85,6 +88,7 @@ typedef uint16_t ComponentIndex;
 /// a given Entity.
 static const ComponentIndex kUnusedComponentIndex =
     static_cast<ComponentIndex>(-1);
+/// @}
 
 }  // corgi
 

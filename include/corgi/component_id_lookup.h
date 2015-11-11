@@ -20,6 +20,9 @@
 namespace corgi {
 
 /// @file
+/// @addtogroup corgi_component
+/// @{
+///
 /// @struct ComponentIdLookup
 ///
 /// @brief A templated struct for holding type-dependent data.
@@ -86,6 +89,8 @@ struct ComponentIdLookup {};
   namespace corgi {                                                          \
   ComponentId ComponentIdLookup<DataType>::component_id = kInvalidComponent; \
   }
+
+/// @}
 
 }  // corgi
 

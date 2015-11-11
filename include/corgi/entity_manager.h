@@ -25,6 +25,9 @@
 namespace corgi {
 
 /// @file
+/// @addtogroup corgi_entity_manager
+/// @{
+///
 /// @typedef EntityRef
 ///
 /// @brief This should be used as the primary way to reference an Entity.
@@ -415,6 +418,7 @@ class EntityFactoryInterface {
   virtual EntityRef CreateEntityFromData(const void* data,
                                          EntityManager* entity_manager) = 0;
 };
+/// @}
 
 }  // corgi
 

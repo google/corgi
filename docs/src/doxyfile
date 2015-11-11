@@ -746,6 +746,8 @@ WARN_LOGFILE           =
 INPUT                  = "index.md" \
                          "api_reference.md" \
                          "contributing.md" \
+                         "groups" \
+                         "programmers_guide" \
                          "../../readme.md" \
                          "../../include" \
                          "../../component_library/include" \
@@ -858,7 +860,7 @@ EXCLUDE_SYMBOLS        =
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           = ../../src/samples
+EXAMPLE_PATH           = ../../sample
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and
@@ -1127,6 +1129,7 @@ HTML_EXTRA_STYLESHEET  = $(SHARED_DOCS_PATH)/style.css
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
 HTML_EXTRA_FILES       =  "redirects/component_library.html" \
+                          "redirects/component_interface.html" \
                           "redirects/entity_factory.html" \
                           "redirects/meta_component.html" \
                           "redirects/physics_component.html" \

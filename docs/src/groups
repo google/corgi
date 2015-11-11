@@ -1,0 +1,14 @@
+/// @defgroup corgi_component Component
+/// @brief Component classes and functions.
+
+/// @defgroup corgi_component_library Component Library
+/// @brief A collection of Components for common game services.
+
+/// @defgroup corgi_entity Entity
+/// @brief Entity classes and functions.
+
+/// @defgroup corgi_entity_manager Entity Manager
+/// @brief EntityManager class and functions.
+
+/// @defgroup corgi_vector_pool Vector Pool
+/// @brief VectorPool class and functions.
