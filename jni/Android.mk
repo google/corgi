@@ -23,6 +23,7 @@ LOCAL_MODULE := corgi
 LOCAL_ARM_MODE := arm
 LOCAL_EXPORT_C_INCLUDES := $(CORGI_DIR)/include
 LOCAL_C_INCLUDES := $(LOCAL_EXPORT_C_INCLUDES)
-LOCAL_SRC_FILES := src/entity_manager.cpp
+LOCAL_SRC_FILES := src/entity_manager.cpp \
+                   src/version.cpp
 
 include $(BUILD_STATIC_LIBRARY)

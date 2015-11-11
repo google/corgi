@@ -167,6 +167,7 @@ void PhysicsData::GetAabb(int rigid_body_idx, mathfu::vec3* min,
 // Used by Bullet to render the physics scene as a wireframe.
 class PhysicsDebugDrawer : public btIDebugDraw {
  public:
+  virtual ~PhysicsDebugDrawer() {}
   virtual void drawLine(const btVector3& from, const btVector3& to,
                         const btVector3& color);
   virtual int getDebugMode() const { return DBG_DrawWireframe; }

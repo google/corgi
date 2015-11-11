@@ -20,6 +20,7 @@
 #include "corgi/entity.h"
 #include "corgi/entity_common.h"
 #include "corgi/vector_pool.h"
+#include "corgi/version.h"
 
 namespace corgi {
 
@@ -58,6 +59,9 @@ class EntityManager {
  public:
   /// @brief Constructor for the EntityManager.
   EntityManager();
+
+  /// @brief Returns the version of the Corgi entity library.
+  const CorgiVersion* GetCorgiVersion() { return version_; }
 
   /// @typedef EntityStorageContainer
   ///
@@ -384,6 +388,9 @@ class EntityManager {
   EntityFactoryInterface* entity_factory_;
 
   ComponentId max_component_id_;
+
+  // Current version of the Corgi Entity Library.
+  const CorgiVersion* version_;
 };
 
 /// @class EntityFactoryInterface
@@ -392,6 +399,9 @@ class EntityManager {
 /// for a given EntityManager.
 class EntityFactoryInterface {
  public:
+  /// @brief A destructor of the entity factory interface.
+  virtual ~EntityFactoryInterface() {}
+
   /// @brief Creates an Entity with a given EntityManager, registers it
   /// with all Components specified, and populates the Component data.
   ///

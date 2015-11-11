@@ -171,7 +171,8 @@ void EntityFactory::LoadEntityData(const void* def,
   }
 
   const MetaDef* meta_def = static_cast<const MetaDef*>(components[meta_id]);
-  if (meta_def != nullptr && meta_def->prototype() != nullptr) {
+  if (meta_def != nullptr && meta_def->prototype() != nullptr &&
+      *meta_def->prototype()->c_str() != '\0') {
     const char* prototype_name = meta_def->prototype()->c_str();
     if (prototype_data_.find(prototype_name) != prototype_data_.end()) {
       if (debug_entity_creation()) {

@@ -15,11 +15,16 @@
 #include <assert.h>
 #include "corgi/component_id_lookup.h"
 #include "corgi/entity_manager.h"
+#include "corgi/version.h"
 
 namespace corgi {
 
+// The reference to the version string is important because it ensures that
+// the constant won't be stripped out by the compiler.
 EntityManager::EntityManager()
-    : entity_factory_(nullptr), max_component_id_(kInvalidComponent) {
+    : entity_factory_(nullptr),
+      max_component_id_(kInvalidComponent),
+      version_(&Version()) {
   for (int i = 0; i < kMaxComponentCount; i++) {
     components_[i] = nullptr;
   }

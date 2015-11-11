@@ -104,6 +104,8 @@ struct TransformData {
 
 class TransformComponent : public corgi::Component<TransformData> {
  public:
+  virtual ~TransformComponent() {}
+
   mathfu::vec3 WorldPosition(corgi::EntityRef entity);
   mathfu::quat WorldOrientation(corgi::EntityRef entity);
   mathfu::mat4 WorldTransform(corgi::EntityRef entity);

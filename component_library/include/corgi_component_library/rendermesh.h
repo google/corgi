@@ -113,6 +113,7 @@ class RenderMeshComponent : public Component<RenderMeshData> {
   RenderMeshComponent()
       : asset_manager_(nullptr),
         culling_distance_squared_(kDefaultCullDist * kDefaultCullDist) {}
+  virtual ~RenderMeshComponent() {}
 
   virtual void Init();
   virtual void AddFromRawData(EntityRef& entity, const void* raw_data);

@@ -295,9 +295,10 @@ corgi::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
                       ->export_force_defaults();
   fbb.ForceDefaults(defaults);
 
-  auto source_file =
-      (data->mesh_filename != "") ? fbb.CreateString(data->mesh_filename) : 0;
-  auto shader = (data->shader_filename != "")
+  auto source_file = (defaults || data->mesh_filename != "")
+                         ? fbb.CreateString(data->mesh_filename)
+                         : 0;
+  auto shader = (defaults || data->shader_filename != "")
                     ? fbb.CreateString(data->shader_filename)
                     : 0;
   std::vector<unsigned char> render_pass_vec;

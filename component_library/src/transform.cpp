@@ -19,6 +19,7 @@
 #include "corgi_component_library/meta.h"
 #include "corgi_component_library/physics.h"
 #include "corgi_component_library/transform.h"
+
 #include "fplbase/utilities.h"
 
 CORGI_DEFINE_COMPONENT(corgi::component_library::TransformComponent,
@@ -227,8 +228,9 @@ corgi::ComponentInterface::RawDataUniquePtr TransformComponent::ExportRawData(
     child_ids_vector.push_back(fbb.CreateString(*iter));
   }
 
-  auto child_ids =
-      (child_ids_vector.size() > 0) ? fbb.CreateVector(child_ids_vector) : 0;
+  auto child_ids = (defaults || child_ids_vector.size() > 0)
+                       ? fbb.CreateVector(child_ids_vector)
+                       : 0;
 
   TransformDefBuilder builder(fbb);
   builder.add_position(&position);

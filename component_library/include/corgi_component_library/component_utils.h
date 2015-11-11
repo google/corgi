@@ -21,13 +21,28 @@
 
 namespace corgi {
 namespace component_library {
-
-// Get the max and min positions of an entity, based on its rendermesh.
-// Returns true if positions are gotten, and results stored in the provided
-// max and min vectors.
+/// @file
+/// @addtogroup corgi_component_library
+/// @{
+///
+/// @brief Get the minimum and maximum positions of an Entity, based on its
+/// and its children's rendermeshes.
+///
+/// @param[in] entity An EntityRef reference to the Entity whose minimum and
+/// maximum positions should be returned through the `min` and `max` parameters.
+/// @param[in] entity_manager An EntityManager reference to the EntityManager
+/// reponsible for managing this Entity.
+/// @param[out] max A mathfu::vec3 pointer that is used to capture the output
+/// value of the maximum Entity position.
+/// @param[out] min A mathfu::vec3 pointer that is used to capture the output
+/// value of the minimum Entity position.
+///
+/// @return Returns `true` if `min` and `max` were set successfully. Otherwise
+/// it returns false.
 bool GetMaxMinPositionsForEntity(corgi::EntityRef& entity,
                                  corgi::EntityManager& entity_manager,
                                  mathfu::vec3* max, mathfu::vec3* min);
+/// @}
 
 }  // component_library
 }  // corgi

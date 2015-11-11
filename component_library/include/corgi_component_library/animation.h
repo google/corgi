@@ -31,6 +31,8 @@ namespace component_library {
 BREADBOARD_DECLARE_EVENT(kAnimationCompleteEventId)
 
 /// @file
+/// @addtogroup corgi_component_library
+/// @{
 ///
 /// @enum AnimationDebugState
 ///
@@ -105,6 +107,9 @@ struct AnimationData {
 /// by interacting with the Motive animation library.
 class AnimationComponent : public Component<AnimationData> {
  public:
+  /// @brief Deconstructor of the Animation component.
+  virtual ~AnimationComponent() {}
+
   /// @brief Updates all Motivators in the AnimationData, as well as, any other
   /// Motivators that were initialized with AnimationComponent's MotiveEngine.
   ///
@@ -245,6 +250,7 @@ class AnimationComponent : public Component<AnimationData> {
   /// `anim_idx` in the `AnimateFromTable()` call.
   motive::AnimTable anim_table_;
 };
+/// @}
 
 }  // component_library
 }  // corgi

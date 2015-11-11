@@ -81,7 +81,8 @@ set(corgi_SRCS
     include/corgi/entity_manager.h
     include/corgi/entity.h
     include/corgi/vector_pool.h
-    src/entity_manager.cpp)
+    src/entity_manager.cpp
+    src/version.cpp)
 
 # Includes for this project.
 include_directories(src include)

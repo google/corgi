@@ -26,18 +26,39 @@
 namespace corgi {
 namespace component_library {
 
-// Data for scene object components.
+/// @file
+/// @addtogroup corgi_component_library
+/// @{
+///
+/// @struct CommonServicesData
+///
+/// @brief Holds the data that Components need (e.g. the input system,
+/// renderer, etc.).
 struct CommonServicesData {};
 
-// This is a somewhat unique component - No entities will directly subscribe
-// to it, and it has no per-entity data.  However, it provides an easy place
-// for other components to access game services and managers.  (Since components
-// don't have direct access to the gamestate, but they do have access to other
-// components.)
+/// @class CommonServicesComponent
+///
+/// @brief This is a unique Component, as no Entities will register with it and
+/// it contains no per-entity data. Its use is to provide a central location for
+/// other Components to easily access game services and managers (since
+/// Components themselves do not have direct access to the game state, but do
+/// have access to other Components).
 class CommonServicesComponent : public corgi::Component<CommonServicesData> {
  public:
+  /// @brief The default constructor to create an empty CommonServicesComponent.
   CommonServicesComponent() : export_force_defaults_(false) {}
 
+  /// @brief Destructor for CommonServicesComponent.
+  virtual ~CommonServicesComponent() {}
+
+  /// @brief Initializes the CommonServicesComponent with pointers to the
+  /// various game services and managers.
+  ///
+  /// @param[in] asset_manager A pointer to the game's AssetManager.
+  /// @param[in] entity_factory A pointer to the game's EntityFactory.
+  /// @param[in] graph_factory A pointer to the game's breadboard::GraphFactory.
+  /// @param[in] input_system A pointer to the game's input_system.
+  /// @param[in] renderer A pointer to the game's Renderer.
   void Initialize(fplbase::AssetManager* asset_manager,
                   EntityFactory* entity_factory,
                   breadboard::GraphFactory* graph_factory,
@@ -50,20 +71,44 @@ class CommonServicesComponent : public corgi::Component<CommonServicesData> {
     renderer_ = renderer;
   }
 
+  /// @return Returns a pointer to the AssetManager.
   fplbase::AssetManager* asset_manager() { return asset_manager_; }
+
+  /// @return Returns a pointer to the breadboard::GraphFactory.
   breadboard::GraphFactory* graph_factory() { return graph_factory_; }
+
+  /// @return Returns a pointer to the InputSystem.
   fplbase::InputSystem* input_system() { return input_system_; }
+
+  /// @return Returns a pointer to the EntityFactory.
   EntityFactory* entity_factory() { return entity_factory_; }
+
+  /// @return Returns a pointer to the Renderer.
   fplbase::Renderer* renderer() { return renderer_; }
 
-  // This component should never be added to an entity.  It is only provided
-  // as an interface for other components to access common resources.
+  /// @brief This component should never be added to an Entity. It is only
+  /// provided as an interface for other components to access common game
+  /// resources.
+  ///
+  /// @warning Asserts when called.
   void AddFromRawData(corgi::EntityRef& /*entity*/, const void* /*raw_data*/) {
     assert(false);
   }
 
-  // When components are exporting their data, should they use ForceDefaults?
+  /// @brief This should be called when Components are exporting their data to a
+  /// FlatBuffer. It indicates if the FlatBuffer should include default values
+  /// in the serialized data.
+  ///
+  /// @return Returns `true` if the FlatBuffer serialized data should include
+  /// default values. Otherwise returns `false`, indicating that default values
+  /// should be excluded from the FlatBuffer serialized data.
   bool export_force_defaults() const { return export_force_defaults_; }
+
+  /// @brief Set a flag to determine if Components, when exporting their data
+  /// to FlatBuffers, should include default values in the serialized data.
+  ///
+  /// @param[in] b A `bool` indicating if the FlatBuffer serialized data should
+  /// include default values.
   void set_export_force_defaults(bool b) { export_force_defaults_ = b; }
 
  private:
@@ -74,6 +119,7 @@ class CommonServicesComponent : public corgi::Component<CommonServicesData> {
   fplbase::Renderer* renderer_;
   bool export_force_defaults_;
 };
+/// @}
 
 }  // component_library
 }  // corgi

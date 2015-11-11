@@ -56,6 +56,7 @@ LOCAL_SRC_FILES := \
   src/physics.cpp \
   src/rendermesh.cpp \
   src/transform.cpp
+
 include $(BUILD_STATIC_LIBRARY)
 
 ifeq (,$(CORGI_COMPONENTS_RUN_ONCE))

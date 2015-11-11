@@ -16,6 +16,7 @@
 #include "corgi_component_library/common_services.h"
 #include "corgi_component_library/meta.h"
 #include "corgi_component_library/rendermesh.h"
+#include "fplbase/utilities.h"
 #include "mathfu/utilities.h"
 
 CORGI_DEFINE_COMPONENT(corgi::component_library::MetaComponent,
@@ -76,9 +77,11 @@ corgi::ComponentInterface::RawDataUniquePtr MetaComponent::ExportRawData(
   // have one).
   auto entity_id =
       fbb.CreateString(const_cast<MetaComponent*>(this)->GetEntityID(entity));
-  auto prototype =
-      (data->prototype != "") ? fbb.CreateString(data->prototype) : 0;
-  auto comment = (data->comment != "") ? fbb.CreateString(data->comment) : 0;
+  auto prototype = (defaults || data->prototype != "")
+                       ? fbb.CreateString(data->prototype)
+                       : 0;
+  auto comment =
+      (defaults || data->comment != "") ? fbb.CreateString(data->comment) : 0;
 
   MetaDefBuilder builder(fbb);
   builder.add_entity_id(entity_id);
@@ -120,6 +123,13 @@ const std::string& MetaComponent::GetEntityID(const corgi::EntityRef& entity) {
 
 void MetaComponent::AddEntityToDictionary(const std::string& key,
                                           const corgi::EntityRef& entity) {
+  // Check for duplicate entities so we can warn the user.
+  auto i = entity_dictionary_.find(key);
+  if (i != entity_dictionary_.end()) {
+    fplbase::LogError(
+        "Duplicate entities with entity ID '%s', check your entity data.",
+        key.c_str());
+  }
   entity_dictionary_[key] = entity;
 }
 void MetaComponent::RemoveEntityFromDictionary(const std::string& key) {

@@ -23,7 +23,13 @@
 namespace corgi {
 
 /// @file
+/// @addtogroup corgi_vector_pool
+/// @{
+///
 /// @enum AllocationLocation
+///
+/// @brief `kAddToFront` allocates from the front of the pool. `kAddToBack`
+/// allocates from the back of the pool.
 enum AllocationLocation { kAddToFront, kAddToBack };
 
 /// @class VectorPool
@@ -787,6 +793,7 @@ class VectorPool {
   size_t active_count_;
   UniqueIdType next_unique_id_;
 };
+/// @}
 
 }  // corgi
 
