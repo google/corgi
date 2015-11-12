@@ -13,9 +13,10 @@
 // limitations under the License.
 
 #include <cfloat>
-#include "component_library/component_utils.h"
-#include "component_library/rendermesh.h"
-#include "component_library/transform.h"
+
+#include "corgi_component_library/component_utils.h"
+#include "corgi_component_library/rendermesh.h"
+#include "corgi_component_library/transform.h"
 
 using mathfu::vec3;
 

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <assert.h>
-#include "entity/component_id_lookup.h"
-#include "entity/entity_manager.h"
+#include "corgi/component_id_lookup.h"
+#include "corgi/entity_manager.h"
 
 namespace corgi {
 

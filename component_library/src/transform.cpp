@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "component_library/transform.h"
 #include <math.h>
 #include <queue>
-#include "component_library/physics.h"
-#include "component_library/meta.h"
-#include "component_library/common_services.h"
+
+#include "corgi_component_library/common_services.h"
+#include "corgi_component_library/meta.h"
+#include "corgi_component_library/physics.h"
+#include "corgi_component_library/transform.h"
 #include "fplbase/utilities.h"
 
-FPL_ENTITY_DEFINE_COMPONENT(corgi::component_library::TransformComponent,
-                            corgi::component_library::TransformData)
+CORGI_DEFINE_COMPONENT(corgi::component_library::TransformComponent,
+                       corgi::component_library::TransformData)
 
 namespace corgi {
 namespace component_library {
@@ -120,7 +121,7 @@ void TransformComponent::UpdateChildLinks(corgi::EntityRef& entity) {
       // Otherwise, instantiate a prototype with that entity ID and map it
       // as a child.
       corgi::EntityRef child = entity_manager_->GetComponent<MetaComponent>()
-                                    ->GetEntityFromDictionary(child_id);
+                                   ->GetEntityFromDictionary(child_id);
 
       if (!child.IsValid()) {
         // Do some FlatBuffering to create a nearly-empty EntityDef
@@ -216,7 +217,7 @@ corgi::ComponentInterface::RawDataUniquePtr TransformComponent::ExportRawData(
 
   mathfu::vec3 euler = data->orientation.ToEulerAngles() / kDegreesToRadians;
   fplbase::Vec3 position(data->position.x(), data->position.y(),
-                     data->position.z());
+                         data->position.z());
   fplbase::Vec3 scale(data->scale.x(), data->scale.y(), data->scale.z());
   fplbase::Vec3 orientation(euler.x(), euler.y(), euler.z());
 

@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef COMPONENT_LIBRARY_META_H_
-#define COMPONENT_LIBRARY_META_H_
+#ifndef CORGI_COMPONENT_LIBRARY_META_H_
+#define CORGI_COMPONENT_LIBRARY_META_H_
 
+#include <set>
 #include <string>
 #include <unordered_map>
-#include <set>
-#include "entity/component.h"
+#include "corgi/component.h"
 #include "library_components_generated.h"
 
 namespace corgi {
@@ -65,7 +65,7 @@ class MetaComponent : public corgi::Component<MetaData> {
 }  // namespace component_library
 }  // namespace corgi
 
-FPL_ENTITY_REGISTER_COMPONENT(corgi::component_library::MetaComponent,
-                              corgi::component_library::MetaData)
+CORGI_REGISTER_COMPONENT(corgi::component_library::MetaComponent,
+                         corgi::component_library::MetaData)
 
-#endif  // COMPONENT_LIBRARY_META_H_
+#endif  // CORGI_COMPONENT_LIBRARY_META_H_

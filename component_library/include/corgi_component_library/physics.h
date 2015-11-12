@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef COMPONENT_LIBRARY_PHYSICS_H_
-#define COMPONENT_LIBRARY_PHYSICS_H_
+#ifndef CORGI_COMPONENT_LIBRARY_PHYSICS_H_
+#define CORGI_COMPONENT_LIBRARY_PHYSICS_H_
 
 #include <memory>
 #include <vector>
+
 #include "breadboard/event.h"
-#include "entity/component.h"
+#include "corgi/component.h"
 #include "flatbuffers/reflection.h"
 #include "fplbase/asset_manager.h"
 #include "fplbase/renderer.h"
@@ -164,11 +165,11 @@ class PhysicsComponent : public corgi::Component<PhysicsData> {
   // the collision with the ray occurred.
   corgi::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end);
   corgi::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end,
-                                  short layer_mask);
+                                 short layer_mask);
   corgi::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end,
-                                  mathfu::vec3* hit_point);
+                                 mathfu::vec3* hit_point);
   corgi::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end,
-                                  short layer_mask, mathfu::vec3* hit_point);
+                                 short layer_mask, mathfu::vec3* hit_point);
   void DebugDrawWorld(fplbase::Renderer* renderer,
                       const mathfu::mat4& camera_transform);
   void DebugDrawObject(fplbase::Renderer* renderer,
@@ -219,7 +220,7 @@ class PhysicsComponent : public corgi::Component<PhysicsData> {
 }  // component_library
 }  // corgi
 
-FPL_ENTITY_REGISTER_COMPONENT(corgi::component_library::PhysicsComponent,
-                              corgi::component_library::PhysicsData)
+CORGI_REGISTER_COMPONENT(corgi::component_library::PhysicsComponent,
+                         corgi::component_library::PhysicsData)
 
-#endif  // COMPONENT_LIBRARY_PHYSICS_H_
+#endif  // CORGI_COMPONENT_LIBRARY_PHYSICS_H_

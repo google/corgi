@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef FPL_BASE_COMPONENT_H_
-#define FPL_BASE_COMPONENT_H_
+#ifndef CORGI_COMPONENT_INTERFACE_H_
+#define CORGI_COMPONENT_INTERFACE_H_
 
 #include <stdint.h>
-#include <memory>
 #include <functional>
-#include "entity/entity.h"
-#include "entity/entity_common.h"
-#include "entity/entity_manager.h"
-#include "entity/vector_pool.h"
+#include <memory>
+#include "corgi/entity.h"
+#include "corgi/entity_common.h"
+#include "corgi/entity_manager.h"
+#include "corgi/vector_pool.h"
 
 namespace corgi {
 
@@ -183,4 +183,4 @@ class ComponentInterface {
 
 }  // corgi
 
-#endif  // FPL_BASE_COMPONENT_H_
+#endif  // CORGI_COMPONENT_INTERFACE_H_

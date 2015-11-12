@@ -13,12 +13,12 @@
 # limitations under the License.
 
 # Locations of 3rd party and FPL libraries.
-FPL_ROOT:=$(ENTITY_DIR)/../../libs
+FPL_ROOT:=$(CORGI_DIR)/../../libs
 # If the dependencies directory exists either as a subdirectory or as the
 # container of this project directory, assume the dependencies directory is
 # the root directory for all libraries required by this project.
-$(foreach dep_dir,$(wildcard $(ENTITY_DIR)/dependencies) \
-                  $(wildcard $(ENTITY_DIR)/../../dependencies),\
+$(foreach dep_dir,$(wildcard $(CORGI_DIR)/dependencies) \
+                  $(wildcard $(CORGI_DIR)/../../dependencies),\
   $(eval DEPENDENCIES_ROOT?=$(dep_dir)))
 ifneq ($(DEPENDENCIES_ROOT),)
   THIRD_PARTY_ROOT:=$(DEPENDENCIES_ROOT)
@@ -30,7 +30,7 @@ endif
 # Location of the CORGI library.
 # This intentionally overrides any prior setting.
 # NOTE: This is only required as the CORGI's component library and Breadboard's
-# entity library have a circular dependency.
-DEPENDENCIES_ENTITY_DIR:=$(ENTITY_DIR)
+# module library have a circular dependency.
+DEPENDENCIES_CORGI_DIR:=$(CORGI_DIR)
 # Location of the fplutil library (only for sample code).
 DEPENDENCIES_FPLUTIL_DIR:=$(FPL_ROOT)/fplutil

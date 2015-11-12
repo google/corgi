@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef COMPONENT_LIBRARY_COMMON_SERVICES_H_
-#define COMPONENT_LIBRARY_COMMON_SERVICES_H_
+#ifndef CORGI_COMPONENT_LIBRARY_COMMON_SERVICES_H_
+#define CORGI_COMPONENT_LIBRARY_COMMON_SERVICES_H_
 
 #include "breadboard/graph_factory.h"
-#include "component_library/entity_factory.h"
-#include "entity/component.h"
+#include "corgi/component.h"
+#include "corgi_component_library/entity_factory.h"
 #include "fplbase/asset_manager.h"
 #include "fplbase/input.h"
 #include "fplbase/renderer.h"
@@ -78,7 +78,7 @@ class CommonServicesComponent : public corgi::Component<CommonServicesData> {
 }  // component_library
 }  // corgi
 
-FPL_ENTITY_REGISTER_COMPONENT(corgi::component_library::CommonServicesComponent,
-                              corgi::component_library::CommonServicesData)
+CORGI_REGISTER_COMPONENT(corgi::component_library::CommonServicesComponent,
+                         corgi::component_library::CommonServicesData)
 
-#endif  // COMPONENT_LIBRARY_SERVICES_H_
+#endif  // CORGI_COMPONENT_LIBRARY_COMMON_SERVICES_H_

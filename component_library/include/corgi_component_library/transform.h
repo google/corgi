@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef COMPONENT_LIBRARY_TRANSFORM_H_
-#define COMPONENT_LIBRARY_TRANSFORM_H_
+#ifndef CORGI_COMPONENT_LIBRARY_TRANSFORM_H_
+#define CORGI_COMPONENT_LIBRARY_TRANSFORM_H_
 
-#include <vector>
 #include <set>
-#include "entity/component.h"
+#include <vector>
+
+#include "corgi/component.h"
+#include "fplutil/intrusive_list.h"
 #include "library_components_generated.h"
 #include "mathfu/constants.h"
 #include "mathfu/glsl_mappings.h"
 #include "mathfu/matrix_4x4.h"
-#include "fplutil/intrusive_list.h"
 
 namespace corgi {
 namespace component_library {
@@ -130,7 +131,7 @@ class TransformComponent : public corgi::Component<TransformData> {
   // that has component `id`. Or returns an invalid EntityRef if no such child
   // exists.
   corgi::EntityRef ChildWithComponent(const corgi::EntityRef& entity,
-                                       corgi::ComponentId id) const {
+                                      corgi::ComponentId id) const {
     return ChildWithComponents(entity, &id, 1);
   }
 
@@ -138,8 +139,8 @@ class TransformComponent : public corgi::Component<TransformData> {
   // that has all components in array `ids`. Or returns an invalid EntityRef
   // if no such child exists.
   corgi::EntityRef ChildWithComponents(const corgi::EntityRef& entity,
-                                        const corgi::ComponentId* ids,
-                                        size_t num_ids) const;
+                                       const corgi::ComponentId* ids,
+                                       size_t num_ids) const;
 
  private:
   void UpdateWorldPosition(corgi::EntityRef& entity,
@@ -149,7 +150,7 @@ class TransformComponent : public corgi::Component<TransformData> {
 }  // component_library
 }  // corgi
 
-FPL_ENTITY_REGISTER_COMPONENT(corgi::component_library::TransformComponent,
-                              corgi::component_library::TransformData)
+CORGI_REGISTER_COMPONENT(corgi::component_library::TransformComponent,
+                         corgi::component_library::TransformData)
 
-#endif  // COMPONENT_LIBRARY_TRANSFORM_H_
+#endif  // CORGI_COMPONENT_LIBRARY_TRANSFORM_H_

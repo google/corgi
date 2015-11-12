@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef COMPONENT_LIBRARY_ANIMATION_H_
-#define COMPONENT_LIBRARY_ANIMATION_H_
+#ifndef CORGI_COMPONENT_LIBRARY_ANIMATION_H_
+#define CORGI_COMPONENT_LIBRARY_ANIMATION_H_
 
 #include "breadboard/event.h"
-#include "entity/component.h"
+#include "corgi/component.h"
 #include "motive/anim_table.h"
 #include "motive/engine.h"
 #include "motive/motivator.h"
@@ -181,8 +181,8 @@ class AnimationComponent : public Component<AnimationData> {
   motive::MotiveTime AnimLength(const corgi::EntityRef& entity,
                                 int anim_idx) const {
     const AnimationData* data = Data<AnimationData>(entity);
-    const motive::RigAnim* anim = anim_table_.Query(data->anim_table_object,
-                                                    anim_idx);
+    const motive::RigAnim* anim =
+        anim_table_.Query(data->anim_table_object, anim_idx);
     return anim == nullptr ? 0 : anim->end_time();
   }
 
@@ -249,7 +249,7 @@ class AnimationComponent : public Component<AnimationData> {
 }  // component_library
 }  // corgi
 
-FPL_ENTITY_REGISTER_COMPONENT(corgi::component_library::AnimationComponent,
-                              corgi::component_library::AnimationData)
+CORGI_REGISTER_COMPONENT(corgi::component_library::AnimationComponent,
+                         corgi::component_library::AnimationData)
 
-#endif  // COMPONENT_LIBRARY_ANIMATION_H_
+#endif  // CORGI_COMPONENT_LIBRARY_ANIMATION_H_

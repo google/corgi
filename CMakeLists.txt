@@ -13,15 +13,15 @@
 # limitations under the License.
 cmake_minimum_required(VERSION 2.8.12)
 
-project(entity)
+project(corgi)
 
-option(entity_build_component_library
+option(corgi_build_component_library
   "Build a library of standard components along with the entity system"
   ON)
-option(entity_build_samples "Build samples for this project." ON)
+option(corgi_build_samples "Build samples for this project." ON)
 
 # Compile the game with the debug flag
-set(entity_DEBUG ON)
+set(corgi_DEBUG ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
@@ -66,21 +66,21 @@ set(dependencies_bulletphysics_distr_dir "${third_party_root}/bulletphysics"
     CACHE PATH "Directory containing the Bullet Physics distribution.")
 # NOTE: This is only required as the breadboard module library and CORGI's
 # component library have a circular dependency.
-set(dependencies_entity_dir "${CMAKE_CURRENT_SOURCE_DIR}"
-    CACHE PATH "Directory containing the Entity library.")
+set(dependencies_corgi_dir "${CMAKE_CURRENT_SOURCE_DIR}"
+    CACHE PATH "Directory containing the CORGI library.")
 
 # Temporary files (like object files) created while compiling projects.
 set(tmp_dir ${CMAKE_CURRENT_BINARY_DIR}/obj)
 
-# entity source files.
-set(entity_SRCS
-    include/entity/component.h
-    include/entity/component_id_lookup.h
-    include/entity/component_interface.h
-    include/entity/entity_common.h
-    include/entity/entity_manager.h
-    include/entity/entity.h
-    include/entity/vector_pool.h
+# CORGI source files.
+set(corgi_SRCS
+    include/corgi/component.h
+    include/corgi/component_id_lookup.h
+    include/corgi/component_interface.h
+    include/corgi/entity_common.h
+    include/corgi/entity_manager.h
+    include/corgi/entity.h
+    include/corgi/vector_pool.h
     src/entity_manager.cpp)
 
 # Includes for this project.
@@ -107,10 +107,10 @@ set(CMAKE_CXX_FLAGS_DEFAULT "${CMAKE_CXX_FLAGS}")
 set(CMAKE_C_FLAGS_DEFAULT "${CMAKE_C_FLAGS}")
 
 # Library targets.
-add_library(entity ${entity_SRCS})
+add_library(corgi ${corgi_SRCS})
 
-if (entity_build_component_library)
-  set(COMPONENT_COLLECTION_DIR ${CMAKE_CURRENT_SOURCE_DIR}/component_library)
+if (corgi_build_component_library)
+  set(CORGI_COMPONENT_LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/component_library)
   # The component library uses a bunch of Flatbuffers, so we should build them.
   # Generate source files for all FlatBuffers schema files under the src
   # directory.
@@ -119,23 +119,24 @@ if (entity_build_component_library)
     add_subdirectory("${dependencies_flatbuffers_dir}" ${tmp_dir}/flatbuffers)
   endif()
 
-  set(COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR
-     ${COMPONENT_COLLECTION_DIR}/${CMAKE_FILES_DIRECTORY}/include)
+  set(CORGI_COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR
+      ${CORGI_COMPONENT_LIBRARY_DIR}/${CMAKE_FILES_DIRECTORY}/include)
   file(GLOB_RECURSE
-    COMPONENT_LIBRARY_FLATBUFFERS_SCHEMAS
-    ${COMPONENT_COLLECTION_DIR}/schemas/*.fbs)
+       CORGI_COMPONENT_LIBRARY_FLATBUFFERS_SCHEMAS
+       ${CORGI_COMPONENT_LIBRARY_DIR}/schemas/*.fbs)
 
   # Generate rules to build the set of output files from the set of input
   # schema files.
-  set(component_library_flatbuffer_dependencies
+  set(corgi_component_library_flatbuffer_dependencies
       "${dependencies_fplbase_dir}/schemas")
-  build_flatbuffers("${COMPONENT_LIBRARY_FLATBUFFERS_SCHEMAS}"
-                    "${component_library_flatbuffer_dependencies}"
-                    component_library_generated_includes
-                    ""
-                    ${COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR}
-                    ""
-                    "")
+  build_flatbuffers(
+     "${CORGI_COMPONENT_LIBRARY_FLATBUFFERS_SCHEMAS}"
+     "${corgi_component_library_flatbuffer_dependencies}"
+     corgi_component_library_generated_includes
+     ""
+     "${CORGI_COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR}"
+     ""
+     "")
 
   # Include dependencies for the component library.
   if(NOT TARGET breadboard)
@@ -170,34 +171,36 @@ if (entity_build_component_library)
   endif()
 
   # component library source files.
-  set(component_library_SRCS
-      ${COMPONENT_COLLECTION_DIR}/include/component_library/animation.h
-      ${COMPONENT_COLLECTION_DIR}/include/component_library/camera_interface.h
-      ${COMPONENT_COLLECTION_DIR}/include/component_library/common_services.h
-      ${COMPONENT_COLLECTION_DIR}/include/component_library/component_utils.h
-      ${COMPONENT_COLLECTION_DIR}/include/component_library/entity_factory.h
-      ${COMPONENT_COLLECTION_DIR}/include/component_library/graph.h
-      ${COMPONENT_COLLECTION_DIR}/include/component_library/meta.h
-      ${COMPONENT_COLLECTION_DIR}/include/component_library/physics.h
-      ${COMPONENT_COLLECTION_DIR}/include/component_library/rendermesh.h
-      ${COMPONENT_COLLECTION_DIR}/include/component_library/transform.h
-      ${COMPONENT_COLLECTION_DIR}/src/animation.cpp
-      ${COMPONENT_COLLECTION_DIR}/src/common_services.cpp
-      ${COMPONENT_COLLECTION_DIR}/src/component_utils.cpp
-      ${COMPONENT_COLLECTION_DIR}/src/entity_factory.cpp
-      ${COMPONENT_COLLECTION_DIR}/src/graph.cpp
-      ${COMPONENT_COLLECTION_DIR}/src/meta.cpp
-      ${COMPONENT_COLLECTION_DIR}/src/physics.cpp
-      ${COMPONENT_COLLECTION_DIR}/src/rendermesh.cpp
-      ${COMPONENT_COLLECTION_DIR}/src/transform.cpp)
+  set(CORGI_COMPONENT_LIBRARY_INCLUDE_DIR
+      ${CORGI_COMPONENT_LIBRARY_DIR}/include/corgi_component_library)
+  set(corgi_component_library_SRCS
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/animation.h
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/camera_interface.h
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/common_services.h
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/component_utils.h
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/entity_factory.h
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/graph.h
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/meta.h
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/physics.h
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/rendermesh.h
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/transform.h
+      ${CORGI_COMPONENT_LIBRARY_DIR}/src/animation.cpp
+      ${CORGI_COMPONENT_LIBRARY_DIR}/src/common_services.cpp
+      ${CORGI_COMPONENT_LIBRARY_DIR}/src/component_utils.cpp
+      ${CORGI_COMPONENT_LIBRARY_DIR}/src/entity_factory.cpp
+      ${CORGI_COMPONENT_LIBRARY_DIR}/src/graph.cpp
+      ${CORGI_COMPONENT_LIBRARY_DIR}/src/meta.cpp
+      ${CORGI_COMPONENT_LIBRARY_DIR}/src/physics.cpp
+      ${CORGI_COMPONENT_LIBRARY_DIR}/src/rendermesh.cpp
+      ${CORGI_COMPONENT_LIBRARY_DIR}/src/transform.cpp)
 
-  include_directories(${COMPONENT_COLLECTION_DIR}/include)
+  include_directories(${CORGI_COMPONENT_LIBRARY_DIR}/include)
   get_property(FPLBASE_FLATBUFFERS_GENERATED_INCLUDES_DIR
                TARGET fplbase_generated_includes
                PROPERTY GENERATED_INCLUDES_DIR)
   include_directories(${FPLBASE_FLATBUFFERS_GENERATED_INCLUDES_DIR})
   include_directories(${dependencies_bulletphysics_distr_dir}/src)
-  include_directories(${dependencies_entity_dir}/include)
+  include_directories(${dependencies_corgi_dir}/include)
   include_directories(${dependencies_breadboard_dir}/include)
   include_directories(${dependencies_flatbuffers_dir}/include)
   include_directories(${dependencies_fplbase_dir}/include)
@@ -206,16 +209,16 @@ if (entity_build_component_library)
   include_directories(${dependencies_mathfu_dir}/include)
 
   set_compiler_flags_for_external_libraries()
-  add_library(component_library ${component_library_SRCS})
-  add_dependencies(component_library
-                   entity
-                   component_library_generated_includes
+  add_library(corgi_component_library ${corgi_component_library_SRCS})
+  add_dependencies(corgi_component_library
+                   corgi
+                   corgi_component_library_generated_includes
                    fplbase_generated_includes)
-  target_link_libraries(component_library LINK_INTERFACE_LIBRARIES
+  target_link_libraries(corgi_component_library LINK_INTERFACE_LIBRARIES
                         BulletDynamics BulletCollision LinearMath)
-  mathfu_configure_flags(component_library)
+  mathfu_configure_flags(corgi_component_library)
   restore_compiler_flags()
-endif()  # entity_build_component_library
+endif()  # corgi_build_component_library
 
 if(entity_build_samples)
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/sample)

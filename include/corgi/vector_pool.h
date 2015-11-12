@@ -15,10 +15,10 @@
 #ifndef VECTOR_POOL_H
 #define VECTOR_POOL_H
 
+#include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <vector>
-#include <assert.h>
 
 namespace corgi {
 
@@ -255,11 +255,11 @@ class VectorPool {
     friend class VectorPool<T>;
 
    public:
-   /// @brief Constructor for an IteratorTemplate to a given VectorPool
-   /// index.
-   ///
-   /// @param[in] container The VectorPool to point to.
-   /// @param[in] index The index into the VectorPool's underlying vector.
+    /// @brief Constructor for an IteratorTemplate to a given VectorPool
+    /// index.
+    ///
+    /// @param[in] container The VectorPool to point to.
+    /// @param[in] index The index into the VectorPool's underlying vector.
     IteratorTemplate(VectorPool<T>* container, size_t index)
         : container_(container), index_(index) {}
 

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "component_library/common_services.h"
+#include "corgi_component_library/common_services.h"
 
-FPL_ENTITY_DEFINE_COMPONENT(corgi::component_library::CommonServicesComponent,
-                            corgi::component_library::CommonServicesData)
+CORGI_DEFINE_COMPONENT(corgi::component_library::CommonServicesComponent,
+                       corgi::component_library::CommonServicesData)

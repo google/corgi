@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef FPL_COMPONENT_H_
-#define FPL_COMPONENT_H_
+#ifndef CORGI_COMPONENT_H_
+#define CORGI_COMPONENT_H_
 
-#include "entity/component_id_lookup.h"
-#include "entity/component_interface.h"
-#include "entity/entity.h"
-#include "entity/entity_common.h"
-#include "entity/entity_manager.h"
-#include "entity/vector_pool.h"
+#include "corgi/component_id_lookup.h"
+#include "corgi/component_interface.h"
+#include "corgi/entity.h"
+#include "corgi/entity_common.h"
+#include "corgi/entity_manager.h"
+#include "corgi/vector_pool.h"
 
 namespace corgi {
 
@@ -169,7 +169,8 @@ class Component : public ComponentInterface {
   /// calling the destructor on the data, and returning the memory to the
   /// memory pool.
   ///
-  /// @param[in,out] iter An EntityIterator that references an Entity that should
+  /// @param[in,out] iter An EntityIterator that references an Entity that
+  /// should
   /// be removed.
   ///
   /// @return Returns an iterator to the next Entity after the one that was
@@ -425,9 +426,7 @@ class Component : public ComponentInterface {
   ///
   /// @param[in] entity An EntityRef reference to the Entity that is being
   /// removed and may need to be cleaned up.
-  void RemoveEntityInternal(EntityRef& entity) {
-    CleanupEntity(entity);
-  }
+  void RemoveEntityInternal(EntityRef& entity) { CleanupEntity(entity); }
 
  protected:
   /// @brief Get the index of the Component data for a given Entity.
@@ -455,4 +454,4 @@ class Component : public ComponentInterface {
 
 }  // corgi
 
-#endif  // FPL_COMPONENT_H_
+#endif  // CORGI_COMPONENT_H_

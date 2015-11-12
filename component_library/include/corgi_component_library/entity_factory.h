@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ENTITY_FACTORY_H_
-#define ENTITY_FACTORY_H_
+#ifndef CORGI_COMPONENT_LIBRARY_ENTITY_FACTORY_H_
+#define CORGI_COMPONENT_LIBRARY_ENTITY_FACTORY_H_
 
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "entity/entity_manager.h"
+#include "corgi/entity_manager.h"
 #include "flatbuffers/flatbuffers.h"
 #include "library_components_generated.h"
 
@@ -73,7 +73,7 @@ class EntityFactory : public corgi::EntityFactoryInterface {
   // Initialize an entity from an entity definition. This is what
   // LoadRawEntityList calls for each entity definition.
   corgi::EntityRef CreateEntityFromData(const void* data,
-                                         corgi::EntityManager* entity_manager);
+                                        corgi::EntityManager* entity_manager);
 
   // Initialize an entity by prototype name.
   virtual corgi::EntityRef CreateEntityFromPrototype(
@@ -82,8 +82,8 @@ class EntityFactory : public corgi::EntityFactoryInterface {
   // When you register each component to the entity system, it will get
   // a component ID. This factory needs to know the component ID assigned
   // for each component data type (the data_type() in the flatbuffer union).
-  void SetComponentType(corgi::ComponentId component_id,
-                        unsigned int data_type, const char* table_name);
+  void SetComponentType(corgi::ComponentId component_id, unsigned int data_type,
+                        const char* table_name);
 
   // Get the component for a given data type specifier.
   corgi::ComponentId DataTypeToComponentId(unsigned int data_type) {
@@ -226,4 +226,4 @@ class EntityFactory : public corgi::EntityFactoryInterface {
 }  // namespace component_library
 }  // namespace corgi
 
-#endif  // ENTITY_FACTORY_H_
+#endif  // CORGI_COMPONENT_LIBRARY_ENTITY_FACTORY_H_

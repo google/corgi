@@ -14,17 +14,17 @@
 
 #include "entity_component_system.h"
 
-// `FPL_ENTITY_DEFINE_COMPONENT` should be called in a `.cpp` file
+// `CORGI_DEFINE_COMPONENT` should be called in a `.cpp` file
 // that defines the Component class and corresponding Component data stucture.
 // It handles defining the storage location for the Component for a given
 // Component type and data type.
 //
 // NOTE: Calls to this function should happen outside of any namespaces!
-FPL_ENTITY_DEFINE_COMPONENT(corgi::sample::CounterComponent,
-                            corgi::sample::CounterComponentData)
+CORGI_DEFINE_COMPONENT(corgi::sample::CounterComponent,
+                       corgi::sample::CounterComponentData)
 
-FPL_ENTITY_DEFINE_COMPONENT(corgi::sample::ScreamingComponent,
-                            corgi::sample::ScreamingComponentData)
+CORGI_DEFINE_COMPONENT(corgi::sample::ScreamingComponent,
+                       corgi::sample::ScreamingComponentData)
 
 namespace corgi {
 namespace sample {

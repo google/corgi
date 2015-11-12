@@ -14,15 +14,16 @@
 
 #include <cfloat>
 #include <cmath>
+
 #include "breadboard/event.h"
 #include "breadboard/graph_state.h"
-#include "component_library/bullet_physics.h"
-#include "component_library/common_services.h"
-#include "component_library/component_utils.h"
-#include "component_library/graph.h"
-#include "component_library/physics.h"
-#include "component_library/rendermesh.h"
-#include "component_library/transform.h"
+#include "corgi_component_library/bullet_physics.h"
+#include "corgi_component_library/common_services.h"
+#include "corgi_component_library/component_utils.h"
+#include "corgi_component_library/graph.h"
+#include "corgi_component_library/physics.h"
+#include "corgi_component_library/rendermesh.h"
+#include "corgi_component_library/transform.h"
 #include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/reflection.h"
 #include "fplbase/flatbuffer_utils.h"
@@ -57,8 +58,8 @@ using fplbase::Shader;
 using fplbase::Vec3;
 using mathfu::vec4;
 
-FPL_ENTITY_DEFINE_COMPONENT(corgi::component_library::PhysicsComponent,
-                            corgi::component_library::PhysicsData)
+CORGI_DEFINE_COMPONENT(corgi::component_library::PhysicsComponent,
+                       corgi::component_library::PhysicsData)
 
 BREADBOARD_DEFINE_EVENT(corgi::component_library::kCollisionEventId)
 
@@ -444,7 +445,7 @@ corgi::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
       fplbase::Vec3 offset(body.offset.x(), body.offset.y(), body.offset.z());
       shape_builder.add_offset(&offset);
       shape_builder.add_collision_type(
-        static_cast<BulletCollisionType>(body.collision_type));
+          static_cast<BulletCollisionType>(body.collision_type));
       shape_builder.add_collides_with(collides);
       shape_builder.add_user_tag(user_tag);
       shape_vector.push_back(shape_builder.Finish());
@@ -782,28 +783,26 @@ void PhysicsComponent::FinalizeStaticMesh(const corgi::EntityRef& entity,
 }
 
 corgi::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
-                                                  mathfu::vec3& end) {
-  return RaycastSingle(start, end,
-                       BulletCollisionType_Raycast, nullptr);
+                                                 mathfu::vec3& end) {
+  return RaycastSingle(start, end, BulletCollisionType_Raycast, nullptr);
 }
 
 corgi::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
-                                                  mathfu::vec3& end,
-                                                  short layer_mask) {
+                                                 mathfu::vec3& end,
+                                                 short layer_mask) {
   return RaycastSingle(start, end, layer_mask, nullptr);
 }
 
 corgi::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
-                                                  mathfu::vec3& end,
-                                                  mathfu::vec3* hit_point) {
-  return RaycastSingle(start, end, BulletCollisionType_Raycast,
-                       hit_point);
+                                                 mathfu::vec3& end,
+                                                 mathfu::vec3* hit_point) {
+  return RaycastSingle(start, end, BulletCollisionType_Raycast, hit_point);
 }
 
 corgi::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
-                                                  mathfu::vec3& end,
-                                                  short layer_mask,
-                                                  mathfu::vec3* hit_point) {
+                                                 mathfu::vec3& end,
+                                                 short layer_mask,
+                                                 mathfu::vec3* hit_point) {
   btVector3 bt_start = ToBtVector3(start);
   btVector3 bt_end = ToBtVector3(end);
   btCollisionWorld::ClosestRayResultCallback ray_results(bt_start, bt_end);
@@ -818,7 +817,7 @@ corgi::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
         *hit_point = BtToMathfuVec3(ray_results.m_hitPointWorld);
 
       return corgi::EntityRef(container,
-                               ray_results.m_collisionObject->getUserIndex());
+                              ray_results.m_collisionObject->getUserIndex());
     }
   }
   return corgi::EntityRef();
@@ -916,12 +915,12 @@ void PhysicsDebugDrawer::drawLine(const btVector3& from, const btVector3& to,
   }
 
   static const fplbase::Attribute attributes[] = {fplbase::kPosition3f,
-    fplbase::kEND};
+                                                  fplbase::kEND};
   static const unsigned short indices[] = {0, 1};
   const btVector3 vertices[] = {from, to};
   fplbase::Mesh::RenderArray(fplbase::Mesh::kLines, 2, attributes,
                              sizeof(btVector3),
-                    reinterpret_cast<const char*>(vertices), indices);
+                             reinterpret_cast<const char*>(vertices), indices);
 }
 
 }  // component_library

@@ -15,13 +15,13 @@
 #ifndef ENTITY_SAMPLES_ENTITY_COMPONENT_SYSTEM_H_
 #define ENTITY_SAMPLES_ENTITY_COMPONENT_SYSTEM_H_
 
+#include <stdio.h>  // printf()
 #include <cstdlib>  // std::srand(), std::rand()
 #include <ctime>    // std::time()
-#include <stdio.h>  // printf()
 #include <string>   // std::string
 
-#include "entity/component.h"
-#include "entity/entity_manager.h"
+#include "corgi/component.h"
+#include "corgi/entity_manager.h"
 
 namespace corgi {
 namespace sample {
@@ -84,15 +84,15 @@ class ScreamingComponent : public corgi::Component<ScreamingComponentData> {
 }  // namespace sample
 }  // namespace corgi
 
-// Make sure you call `FPL_ENTITY_REGISTER_COMPONENT` in the header file
+// Make sure you call `CORGI_REGISTER_COMPONENT` in the header file
 // where you declare the Component and associated Component data struct. This
 // is required in order to declare the necessary constants for lookups.
 //
 // NOTE: Remember, this should be called outside of any namespaces!
-FPL_ENTITY_REGISTER_COMPONENT(corgi::sample::CounterComponent,
-                              corgi::sample::CounterComponentData)
+CORGI_REGISTER_COMPONENT(corgi::sample::CounterComponent,
+                         corgi::sample::CounterComponentData)
 
-FPL_ENTITY_REGISTER_COMPONENT(corgi::sample::ScreamingComponent,
-                              corgi::sample::ScreamingComponentData)
+CORGI_REGISTER_COMPONENT(corgi::sample::ScreamingComponent,
+                         corgi::sample::ScreamingComponentData)
 
 #endif  // ENTITY_SAMPLES_ENTITY_COMPONENT_SYSTEM_H_

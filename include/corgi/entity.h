@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef FPL_ENTITY_H_
-#define FPL_ENTITY_H_
+#ifndef CORGI_ENTITY_H_
+#define CORGI_ENTITY_H_
 
-#include "entity/entity_common.h"
+#include "corgi/entity_common.h"
 
 namespace corgi {
 
@@ -90,4 +90,5 @@ class Entity {
 };
 
 }  // corgi
-#endif  // FPL_ENTITY_H_
+
+#endif  // CORGI_ENTITY_H_

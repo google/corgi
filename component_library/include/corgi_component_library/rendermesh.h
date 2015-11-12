@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef COMPONENT_LIBRARY_RENDERMESH_H_
-#define COMPONENT_LIBRARY_RENDERMESH_H_
+#ifndef CORGI_COMPONENT_LIBRARY_RENDERMESH_H_
+#define CORGI_COMPONENT_LIBRARY_RENDERMESH_H_
 
-#include "component_library/camera_interface.h"
-#include "component_library/transform.h"
-#include "entity/component.h"
+#include "corgi/component.h"
+#include "corgi_component_library/camera_interface.h"
+#include "corgi_component_library/transform.h"
 #include "fplbase/asset_manager.h"
 #include "fplbase/mesh.h"
 #include "fplbase/renderer.h"
@@ -183,7 +183,7 @@ class RenderMeshComponent : public Component<RenderMeshData> {
 }  // component_library
 }  // corgi
 
-FPL_ENTITY_REGISTER_COMPONENT(corgi::component_library::RenderMeshComponent,
-                              corgi::component_library::RenderMeshData)
+CORGI_REGISTER_COMPONENT(corgi::component_library::RenderMeshComponent,
+                         corgi::component_library::RenderMeshData)
 
-#endif  // COMPONENT_LIBRARY_RENDERMESH_H_
+#endif  // CORGI_COMPONENT_LIBRARY_RENDERMESH_H_

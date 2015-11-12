@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef FPL_COMPONENTS_GRAPH_H_
-#define FPL_COMPONENTS_GRAPH_H_
+#ifndef CORGI_COMPONENTS_GRAPH_H_
+#define CORGI_COMPONENTS_GRAPH_H_
 
 #include <memory>
+
 #include "breadboard/event.h"
 #include "breadboard/graph.h"
 #include "breadboard/graph_factory.h"
 #include "breadboard/graph_state.h"
-#include "entity/component.h"
+#include "corgi/component.h"
 
 namespace corgi {
 namespace component_library {
@@ -117,7 +118,7 @@ class GraphComponent : public corgi::Component<GraphData> {
 }  // component_library
 }  // corgi
 
-FPL_ENTITY_REGISTER_COMPONENT(corgi::component_library::GraphComponent,
-                              corgi::component_library::GraphData)
+CORGI_REGISTER_COMPONENT(corgi::component_library::GraphComponent,
+                         corgi::component_library::GraphData)
 
-#endif  // FPL_COMPONENTS_GRAPH_H_
+#endif  // CORGI_COMPONENTS_GRAPH_H_

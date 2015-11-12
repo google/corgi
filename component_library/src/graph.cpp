@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "component_library/graph.h"
 #include <cstdio>
+
 #include "breadboard/graph.h"
 #include "breadboard/graph_factory.h"
 #include "breadboard/graph_state.h"
-#include "component_library/common_services.h"
+#include "corgi_component_library/common_services.h"
+#include "corgi_component_library/graph.h"
 #include "library_components_generated.h"
 
-FPL_ENTITY_DEFINE_COMPONENT(corgi::component_library::GraphComponent,
-                            corgi::component_library::GraphData)
+CORGI_DEFINE_COMPONENT(corgi::component_library::GraphComponent,
+                       corgi::component_library::GraphData)
 
 BREADBOARD_DEFINE_EVENT(corgi::component_library::kAdvanceFrameEventId)
 

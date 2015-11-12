@@ -16,11 +16,12 @@
 #define DEFAULT_ENTITY_FACTORY_H_
 
 #include <set>
-#include <vector>
 #include <string>
-#include "component_library/entity_factory.h"
-#include "component_library/meta.h"
-#include "entity/entity_manager.h"
+#include <vector>
+
+#include "corgi/entity_manager.h"
+#include "corgi_component_library/entity_factory.h"
+#include "corgi_component_library/meta.h"
 #include "flatbuffers/flatbuffers.h"
 #include "fplbase/utilities.h"
 

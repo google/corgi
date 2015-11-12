@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef FPL_ENTITY_MANAGER_H_
-#define FPL_ENTITY_MANAGER_H_
+#ifndef CORGI_ENTITY_MANAGER_H_
+#define CORGI_ENTITY_MANAGER_H_
 
-#include "entity/component_id_lookup.h"
-#include "entity/component_interface.h"
-#include "entity/entity.h"
-#include "entity/entity_common.h"
-#include "entity/vector_pool.h"
+#include "corgi/component_id_lookup.h"
+#include "corgi/component_interface.h"
+#include "corgi/entity.h"
+#include "corgi/entity_common.h"
+#include "corgi/vector_pool.h"
 
 namespace corgi {
 
@@ -407,4 +407,5 @@ class EntityFactoryInterface {
 };
 
 }  // corgi
-#endif  // FPL_ENTITY_MANAGER_H_
+
+#endif  // CORGI_ENTITY_MANAGER_H_

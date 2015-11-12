@@ -13,12 +13,12 @@
 # limitations under the License.
 
 # Locations of 3rd party and FPL libraries.
-FPL_ROOT:=$(ENTITY_DIR)/../../libs
+FPL_ROOT:=$(CORGI_DIR)/../../libs
 # If the dependencies directory exists either as a subdirectory or as the
 # container of this project directory, assume the dependencies directory is
 # the root directory for all libraries required by this project.
-$(foreach dep_dir,$(wildcard $(ENTITY_DIR)/dependencies) \
-                  $(wildcard $(ENTITY_DIR)/../../dependencies),\
+$(foreach dep_dir,$(wildcard $(CORGI_DIR)/dependencies) \
+                  $(wildcard $(CORGI_DIR)/../../dependencies),\
   $(eval DEPENDENCIES_ROOT?=$(dep_dir)))
 ifneq ($(DEPENDENCIES_ROOT),)
   THIRD_PARTY_ROOT:=$(DEPENDENCIES_ROOT)
@@ -27,7 +27,7 @@ else
   THIRD_PARTY_ROOT:=$(FPL_ROOT)/../../../external
 endif
 
-COMPONENTS_GENERATED_OUTPUT_DIR := $(COMPONENTS_DIR)/gen/include
+CORGI_COMPONENTS_GENERATED_OUTPUT_DIR := $(CORGI_COMPONENTS_DIR)/gen/include
 
 # Location of the Flatbuffers library.
 DEPENDENCIES_FLATBUFFERS_DIR?=$(FPL_ROOT)/flatbuffers
@@ -43,6 +43,6 @@ DEPENDENCIES_BREADBOARD_DIR?=$(FPL_ROOT)/breadboard
 DEPENDENCIES_MOTIVE_DIR?=$(FPL_ROOT)/motive
 # Location of the Bullet Physics library.
 DEPENDENCIES_BULLETPHYSICS_DIR?=$(THIRD_PARTY_ROOT)/bulletphysics
-# Location of the Entity library.
-DEPENDENCIES_ENTITY_DIR?=$(ENTITY_DIR)
+# Location of the CORGI library.
+DEPENDENCIES_CORGI_DIR?=$(CORGI_DIR)
 

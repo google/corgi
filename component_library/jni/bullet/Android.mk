@@ -15,8 +15,8 @@
 LOCAL_PATH:=$(call my-dir)
 
 # Project directory relative to this file.
-COMPONENT_LIBRARY_DIR:=$(LOCAL_PATH)/../..
-include $(COMPONENT_LIBRARY_DIR)/jni/android_config.mk
+CORGI_COMPONENT_LIBRARY_DIR:=$(LOCAL_PATH)/../..
+include $(CORGI_COMPONENT_LIBRARY_DIR)/jni/android_config.mk
 
 include $(CLEAR_VARS)
 LOCAL_PATH:=$(DEPENDENCIES_BULLETPHYSICS_DIR)/src

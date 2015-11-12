@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef COMPONENT_LIBRARY_COMPONENT_UTILS_H_
-#define COMPONENT_LIBRARY_COMPONENT_UTILS_H_
+#ifndef CORGI_COMPONENT_LIBRARY_COMPONENT_UTILS_H_
+#define CORGI_COMPONENT_LIBRARY_COMPONENT_UTILS_H_
 
 #include <cfloat>
-#include "entity/component.h"
+#include "corgi/component.h"
 #include "mathfu/glsl_mappings.h"
 
 namespace corgi {
@@ -32,4 +32,4 @@ bool GetMaxMinPositionsForEntity(corgi::EntityRef& entity,
 }  // component_library
 }  // corgi
 
-#endif  // COMPONENT_LIBRARY_COMPONENT_UTILS_H_
+#endif  // CORGI_COMPONENT_LIBRARY_COMPONENT_UTILS_H_

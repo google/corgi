@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "component_library/rendermesh.h"
-#include "component_library/animation.h"
-#include "component_library/common_services.h"
-#include "component_library/transform.h"
-#include "library_components_generated.h"
+#include "corgi_component_library/rendermesh.h"
+#include "corgi_component_library/animation.h"
+#include "corgi_component_library/common_services.h"
+#include "corgi_component_library/transform.h"
 #include "fplbase/mesh.h"
 #include "fplbase/utilities.h"
+#include "library_components_generated.h"
 
 using mathfu::vec3;
 using mathfu::mat4;
 
-FPL_ENTITY_DEFINE_COMPONENT(corgi::component_library::RenderMeshComponent,
-                            corgi::component_library::RenderMeshData)
+CORGI_DEFINE_COMPONENT(corgi::component_library::RenderMeshComponent,
+                       corgi::component_library::RenderMeshData)
 
 namespace corgi {
 namespace component_library {
@@ -77,8 +77,7 @@ void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
 
         // Are we culling this object based on the view angle?
         // If so, does this lie outside of our view frustrum?
-        if ((rendermesh_data->culling_mask &
-            (1 << CullingTest_ViewAngle)) &&
+        if ((rendermesh_data->culling_mask & (1 << CullingTest_ViewAngle)) &&
             (vec3::DotProduct(pos_relative_to_camera.Normalized(),
                               camera_facing.Normalized()) < max_cos)) {
           // The origin point for this mesh is not in our field of view.  Cut
@@ -88,14 +87,13 @@ void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
 
         // Are we culling this object based on view distance?  If so,
         // is it far enough away that we should skip it?
-        if ((rendermesh_data->culling_mask &
-            (1 << CullingTest_Distance)) &&
+        if ((rendermesh_data->culling_mask & (1 << CullingTest_Distance)) &&
             rendermesh_data->z_depth > culling_distance_squared()) {
           continue;
         }
 
-        pass_render_list_[pass]
-            .push_back(RenderlistEntry(iter->entity, &iter->data));
+        pass_render_list_[pass].push_back(
+            RenderlistEntry(iter->entity, &iter->data));
       }
     }
   }
@@ -203,8 +201,8 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
   }
 }
 
-void RenderMeshComponent::SetVisibilityRecursively(
-    const EntityRef& entity, bool visible) {
+void RenderMeshComponent::SetVisibilityRecursively(const EntityRef& entity,
+                                                   bool visible) {
   RenderMeshData* rendermesh_data = Data<RenderMeshData>(entity);
   TransformData* transform_data = Data<TransformData>(entity);
   if (transform_data) {

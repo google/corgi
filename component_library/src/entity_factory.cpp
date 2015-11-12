@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "component_library/entity_factory.h"
 #include <set>
-#include "component_library/meta.h"
+
+#include "corgi_component_library/entity_factory.h"
+#include "corgi_component_library/meta.h"
 #include "fplbase/utilities.h"
 
 namespace corgi {
@@ -139,8 +140,7 @@ int EntityFactory::LoadEntityListFromMemory(
   int total = 0;
   for (size_t i = 0; i < entities.size(); i++) {
     total++;
-    corgi::EntityRef entity =
-        entity_manager->CreateEntityFromData(entities[i]);
+    corgi::EntityRef entity = entity_manager->CreateEntityFromData(entities[i]);
     if (entity && entities_loaded != nullptr) {
       entities_loaded->push_back(entity);
     }

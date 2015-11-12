@@ -1,6 +1,6 @@
 {
   "package": {
-    "name": "entity",
+    "name": "corgi",
     "url": "http://github.com/google/corgi.git",
     "branch": "develop",
     "is_library": 1,

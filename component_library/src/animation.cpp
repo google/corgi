@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "component_library/animation.h"
-#include "component_library/common_services.h"
-#include "component_library/graph.h"
-#include "component_library/meta.h"
-#include "component_library/rendermesh.h"
+#include "corgi_component_library/animation.h"
+#include "corgi_component_library/common_services.h"
+#include "corgi_component_library/graph.h"
+#include "corgi_component_library/meta.h"
+#include "corgi_component_library/rendermesh.h"
 #include "motive/anim.h"
 #include "motive/init.h"
 
-FPL_ENTITY_DEFINE_COMPONENT(corgi::component_library::AnimationComponent,
-                            corgi::component_library::AnimationData)
+CORGI_DEFINE_COMPONENT(corgi::component_library::AnimationComponent,
+                       corgi::component_library::AnimationData)
 
 BREADBOARD_DEFINE_EVENT(corgi::component_library::kAnimationCompleteEventId)
 
@@ -47,12 +47,12 @@ void AnimationComponent::UpdateAllEntities(corgi::WorldTime delta_time) {
       // Log debug info. Only log the header the first time.
       if (animation_data->debug_state == kAnimationDebug_OutputHeaderAndState) {
         fplbase::LogInfo(
-              animation_data->motivator.CsvHeaderForDebugging().c_str());
+            animation_data->motivator.CsvHeaderForDebugging().c_str());
         animation_data->debug_state = kAnimationDebug_OutputState;
       }
       if (animation_data->debug_state != kAnimationDebug_Inactive) {
         fplbase::LogInfo(
-              animation_data->motivator.CsvValuesForDebugging().c_str());
+            animation_data->motivator.CsvValuesForDebugging().c_str());
       }
     }
   }
@@ -82,9 +82,9 @@ void AnimationComponent::AddFromRawData(corgi::EntityRef& entity,
   auto animation_def = static_cast<const corgi::AnimationDef*>(raw_data);
   AnimationData* animation_data = AddEntity(entity);
   animation_data->anim_table_object = animation_def->anim_table_object();
-  animation_data->debug_state =
-      animation_def->debug() ? kAnimationDebug_OutputHeaderAndState
-                             : kAnimationDebug_Inactive;
+  animation_data->debug_state = animation_def->debug()
+                                    ? kAnimationDebug_OutputHeaderAndState
+                                    : kAnimationDebug_Inactive;
   AnimateFromTable(entity, animation_def->anim_table_start_idx());
 }
 
@@ -124,8 +124,8 @@ void AnimationComponent::InitializeMotivator(const EntityRef& entity) {
 
 void AnimationComponent::Animate(const EntityRef& entity, const RigAnim& anim) {
   AnimationData* data = Data<AnimationData>(entity);
-  motive::SplinePlayback playback(kAnimStartTime, anim.repeat(), kAnimPlaybackRate,
-                               kAnimBlendTime);
+  motive::SplinePlayback playback(kAnimStartTime, anim.repeat(),
+                                  kAnimPlaybackRate, kAnimBlendTime);
 
   // We initialize the rig motivator only once, using the defining_anim so that
   // it can play back any animation for this object in the `anim_table_`.

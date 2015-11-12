@@ -1,6 +1,7 @@
 CMakeFiles/*
 component_library/CMakeFiles/*
 component_library/gen
+component_library/libs
 *~
 CMakeCache.txt
 Makefile

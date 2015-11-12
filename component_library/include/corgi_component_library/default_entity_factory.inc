@@ -75,14 +75,14 @@
 /// #include "mygame_components_generated.h"
 ///
 /// #define FACTORY_TYPE_NAMESPACE mygame
-/// #include "component_library/default_entity_factory.inc"
+/// #include "corgi_component_library/default_entity_factory.inc"
 
 #ifndef FACTORY_TYPE_NAMESPACE
 #error You must #define FACTORY_TYPE_NAMESPACE to the namespace your generated \
        FlatBuffers types are in before including this file.
 #endif
 
-#include "component_library/default_entity_factory.h"
+#include "corgi_component_library/default_entity_factory.h"
 #include "flatbuffers/reflection.h"
 
 namespace corgi {

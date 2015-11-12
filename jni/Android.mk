@@ -14,14 +14,14 @@
 
 LOCAL_PATH := $(realpath $(call my-dir)/..)
 
-ENTITY_DIR := $(LOCAL_PATH)
-include $(ENTITY_DIR)/jni/android_config.mk
+CORGI_DIR := $(LOCAL_PATH)
+include $(CORGI_DIR)/jni/android_config.mk
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := entity
+LOCAL_MODULE := corgi
 LOCAL_ARM_MODE := arm
-LOCAL_EXPORT_C_INCLUDES := $(ENTITY_DIR)/include
+LOCAL_EXPORT_C_INCLUDES := $(CORGI_DIR)/include
 LOCAL_C_INCLUDES := $(LOCAL_EXPORT_C_INCLUDES)
 LOCAL_SRC_FILES := src/entity_manager.cpp
 

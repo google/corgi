@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
-#ifndef FPL_ENTITY_COMMON_H_
-#define FPL_ENTITY_COMMON_H_
+#ifndef CORGI_ENTITY_COMMON_H_
+#define CORGI_ENTITY_COMMON_H_
 
 namespace corgi {
 
 /// @file
-/// @def FPL_ENTITY_MAX_COMPONENT_COUNT
+/// @def CORGI_MAX_COMPONENT_COUNT
 ///
 /// @brief The maximum number of components in the system.
 ///
@@ -30,7 +30,7 @@ namespace corgi {
 /// @warning This should be set with care, because it affects the size of each
 /// Entity. Ideally this should be set to something that is as close as
 /// possible to the actual number of Components used by the program.
-#define FPL_ENTITY_MAX_COMPONENT_COUNT 30
+#define CORGI_MAX_COMPONENT_COUNT 30
 
 /// @var ComponentId
 ///
@@ -57,7 +57,7 @@ typedef uint32_t ComponentId;
 const ComponentId kInvalidComponent = 0;
 
 /// @cond CORGI_INTERNAL
-static const ComponentId kMaxComponentCount = FPL_ENTITY_MAX_COMPONENT_COUNT;
+static const ComponentId kMaxComponentCount = CORGI_MAX_COMPONENT_COUNT;
 /// @endcond
 
 /// @typedef WorldTime
@@ -87,4 +87,5 @@ static const ComponentIndex kUnusedComponentIndex =
     static_cast<ComponentIndex>(-1);
 
 }  // corgi
-#endif  // FPL_ENTITY_COMMON_H_
+
+#endif  // CORGI_ENTITY_COMMON_H_

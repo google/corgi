@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef COMPONENT_LIBRARY_BULLET_PHYSICS_H_
-#define COMPONENT_LIBRARY_BULLET_PHYSICS_H_
+#ifndef CORGI_COMPONENT_LIBRARY_BULLET_PHYSICS_H_
+#define CORGI_COMPONENT_LIBRARY_BULLET_PHYSICS_H_
 
 // Suppress warnings in the Bullet header files.
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverloaded-virtual"
 #pragma clang diagnostic ignored "-Wignored-qualifiers"
-#endif // defined(__clang__)
+#endif  // defined(__clang__)
 
 #if defined(_MSC_VER)
 #pragma warning(push)
@@ -45,6 +45,6 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
-#endif // defined(__clang__)
+#endif  // defined(__clang__)
 
-#endif  // COMPONENT_LIBRARY_BULLET_PHYSICS_H_
+#endif  // CORGI_COMPONENT_LIBRARY_BULLET_PHYSICS_H_
