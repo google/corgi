@@ -36,7 +36,7 @@ class btRigidBody;
 class btSequentialImpulseConstraintSolver;
 class btTriangleMesh;
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 BREADBOARD_DECLARE_EVENT(kCollisionEventId)
@@ -50,11 +50,11 @@ static const int kDefaultPhysicsMaxSteps = 5;
 
 // Data describing which entities were involed in a collision and where.
 struct CollisionData {
-  entity::EntityRef this_entity;
+  corgi::EntityRef this_entity;
   mathfu::vec3 this_position;
   std::string this_tag;
 
-  entity::EntityRef other_entity;
+  corgi::EntityRef other_entity;
   mathfu::vec3 other_position;
   std::string other_tag;
 };
@@ -114,42 +114,42 @@ struct PhysicsData {
   bool enabled_;
 };
 
-class PhysicsComponent : public entity::Component<PhysicsData> {
+class PhysicsComponent : public corgi::Component<PhysicsData> {
  public:
   PhysicsComponent();
   virtual ~PhysicsComponent();
 
-  virtual void AddFromRawData(entity::EntityRef& entity, const void* raw_data);
+  virtual void AddFromRawData(corgi::EntityRef& entity, const void* raw_data);
   // TODO: Implement ExportRawData function for editor (b/21589546)
-  virtual RawDataUniquePtr ExportRawData(const entity::EntityRef& entity) const;
+  virtual RawDataUniquePtr ExportRawData(const corgi::EntityRef& entity) const;
 
   virtual void Init();
-  virtual void InitEntity(entity::EntityRef& /*entity*/);
-  virtual void CleanupEntity(entity::EntityRef& entity);
-  virtual void UpdateAllEntities(entity::WorldTime delta_time);
+  virtual void InitEntity(corgi::EntityRef& /*entity*/);
+  virtual void CleanupEntity(corgi::EntityRef& entity);
+  virtual void UpdateAllEntities(corgi::WorldTime delta_time);
 
   void ProcessBulletTickCallback();
 
-  void UpdatePhysicsFromTransform(const entity::EntityRef& entity);
-  void UpdatePhysicsScale(const entity::EntityRef& entity);
+  void UpdatePhysicsFromTransform(const corgi::EntityRef& entity);
+  void UpdatePhysicsScale(const corgi::EntityRef& entity);
 
-  void EnablePhysics(const entity::EntityRef& entity);
-  void DisablePhysics(const entity::EntityRef& entity);
+  void EnablePhysics(const corgi::EntityRef& entity);
+  void DisablePhysics(const corgi::EntityRef& entity);
 
-  void AwakenEntity(const entity::EntityRef& entity);
+  void AwakenEntity(const corgi::EntityRef& entity);
   void AwakenAllEntities();
 
   // Initialize the data needed to generate a static mesh. Adds the entity to
   // the physics component if necessary.
-  void InitStaticMesh(entity::EntityRef& entity);
+  void InitStaticMesh(corgi::EntityRef& entity);
   // Add a triangle to the static mesh for the given entity. Note that Prepare
   // needs to be called beforehand.
-  void AddStaticMeshTriangle(const entity::EntityRef& entity,
+  void AddStaticMeshTriangle(const corgi::EntityRef& entity,
                              const mathfu::vec3& pt0, const mathfu::vec3& pt1,
                              const mathfu::vec3& pt2);
   // Generates a static mesh shape and adds it to the world, based on the
   // previously added static mesh triangles.
-  void FinalizeStaticMesh(const entity::EntityRef& entity, short collision_type,
+  void FinalizeStaticMesh(const corgi::EntityRef& entity, short collision_type,
                           short collides_with, float mass, float restitution,
                           const std::string& user_tag);
 
@@ -157,21 +157,23 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   // layer. Note, if the entity already collides with the raycast layer, no
   // change occurs. If there is no rendermesh, a unit cube is used instead.
   // Also sets whether the resulting shape should be exported.
-  void GenerateRaycastShape(entity::EntityRef& entity, bool result_exportable);
+  void GenerateRaycastShape(corgi::EntityRef& entity, bool result_exportable);
   // Performs a raycast into the world, returning the first entity hit.
   // Optionally takes a layer_mask, which the shape much collide with to be
   // raycast against, and output vector, where it will store the world position
   // the collision with the ray occurred.
-  entity::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end);
-  entity::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end,
+  corgi::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end);
+  corgi::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end,
                                   short layer_mask);
-  entity::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end,
+  corgi::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end,
                                   mathfu::vec3* hit_point);
-  entity::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end,
+  corgi::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end,
                                   short layer_mask, mathfu::vec3* hit_point);
-  void DebugDrawWorld(Renderer* renderer, const mathfu::mat4& camera_transform);
-  void DebugDrawObject(Renderer* renderer, const mathfu::mat4& camera_transform,
-                       const entity::EntityRef& entity,
+  void DebugDrawWorld(fplbase::Renderer* renderer,
+                      const mathfu::mat4& camera_transform);
+  void DebugDrawObject(fplbase::Renderer* renderer,
+                       const mathfu::mat4& camera_transform,
+                       const corgi::EntityRef& entity,
                        const mathfu::vec3& color);
 
   btDiscreteDynamicsWorld* bullet_world() { return bullet_world_.get(); }
@@ -190,8 +192,8 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
   }
 
  private:
-  void ClearPhysicsData(const entity::EntityRef& entity);
-  void UpdatePhysicsObjectsTransform(const entity::EntityRef& entity,
+  void ClearPhysicsData(const corgi::EntityRef& entity);
+  void UpdatePhysicsObjectsTransform(const corgi::EntityRef& entity,
                                      bool kinematic_only);
 
   // Collision data is cached so that the event graphs can operate on it.
@@ -215,9 +217,9 @@ class PhysicsComponent : public entity::Component<PhysicsData> {
 };
 
 }  // component_library
-}  // fpl
+}  // corgi
 
-FPL_ENTITY_REGISTER_COMPONENT(fpl::component_library::PhysicsComponent,
-                              fpl::component_library::PhysicsData)
+FPL_ENTITY_REGISTER_COMPONENT(corgi::component_library::PhysicsComponent,
+                              corgi::component_library::PhysicsData)
 
 #endif  // COMPONENT_LIBRARY_PHYSICS_H_

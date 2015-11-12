@@ -23,10 +23,10 @@
 using mathfu::vec3;
 using mathfu::mat4;
 
-FPL_ENTITY_DEFINE_COMPONENT(fpl::component_library::RenderMeshComponent,
-                            fpl::component_library::RenderMeshData)
+FPL_ENTITY_DEFINE_COMPONENT(corgi::component_library::RenderMeshComponent,
+                            corgi::component_library::RenderMeshData)
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 // Offset the frustrum by this many world-units.  As long as no objects are
@@ -40,7 +40,7 @@ void RenderMeshComponent::Init() {
 }
 
 // Rendermesh depends on transform:
-void RenderMeshComponent::InitEntity(entity::EntityRef& entity) {
+void RenderMeshComponent::InitEntity(EntityRef& entity) {
   entity_manager_->AddEntityToComponent<TransformComponent>(entity);
 }
 
@@ -77,7 +77,8 @@ void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
 
         // Are we culling this object based on the view angle?
         // If so, does this lie outside of our view frustrum?
-        if ((rendermesh_data->culling_mask & (1 << CullingTest_ViewAngle)) &&
+        if ((rendermesh_data->culling_mask &
+            (1 << CullingTest_ViewAngle)) &&
             (vec3::DotProduct(pos_relative_to_camera.Normalized(),
                               camera_facing.Normalized()) < max_cos)) {
           // The origin point for this mesh is not in our field of view.  Cut
@@ -87,7 +88,8 @@ void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
 
         // Are we culling this object based on view distance?  If so,
         // is it far enough away that we should skip it?
-        if ((rendermesh_data->culling_mask & (1 << CullingTest_Distance)) &&
+        if ((rendermesh_data->culling_mask &
+            (1 << CullingTest_Distance)) &&
             rendermesh_data->z_depth > culling_distance_squared()) {
           continue;
         }
@@ -104,10 +106,10 @@ void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
             std::greater<RenderlistEntry>());
 }
 
-void RenderMeshComponent::RenderAllEntities(Renderer& renderer,
+void RenderMeshComponent::RenderAllEntities(fplbase::Renderer& renderer,
                                             const CameraInterface& camera) {
   // Make sure we only draw the front-facing polygons:
-  renderer.SetCulling(Renderer::kCullBack);
+  renderer.SetCulling(fplbase::Renderer::kCullBack);
 
   // Render the actual game:
   for (int pass = 0; pass < RenderPass_Count; pass++) {
@@ -117,18 +119,18 @@ void RenderMeshComponent::RenderAllEntities(Renderer& renderer,
 
 // Render a pass.
 void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
-                                     Renderer& renderer) {
+                                     fplbase::Renderer& renderer) {
   RenderPass(pass_id, camera, renderer, nullptr);
 }
 
 // Render a single render-pass, by ID.
 void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
-                                     Renderer& renderer,
-                                     const Shader* shader_override) {
+                                     fplbase::Renderer& renderer,
+                                     const fplbase::Shader* shader_override) {
   mat4 camera_vp = camera.GetTransformMatrix();
 
   for (size_t i = 0; i < pass_render_list_[pass_id].size(); i++) {
-    entity::EntityRef& entity = pass_render_list_[pass_id][i].entity;
+    EntityRef& entity = pass_render_list_[pass_id][i].entity;
 
     RenderMeshData* rendermesh_data = Data<RenderMeshData>(entity);
 
@@ -184,13 +186,13 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
 
       rendermesh_data->mesh->Render(renderer);
     } else {
-      const Shader* shader = nullptr;
+      const fplbase::Shader* shader = nullptr;
       if (!shader_override && rendermesh_data->shader) {
         shader = rendermesh_data->shader;
       } else {
         shader = shader_override;
       }
-      vec4i viewport[2] = {camera.viewport(0), camera.viewport(1)};
+      mathfu::vec4i viewport[2] = {camera.viewport(0), camera.viewport(1)};
       mat4 camera_vp_stereo = camera.GetTransformMatrix(1);
       mat4 mvp_matrices[2] = {mvp, camera_vp_stereo * world_transform};
       vec3 camera_positions[2] = {world_matrix_inverse * camera.position(0),
@@ -202,7 +204,7 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
 }
 
 void RenderMeshComponent::SetVisibilityRecursively(
-    const entity::EntityRef& entity, bool visible) {
+    const EntityRef& entity, bool visible) {
   RenderMeshData* rendermesh_data = Data<RenderMeshData>(entity);
   TransformData* transform_data = Data<TransformData>(entity);
   if (transform_data) {
@@ -216,7 +218,7 @@ void RenderMeshComponent::SetVisibilityRecursively(
   }
 }
 
-void RenderMeshComponent::AddFromRawData(entity::EntityRef& entity,
+void RenderMeshComponent::AddFromRawData(corgi::EntityRef& entity,
                                          const void* raw_data) {
   auto rendermesh_def = static_cast<const RenderMeshDef*>(raw_data);
 
@@ -279,8 +281,8 @@ void RenderMeshComponent::AddFromRawData(entity::EntityRef& entity,
   rendermesh_data->tint = mathfu::kOnes4f;
 }
 
-entity::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
-    const entity::EntityRef& entity) const {
+corgi::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
+    const corgi::EntityRef& entity) const {
   const RenderMeshData* data = GetComponentData(entity);
   if (data == nullptr) return nullptr;
 
@@ -337,4 +339,4 @@ entity::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
 }
 
 }  // component_library
-}  // fpl
+}  // corgi

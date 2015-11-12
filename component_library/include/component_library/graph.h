@@ -22,7 +22,7 @@
 #include "breadboard/graph_state.h"
 #include "entity/component.h"
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 BREADBOARD_DECLARE_EVENT(kAdvanceFrameEventId)
@@ -77,7 +77,7 @@ struct GraphData {
   GraphData& operator=(GraphData&);
 };
 
-class GraphComponent : public entity::Component<GraphData> {
+class GraphComponent : public corgi::Component<GraphData> {
  public:
   // Once entities themselves have been initialized, initialize the graphs. This
   // must be done after because graphs may reference entities.
@@ -86,20 +86,20 @@ class GraphComponent : public entity::Component<GraphData> {
   // entities later, individual calls to EntityPostLoadFixup are required on a
   // per-entity basis.
   void PostLoadFixup();
-  void EntityPostLoadFixup(entity::EntityRef& entity);
+  void EntityPostLoadFixup(corgi::EntityRef& entity);
 
   // Gets the broadcaster for an entity, even if that entity does not yet have
   // one.
   breadboard::NodeEventBroadcaster* GetCreateBroadcaster(
-      entity::EntityRef entity);
+      corgi::EntityRef entity);
 
   virtual void Init();
-  virtual void AddFromRawData(entity::EntityRef& entity, const void* raw_data);
-  virtual RawDataUniquePtr ExportRawData(const entity::EntityRef& entity) const;
-  virtual void InitEntity(entity::EntityRef& /*entity*/) {}
-  virtual void UpdateAllEntities(entity::WorldTime delta_time);
+  virtual void AddFromRawData(corgi::EntityRef& entity, const void* raw_data);
+  virtual RawDataUniquePtr ExportRawData(const corgi::EntityRef& entity) const;
+  virtual void InitEntity(corgi::EntityRef& /*entity*/) {}
+  virtual void UpdateAllEntities(corgi::WorldTime delta_time);
 
-  const entity::EntityRef& graph_entity() const { return graph_entity_; }
+  const corgi::EntityRef& graph_entity() const { return graph_entity_; }
 
   breadboard::NodeEventBroadcaster* advance_frame_broadcaster() {
     return &advance_frame_broadcaster_;
@@ -111,13 +111,13 @@ class GraphComponent : public entity::Component<GraphData> {
 
   // TODO: Remove this in favor of a more generic per-graph state interface.
   // b/24510652
-  entity::EntityRef graph_entity_;
+  corgi::EntityRef graph_entity_;
 };
 
-}  // fpl_project
-}  // fpl
+}  // component_library
+}  // corgi
 
-FPL_ENTITY_REGISTER_COMPONENT(fpl::component_library::GraphComponent,
-                              fpl::component_library::GraphData)
+FPL_ENTITY_REGISTER_COMPONENT(corgi::component_library::GraphComponent,
+                              corgi::component_library::GraphData)
 
 #endif  // FPL_COMPONENTS_GRAPH_H_

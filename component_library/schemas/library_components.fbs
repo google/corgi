@@ -15,16 +15,16 @@
 include "bullet_def.fbs";
 include "common.fbs";
 
-namespace fpl;
+namespace corgi;
 
 // Data definitions for the components in the standard component library.
 
 table CommonServicesDef {}
 
 table TransformDef {
-  position:Vec3;
-  scale:Vec3;
-  orientation:Vec3;
+  position:fplbase.Vec3;
+  scale:fplbase.Vec3;
+  orientation:fplbase.Vec3;
   child_ids:[string];
 }
 

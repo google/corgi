@@ -19,17 +19,17 @@
 #include "entity/component.h"
 #include "mathfu/glsl_mappings.h"
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 // Get the max and min positions of an entity, based on its rendermesh.
 // Returns true if positions are gotten, and results stored in the provided
 // max and min vectors.
-bool GetMaxMinPositionsForEntity(entity::EntityRef& entity,
-                                 entity::EntityManager& entity_manager,
+bool GetMaxMinPositionsForEntity(corgi::EntityRef& entity,
+                                 corgi::EntityManager& entity_manager,
                                  mathfu::vec3* max, mathfu::vec3* min);
 
 }  // component_library
-}  // fpl
+}  // corgi
 
 #endif  // COMPONENT_LIBRARY_COMPONENT_UTILS_H_

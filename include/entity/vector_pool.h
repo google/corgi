@@ -20,7 +20,7 @@
 #include <vector>
 #include <assert.h>
 
-namespace fpl {
+namespace corgi {
 
 /// @file
 /// @enum AllocationLocation
@@ -788,6 +788,6 @@ class VectorPool {
   UniqueIdType next_unique_id_;
 };
 
-}  // fpl
+}  // corgi
 
 #endif  // VECTOR_POOL_H

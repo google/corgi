@@ -24,7 +24,7 @@
 #include "mathfu/matrix_4x4.h"
 #include "fplutil/intrusive_list.h"
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 // Data for scene object components.
@@ -53,10 +53,10 @@ struct TransformData {
   mathfu::mat4 world_transform;
 
   // A reference to the entity that owns this component data.
-  entity::EntityRef owner;
+  corgi::EntityRef owner;
 
   // A reference to the parent entity.
-  entity::EntityRef parent;
+  corgi::EntityRef parent;
 
   // Child IDs we will need to export.
   std::set<std::string> child_ids;
@@ -66,8 +66,8 @@ struct TransformData {
   std::vector<std::string> pending_child_ids;
 
   // The list of children.
-  intrusive_list_node child_node;
-  intrusive_list<TransformData> children;
+  fplutil::intrusive_list_node child_node;
+  fplutil::intrusive_list<TransformData> children;
 
   // We construct the matrix by hand here, because we know that it will
   // always be a composition of rotation, scale, and translation, so we
@@ -101,55 +101,55 @@ struct TransformData {
   TransformData& operator=(const TransformData&);
 };
 
-class TransformComponent : public entity::Component<TransformData> {
+class TransformComponent : public corgi::Component<TransformData> {
  public:
-  mathfu::vec3 WorldPosition(entity::EntityRef entity);
-  mathfu::quat WorldOrientation(entity::EntityRef entity);
-  mathfu::mat4 WorldTransform(entity::EntityRef entity);
+  mathfu::vec3 WorldPosition(corgi::EntityRef entity);
+  mathfu::quat WorldOrientation(corgi::EntityRef entity);
+  mathfu::mat4 WorldTransform(corgi::EntityRef entity);
 
   // Returns the topmost parent of this entity.  Returns the entity itself
   // if it has no parents.
-  entity::EntityRef GetRootParent(const entity::EntityRef& entity) const;
+  corgi::EntityRef GetRootParent(const corgi::EntityRef& entity) const;
 
-  virtual void AddFromRawData(entity::EntityRef& entity, const void* raw_data);
-  virtual RawDataUniquePtr ExportRawData(const entity::EntityRef& entity) const;
+  virtual void AddFromRawData(corgi::EntityRef& entity, const void* raw_data);
+  virtual RawDataUniquePtr ExportRawData(const corgi::EntityRef& entity) const;
 
-  virtual void InitEntity(entity::EntityRef& entity);
-  virtual void CleanupEntity(entity::EntityRef& entity);
-  virtual void UpdateAllEntities(entity::WorldTime delta_time);
+  virtual void InitEntity(corgi::EntityRef& entity);
+  virtual void CleanupEntity(corgi::EntityRef& entity);
+  virtual void UpdateAllEntities(corgi::WorldTime delta_time);
 
-  void AddChild(entity::EntityRef& child, entity::EntityRef& parent);
-  void RemoveChild(entity::EntityRef& entity);
+  void AddChild(corgi::EntityRef& child, corgi::EntityRef& parent);
+  void RemoveChild(corgi::EntityRef& entity);
 
   void PostLoadFixup();
 
   // Take any pending child IDs and set up the child links.
-  void UpdateChildLinks(entity::EntityRef& entity);
+  void UpdateChildLinks(corgi::EntityRef& entity);
 
   // Returns `entity` or the first child of entity (in breadth-first order)
   // that has component `id`. Or returns an invalid EntityRef if no such child
   // exists.
-  entity::EntityRef ChildWithComponent(const entity::EntityRef& entity,
-                                       entity::ComponentId id) const {
+  corgi::EntityRef ChildWithComponent(const corgi::EntityRef& entity,
+                                       corgi::ComponentId id) const {
     return ChildWithComponents(entity, &id, 1);
   }
 
   // Returns `entity` or the first child of entity (in breadth-first order)
   // that has all components in array `ids`. Or returns an invalid EntityRef
   // if no such child exists.
-  entity::EntityRef ChildWithComponents(const entity::EntityRef& entity,
-                                        const entity::ComponentId* ids,
+  corgi::EntityRef ChildWithComponents(const corgi::EntityRef& entity,
+                                        const corgi::ComponentId* ids,
                                         size_t num_ids) const;
 
  private:
-  void UpdateWorldPosition(entity::EntityRef& entity,
+  void UpdateWorldPosition(corgi::EntityRef& entity,
                            const mathfu::mat4& transform);
 };
 
 }  // component_library
-}  // fpl
+}  // corgi
 
-FPL_ENTITY_REGISTER_COMPONENT(fpl::component_library::TransformComponent,
-                              fpl::component_library::TransformData)
+FPL_ENTITY_REGISTER_COMPONENT(corgi::component_library::TransformComponent,
+                              corgi::component_library::TransformData)
 
 #endif  // COMPONENT_LIBRARY_TRANSFORM_H_

@@ -18,17 +18,17 @@
 #include "component_library/common_services.h"
 #include "mathfu/utilities.h"
 
-FPL_ENTITY_DEFINE_COMPONENT(fpl::component_library::MetaComponent,
-                            fpl::component_library::MetaData)
+FPL_ENTITY_DEFINE_COMPONENT(corgi::component_library::MetaComponent,
+                            corgi::component_library::MetaData)
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
-void MetaComponent::AddFromRawData(entity::EntityRef& entity,
+void MetaComponent::AddFromRawData(corgi::EntityRef& entity,
                                    const void* raw_data) {
   MetaData* meta_data = AddEntity(entity);
   if (raw_data != nullptr) {
-    auto meta_def = static_cast<const MetaDef*>(raw_data);
+    auto meta_def = static_cast<const corgi::MetaDef*>(raw_data);
     if (meta_def->entity_id() != nullptr) {
       if (meta_data->entity_id != "") {
         RemoveEntityFromDictionary(meta_data->entity_id);
@@ -44,15 +44,15 @@ void MetaComponent::AddFromRawData(entity::EntityRef& entity,
     }
   }
 }
-void MetaComponent::AddFromPrototypeData(entity::EntityRef& entity,
-                                         const MetaDef* meta_def) {
+void MetaComponent::AddFromPrototypeData(corgi::EntityRef& entity,
+                                         const corgi::MetaDef* meta_def) {
   MetaData* meta_data = AddEntity(entity);
   if (meta_def->comment() != nullptr) {
     meta_data->comment = meta_def->comment()->c_str();
   }
 }
 
-void MetaComponent::AddWithSourceFile(entity::EntityRef& entity,
+void MetaComponent::AddWithSourceFile(corgi::EntityRef& entity,
                                       const std::string& source_file) {
   MetaData* data = AddEntity(entity);
   data->source_file = source_file;
@@ -62,8 +62,8 @@ void MetaComponent::AddWithSourceFile(entity::EntityRef& entity,
   }
 }
 
-entity::ComponentInterface::RawDataUniquePtr MetaComponent::ExportRawData(
-    const entity::EntityRef& entity) const {
+corgi::ComponentInterface::RawDataUniquePtr MetaComponent::ExportRawData(
+    const corgi::EntityRef& entity) const {
   const MetaData* data = GetComponentData(entity);
   if (data == nullptr) return nullptr;
 
@@ -92,20 +92,20 @@ entity::ComponentInterface::RawDataUniquePtr MetaComponent::ExportRawData(
   return fbb.ReleaseBufferPointer();
 }
 
-void MetaComponent::InitEntity(entity::EntityRef& entity) {
+void MetaComponent::InitEntity(corgi::EntityRef& entity) {
   MetaData* data = GetComponentData(entity);
   if (data != nullptr && data->entity_id != "")
     AddEntityToDictionary(data->entity_id, entity);
 }
 
-void MetaComponent::CleanupEntity(entity::EntityRef& entity) {
+void MetaComponent::CleanupEntity(corgi::EntityRef& entity) {
   MetaData* data = GetComponentData(entity);
   if (data != nullptr && data->entity_id != "" &&
       GetEntityFromDictionary(data->entity_id) == entity)
     RemoveEntityFromDictionary(data->entity_id);
 }
 
-const std::string& MetaComponent::GetEntityID(const entity::EntityRef& entity) {
+const std::string& MetaComponent::GetEntityID(const corgi::EntityRef& entity) {
   MetaData* data = GetComponentData(entity);
   if (data == nullptr) {
     return empty_string;
@@ -119,7 +119,7 @@ const std::string& MetaComponent::GetEntityID(const entity::EntityRef& entity) {
 }
 
 void MetaComponent::AddEntityToDictionary(const std::string& key,
-                                          const entity::EntityRef& entity) {
+                                          const corgi::EntityRef& entity) {
   entity_dictionary_[key] = entity;
 }
 void MetaComponent::RemoveEntityFromDictionary(const std::string& key) {
@@ -128,16 +128,16 @@ void MetaComponent::RemoveEntityFromDictionary(const std::string& key) {
     entity_dictionary_.erase(i);
   }
 }
-entity::EntityRef MetaComponent::GetEntityFromDictionary(
+corgi::EntityRef MetaComponent::GetEntityFromDictionary(
     const std::string& key) {
   auto i = entity_dictionary_.find(key);
   if (i == entity_dictionary_.end()) {
-    return entity::EntityRef();
+    return corgi::EntityRef();
   }
   if (!i->second.IsValid()) {
     // The entity with this key is no longer valid, we'd better remove it.
     RemoveEntityFromDictionary(key);
-    return entity::EntityRef();
+    return corgi::EntityRef();
   }
   return i->second;
 }

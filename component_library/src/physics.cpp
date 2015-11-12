@@ -32,13 +32,37 @@
 
 using mathfu::vec3;
 using mathfu::quat;
+using fplbase::AssetManager;
+using corgi::BulletBoxDef;
+using corgi::BulletBoxDefBuilder;
+using corgi::BulletCapsuleDef;
+using corgi::BulletCapsuleDefBuilder;
+using corgi::BulletConeDef;
+using corgi::BulletConeDefBuilder;
+using corgi::BulletCylinderDef;
+using corgi::BulletCylinderDefBuilder;
+using corgi::BulletNoShapeDef;
+using corgi::BulletNoShapeDefBuilder;
+using corgi::BulletShapeUnion;
+using corgi::BulletShapeDef;
+using corgi::BulletShapeDefBuilder;
+using corgi::BulletSphereDef;
+using corgi::BulletSphereDefBuilder;
+using corgi::BulletStaticPlaneDef;
+using corgi::BulletStaticPlaneDefBuilder;
+using corgi::PhysicsDef;
+using corgi::PhysicsDefBuilder;
+using fplbase::Renderer;
+using fplbase::Shader;
+using fplbase::Vec3;
+using mathfu::vec4;
 
-FPL_ENTITY_DEFINE_COMPONENT(fpl::component_library::PhysicsComponent,
-                            fpl::component_library::PhysicsData)
+FPL_ENTITY_DEFINE_COMPONENT(corgi::component_library::PhysicsComponent,
+                            corgi::component_library::PhysicsData)
 
-BREADBOARD_DEFINE_EVENT(fpl::component_library::kCollisionEventId)
+BREADBOARD_DEFINE_EVENT(corgi::component_library::kCollisionEventId)
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 // The function that is called from Bullet while calling World's stepSimulation.
@@ -52,12 +76,12 @@ static inline btVector3 ToBtVector3(const mathfu::vec3& v) {
   return btVector3(v.x(), v.y(), v.z());
 }
 
-static inline btVector3 ToBtVector3(const fpl::Vec3& v) {
+static inline btVector3 ToBtVector3(const fplbase::Vec3& v) {
   return btVector3(v.x(), v.y(), v.z());
 }
 
-static inline fpl::Vec3 BtToFlatVec3(const btVector3& v) {
-  return fpl::Vec3(v.x(), v.y(), v.z());
+static inline fplbase::Vec3 BtToFlatVec3(const btVector3& v) {
+  return fplbase::Vec3(v.x(), v.y(), v.z());
 }
 
 static inline mathfu::vec3 BtToMathfuVec3(const btVector3& v) {
@@ -193,7 +217,7 @@ PhysicsComponent::PhysicsComponent()
       max_steps_(kDefaultPhysicsMaxSteps) {}
 PhysicsComponent::~PhysicsComponent() { ClearComponentData(); }
 
-void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
+void PhysicsComponent::AddFromRawData(corgi::EntityRef& entity,
                                       const void* raw_data) {
   auto physics_def = static_cast<const PhysicsDef*>(raw_data);
   PhysicsData* physics_data = AddEntity(entity);
@@ -307,8 +331,8 @@ void PhysicsComponent::AddFromRawData(entity::EntityRef& entity,
   UpdatePhysicsFromTransform(entity);
 }
 
-entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
-    const entity::EntityRef& entity) const {
+corgi::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
+    const corgi::EntityRef& entity) const {
   const PhysicsData* data = GetComponentData(entity);
   if (data == nullptr) return nullptr;
 
@@ -316,7 +340,7 @@ entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
   bool defaults = entity_manager_->GetComponent<CommonServicesComponent>()
                       ->export_force_defaults();
   fbb.ForceDefaults(defaults);
-  std::vector<flatbuffers::Offset<fpl::BulletShapeDef>> shape_vector;
+  std::vector<flatbuffers::Offset<BulletShapeDef>> shape_vector;
   bool kinematic = true;
   if (data->body_count_ > 0) {
     kinematic = data->rigid_bodies_[0].rigid_body->isKinematicObject();
@@ -417,10 +441,10 @@ entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
       float invMass = body.rigid_body->getInvMass();
       shape_builder.add_mass(invMass ? 1.0f / invMass : 0.0f);
       shape_builder.add_restitution(body.rigid_body->getRestitution());
-      fpl::Vec3 offset(body.offset.x(), body.offset.y(), body.offset.z());
+      fplbase::Vec3 offset(body.offset.x(), body.offset.y(), body.offset.z());
       shape_builder.add_offset(&offset);
       shape_builder.add_collision_type(
-          static_cast<BulletCollisionType>(body.collision_type));
+        static_cast<BulletCollisionType>(body.collision_type));
       shape_builder.add_collides_with(collides);
       shape_builder.add_user_tag(user_tag);
       shape_vector.push_back(shape_builder.Finish());
@@ -441,7 +465,7 @@ entity::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
   return fbb.ReleaseBufferPointer();
 }
 
-void PhysicsComponent::UpdateAllEntities(entity::WorldTime delta_time) {
+void PhysicsComponent::UpdateAllEntities(corgi::WorldTime delta_time) {
   // Step the world.
   bullet_world_->stepSimulation(delta_time / 1000.f, max_steps());
 
@@ -480,8 +504,8 @@ static void BulletTickCallback(btDynamicsWorld* world,
 
 static void ExecuteGraphs(
     CollisionData* collision_data, GraphData* this_graph_data,
-    entity::EntityRef this_entity, const mathfu::vec3& this_position,
-    const std::string& this_tag, entity::EntityRef other_entity,
+    corgi::EntityRef this_entity, const mathfu::vec3& this_position,
+    const std::string& this_tag, corgi::EntityRef other_entity,
     const mathfu::vec3& other_position, const std::string& other_tag) {
   collision_data->this_entity = this_entity;
   collision_data->this_position = this_position;
@@ -510,16 +534,16 @@ void PhysicsComponent::ProcessBulletTickCallback() {
         auto body_a = contact_manifold->getBody0();
         auto body_b = contact_manifold->getBody1();
         auto container_a =
-            static_cast<VectorPool<entity::Entity>*>(body_a->getUserPointer());
+            static_cast<VectorPool<corgi::Entity>*>(body_a->getUserPointer());
         auto container_b =
-            static_cast<VectorPool<entity::Entity>*>(body_b->getUserPointer());
+            static_cast<VectorPool<corgi::Entity>*>(body_b->getUserPointer());
         // Only generate events if both containers were defined
         if (container_a == nullptr || container_b == nullptr) {
           continue;
         }
 
-        entity::EntityRef entity_a(container_a, body_a->getUserIndex());
-        entity::EntityRef entity_b(container_b, body_b->getUserIndex());
+        corgi::EntityRef entity_a(container_a, body_a->getUserIndex());
+        corgi::EntityRef entity_b(container_b, body_b->getUserIndex());
         vec3 position_a = BtToMathfuVec3(pt.getPositionWorldOnA());
         vec3 position_b = BtToMathfuVec3(pt.getPositionWorldOnB());
         std::string tag_a;
@@ -558,15 +582,15 @@ void PhysicsComponent::ProcessBulletTickCallback() {
 }
 
 // Physics component requires that you have a transform component:
-void PhysicsComponent::InitEntity(entity::EntityRef& entity) {
+void PhysicsComponent::InitEntity(corgi::EntityRef& entity) {
   entity_manager_->AddEntityToComponent<TransformComponent>(entity);
 }
 
-void PhysicsComponent::CleanupEntity(entity::EntityRef& entity) {
+void PhysicsComponent::CleanupEntity(corgi::EntityRef& entity) {
   DisablePhysics(entity);
 }
 
-void PhysicsComponent::EnablePhysics(const entity::EntityRef& entity) {
+void PhysicsComponent::EnablePhysics(const corgi::EntityRef& entity) {
   PhysicsData* physics_data = Data<PhysicsData>(entity);
   if (physics_data != nullptr && !physics_data->enabled_) {
     physics_data->enabled_ = true;
@@ -579,7 +603,7 @@ void PhysicsComponent::EnablePhysics(const entity::EntityRef& entity) {
   }
 }
 
-void PhysicsComponent::DisablePhysics(const entity::EntityRef& entity) {
+void PhysicsComponent::DisablePhysics(const corgi::EntityRef& entity) {
   PhysicsData* physics_data = Data<PhysicsData>(entity);
   if (physics_data != nullptr && physics_data->enabled_) {
     physics_data->enabled_ = false;
@@ -590,7 +614,7 @@ void PhysicsComponent::DisablePhysics(const entity::EntityRef& entity) {
   }
 }
 
-void PhysicsComponent::ClearPhysicsData(const entity::EntityRef& entity) {
+void PhysicsComponent::ClearPhysicsData(const corgi::EntityRef& entity) {
   PhysicsData* physics_data = Data<PhysicsData>(entity);
   if (physics_data != nullptr) {
     DisablePhysics(entity);
@@ -605,7 +629,7 @@ void PhysicsComponent::ClearPhysicsData(const entity::EntityRef& entity) {
 }
 
 void PhysicsComponent::UpdatePhysicsFromTransform(
-    const entity::EntityRef& entity) {
+    const corgi::EntityRef& entity) {
   // Update all objects on the entity, not just kinematic ones. Also needs to
   // check for updates on the scale.
   UpdatePhysicsObjectsTransform(entity, false);
@@ -613,7 +637,7 @@ void PhysicsComponent::UpdatePhysicsFromTransform(
 }
 
 void PhysicsComponent::UpdatePhysicsObjectsTransform(
-    const entity::EntityRef& entity, bool kinematic_only) {
+    const corgi::EntityRef& entity, bool kinematic_only) {
   if (Data<PhysicsData>(entity) == nullptr) return;
 
   PhysicsData* physics_data = Data<PhysicsData>(entity);
@@ -635,7 +659,7 @@ void PhysicsComponent::UpdatePhysicsObjectsTransform(
   }
 }
 
-void PhysicsComponent::UpdatePhysicsScale(const entity::EntityRef& entity) {
+void PhysicsComponent::UpdatePhysicsScale(const corgi::EntityRef& entity) {
   if (Data<PhysicsData>(entity) == nullptr) return;
 
   PhysicsData* physics_data = Data<PhysicsData>(entity);
@@ -668,7 +692,7 @@ void PhysicsComponent::UpdatePhysicsScale(const entity::EntityRef& entity) {
   }
 }
 
-void PhysicsComponent::AwakenEntity(const entity::EntityRef& entity) {
+void PhysicsComponent::AwakenEntity(const corgi::EntityRef& entity) {
   PhysicsData* physics_data = Data<PhysicsData>(entity);
   if (physics_data != nullptr && physics_data->enabled_) {
     for (int i = 0; i < physics_data->body_count_; i++) {
@@ -687,14 +711,14 @@ void PhysicsComponent::AwakenAllEntities() {
   }
 }
 
-void PhysicsComponent::InitStaticMesh(entity::EntityRef& entity) {
+void PhysicsComponent::InitStaticMesh(corgi::EntityRef& entity) {
   PhysicsData* data = AddEntity(entity);
   // Instantiate a holder for the triangle data. Note that the reset clears any
   // previous data that might have been created.
   data->triangle_mesh_.reset(new btTriangleMesh());
 }
 
-void PhysicsComponent::AddStaticMeshTriangle(const entity::EntityRef& entity,
+void PhysicsComponent::AddStaticMeshTriangle(const corgi::EntityRef& entity,
                                              const vec3& pt0, const vec3& pt1,
                                              const vec3& pt2) {
   PhysicsData* data = GetComponentData(entity);
@@ -704,7 +728,7 @@ void PhysicsComponent::AddStaticMeshTriangle(const entity::EntityRef& entity,
                                     ToBtVector3(pt2));
 }
 
-void PhysicsComponent::FinalizeStaticMesh(const entity::EntityRef& entity,
+void PhysicsComponent::FinalizeStaticMesh(const corgi::EntityRef& entity,
                                           short collision_type,
                                           short collides_with, float mass,
                                           float restitution,
@@ -757,24 +781,26 @@ void PhysicsComponent::FinalizeStaticMesh(const entity::EntityRef& entity,
   data->enabled_ = true;
 }
 
-entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
+corgi::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
                                                   mathfu::vec3& end) {
-  return RaycastSingle(start, end, BulletCollisionType_Raycast, nullptr);
+  return RaycastSingle(start, end,
+                       BulletCollisionType_Raycast, nullptr);
 }
 
-entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
+corgi::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
                                                   mathfu::vec3& end,
                                                   short layer_mask) {
   return RaycastSingle(start, end, layer_mask, nullptr);
 }
 
-entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
+corgi::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
                                                   mathfu::vec3& end,
                                                   mathfu::vec3* hit_point) {
-  return RaycastSingle(start, end, BulletCollisionType_Raycast, hit_point);
+  return RaycastSingle(start, end, BulletCollisionType_Raycast,
+                       hit_point);
 }
 
-entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
+corgi::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
                                                   mathfu::vec3& end,
                                                   short layer_mask,
                                                   mathfu::vec3* hit_point) {
@@ -785,20 +811,20 @@ entity::EntityRef PhysicsComponent::RaycastSingle(mathfu::vec3& start,
 
   bullet_world_->rayTest(bt_start, bt_end, ray_results);
   if (ray_results.hasHit()) {
-    auto container = static_cast<VectorPool<entity::Entity>*>(
+    auto container = static_cast<VectorPool<corgi::Entity>*>(
         ray_results.m_collisionObject->getUserPointer());
     if (container != nullptr) {
       if (hit_point != nullptr)
         *hit_point = BtToMathfuVec3(ray_results.m_hitPointWorld);
 
-      return entity::EntityRef(container,
+      return corgi::EntityRef(container,
                                ray_results.m_collisionObject->getUserIndex());
     }
   }
-  return entity::EntityRef();
+  return corgi::EntityRef();
 }
 
-void PhysicsComponent::GenerateRaycastShape(entity::EntityRef& entity,
+void PhysicsComponent::GenerateRaycastShape(corgi::EntityRef& entity,
                                             bool result_exportable) {
   PhysicsData* data = GetComponentData(entity);
   if (data == nullptr || data->body_count_ == kMaxPhysicsBodies) {
@@ -865,7 +891,7 @@ void PhysicsComponent::DebugDrawWorld(Renderer* renderer,
 
 void PhysicsComponent::DebugDrawObject(Renderer* renderer,
                                        const mathfu::mat4& camera_transform,
-                                       const entity::EntityRef& entity,
+                                       const corgi::EntityRef& entity,
                                        const mathfu::vec3& color) {
   auto physics_data = Data<PhysicsData>(entity);
   if (physics_data == nullptr) {
@@ -889,12 +915,14 @@ void PhysicsDebugDrawer::drawLine(const btVector3& from, const btVector3& to,
     }
   }
 
-  static const Attribute attributes[] = {kPosition3f, kEND};
+  static const fplbase::Attribute attributes[] = {fplbase::kPosition3f,
+    fplbase::kEND};
   static const unsigned short indices[] = {0, 1};
   const btVector3 vertices[] = {from, to};
-  Mesh::RenderArray(Mesh::kLines, 2, attributes, sizeof(btVector3),
+  fplbase::Mesh::RenderArray(fplbase::Mesh::kLines, 2, attributes,
+                             sizeof(btVector3),
                     reinterpret_cast<const char*>(vertices), indices);
 }
 
 }  // component_library
-}  // fpl
+}  // corgi

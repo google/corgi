@@ -23,7 +23,7 @@
 #include "fplbase/renderer.h"
 #include "fplbase/utilities.h"
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 // Data for scene object components.
@@ -34,13 +34,15 @@ struct CommonServicesData {};
 // for other components to access game services and managers.  (Since components
 // don't have direct access to the gamestate, but they do have access to other
 // components.)
-class CommonServicesComponent : public entity::Component<CommonServicesData> {
+class CommonServicesComponent : public corgi::Component<CommonServicesData> {
  public:
   CommonServicesComponent() : export_force_defaults_(false) {}
 
-  void Initialize(AssetManager* asset_manager, EntityFactory* entity_factory,
+  void Initialize(fplbase::AssetManager* asset_manager,
+                  EntityFactory* entity_factory,
                   breadboard::GraphFactory* graph_factory,
-                  InputSystem* input_system, Renderer* renderer) {
+                  fplbase::InputSystem* input_system,
+                  fplbase::Renderer* renderer) {
     asset_manager_ = asset_manager;
     entity_factory_ = entity_factory;
     graph_factory_ = graph_factory;
@@ -48,15 +50,15 @@ class CommonServicesComponent : public entity::Component<CommonServicesData> {
     renderer_ = renderer;
   }
 
-  AssetManager* asset_manager() { return asset_manager_; }
+  fplbase::AssetManager* asset_manager() { return asset_manager_; }
   breadboard::GraphFactory* graph_factory() { return graph_factory_; }
-  InputSystem* input_system() { return input_system_; }
+  fplbase::InputSystem* input_system() { return input_system_; }
   EntityFactory* entity_factory() { return entity_factory_; }
-  Renderer* renderer() { return renderer_; }
+  fplbase::Renderer* renderer() { return renderer_; }
 
   // This component should never be added to an entity.  It is only provided
   // as an interface for other components to access common resources.
-  void AddFromRawData(entity::EntityRef& /*entity*/, const void* /*raw_data*/) {
+  void AddFromRawData(corgi::EntityRef& /*entity*/, const void* /*raw_data*/) {
     assert(false);
   }
 
@@ -65,18 +67,18 @@ class CommonServicesComponent : public entity::Component<CommonServicesData> {
   void set_export_force_defaults(bool b) { export_force_defaults_ = b; }
 
  private:
-  AssetManager* asset_manager_;
+  fplbase::AssetManager* asset_manager_;
   EntityFactory* entity_factory_;
   breadboard::GraphFactory* graph_factory_;
-  InputSystem* input_system_;
-  Renderer* renderer_;
+  fplbase::InputSystem* input_system_;
+  fplbase::Renderer* renderer_;
   bool export_force_defaults_;
 };
 
 }  // component_library
-}  // fpl
+}  // corgi
 
-FPL_ENTITY_REGISTER_COMPONENT(fpl::component_library::CommonServicesComponent,
-                              fpl::component_library::CommonServicesData)
+FPL_ENTITY_REGISTER_COMPONENT(corgi::component_library::CommonServicesComponent,
+                              corgi::component_library::CommonServicesData)
 
 #endif  // COMPONENT_LIBRARY_SERVICES_H_

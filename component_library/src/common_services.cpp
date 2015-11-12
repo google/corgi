@@ -14,5 +14,5 @@
 
 #include "component_library/common_services.h"
 
-FPL_ENTITY_DEFINE_COMPONENT(fpl::component_library::CommonServicesComponent,
-                            fpl::component_library::CommonServicesData)
+FPL_ENTITY_DEFINE_COMPONENT(corgi::component_library::CommonServicesComponent,
+                            corgi::component_library::CommonServicesData)

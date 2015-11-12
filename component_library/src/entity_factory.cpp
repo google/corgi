@@ -17,15 +17,18 @@
 #include "component_library/meta.h"
 #include "fplbase/utilities.h"
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 using component_library::MetaComponent;
 using component_library::MetaData;
+using corgi::MetaDef;
+using fplbase::LogError;
+using fplbase::LogInfo;
 
 bool EntityFactory::AddEntityLibrary(const char* entity_library_filename) {
   std::string* library_data = new std::string;
-  if (!LoadFile(entity_library_filename, library_data)) {
+  if (!fplbase::LoadFile(entity_library_filename, library_data)) {
     LogInfo("EntityFactory: Couldn't load entity library %s",
             entity_library_filename);
     delete library_data;
@@ -84,11 +87,11 @@ bool EntityFactory::WillBeKeptInMemory(const void* pointer) {
 }
 
 int EntityFactory::LoadEntitiesFromFile(const char* filename,
-                                        entity::EntityManager* entity_manager) {
+                                        corgi::EntityManager* entity_manager) {
   LogInfo("EntityFactory::LoadEntitiesFromFile: Reading %s", filename);
   if (loaded_files_.find(filename) == loaded_files_.end()) {
     std::string* data = new std::string();
-    if (!LoadFile(filename, data)) {
+    if (!fplbase::LoadFile(filename, data)) {
       LogInfo("EntityFactory::LoadEntitiesFromFile: Couldn't open file %s",
               filename);
       delete data;
@@ -97,7 +100,7 @@ int EntityFactory::LoadEntitiesFromFile(const char* filename,
     loaded_files_[filename].reset(data);
   }
 
-  std::vector<entity::EntityRef> entities_loaded;
+  std::vector<corgi::EntityRef> entities_loaded;
   int total = LoadEntityListFromMemory(loaded_files_[filename]->c_str(),
                                        entity_manager, &entities_loaded);
 
@@ -105,7 +108,7 @@ int EntityFactory::LoadEntitiesFromFile(const char* filename,
   // file.
   MetaComponent* meta_component = entity_manager->GetComponent<MetaComponent>();
   for (size_t i = 0; i < entities_loaded.size(); i++) {
-    entity::EntityRef& entity = entities_loaded[i];
+    corgi::EntityRef& entity = entities_loaded[i];
     // Track which source file this entity came from, so we can later output
     // it to the same file if we save it in the meta.
     if (meta_component != nullptr) {
@@ -119,8 +122,8 @@ int EntityFactory::LoadEntitiesFromFile(const char* filename,
 }
 
 int EntityFactory::LoadEntityListFromMemory(
-    const void* entity_list, entity::EntityManager* entity_manager,
-    std::vector<entity::EntityRef>* entities_loaded) {
+    const void* entity_list, corgi::EntityManager* entity_manager,
+    std::vector<corgi::EntityRef>* entities_loaded) {
   // First, if there are currently no entities loaded, it's safe to clear out
   // stale entity files.
   if (entity_manager->begin() == entity_manager->end()) {
@@ -136,7 +139,7 @@ int EntityFactory::LoadEntityListFromMemory(
   int total = 0;
   for (size_t i = 0; i < entities.size(); i++) {
     total++;
-    entity::EntityRef entity =
+    corgi::EntityRef entity =
         entity_manager->CreateEntityFromData(entities[i]);
     if (entity && entities_loaded != nullptr) {
       entities_loaded->push_back(entity);
@@ -155,8 +158,8 @@ void EntityFactory::OverrideCachedFile(const char* filename,
 }
 
 void EntityFactory::LoadEntityData(const void* def,
-                                   entity::EntityManager* entity_manager,
-                                   entity::EntityRef& entity,
+                                   corgi::EntityManager* entity_manager,
+                                   corgi::EntityRef& entity,
                                    bool is_prototype) {
   unsigned int meta_id = MetaComponent::GetComponentId();
   MetaComponent* meta_component = entity_manager->GetComponent<MetaComponent>();
@@ -183,7 +186,7 @@ void EntityFactory::LoadEntityData(const void* def,
     }
   }
 
-  std::set<entity::ComponentId> overridden_components;
+  std::set<corgi::ComponentId> overridden_components;
 
   for (size_t i = 0; i < components.size(); i++) {
     const void* component_data = components[i];
@@ -198,7 +201,7 @@ void EntityFactory::LoadEntityData(const void* def,
         meta_component->AddFromPrototypeData(
             entity, static_cast<const MetaDef*>(component_data));
       } else {
-        entity::ComponentInterface* component = entity_manager->GetComponent(i);
+        corgi::ComponentInterface* component = entity_manager->GetComponent(i);
         assert(component != nullptr);
         component->AddFromRawData(entity, component_data);
       }
@@ -225,19 +228,19 @@ void EntityFactory::LoadEntityData(const void* def,
 
 // Factory method for the entity manager, for converting data (in our case.
 // flatbuffer definitions) into entities and sticking them into the system.
-entity::EntityRef EntityFactory::CreateEntityFromData(
-    const void* data, entity::EntityManager* entity_manager) {
+corgi::EntityRef EntityFactory::CreateEntityFromData(
+    const void* data, corgi::EntityManager* entity_manager) {
   assert(data != nullptr);
   if (debug_entity_creation()) {
     LogInfo("EntityFactory::CreateEntityFromData: Creating entity...");
   }
-  entity::EntityRef entity = entity_manager->AllocateNewEntity();
+  corgi::EntityRef entity = entity_manager->AllocateNewEntity();
   LoadEntityData(data, entity_manager, entity, false);
   return entity;
 }
 
-entity::EntityRef EntityFactory::CreateEntityFromPrototype(
-    const char* prototype_name, entity::EntityManager* entity_manager) {
+corgi::EntityRef EntityFactory::CreateEntityFromPrototype(
+    const char* prototype_name, corgi::EntityManager* entity_manager) {
   if (prototype_requests_.find(prototype_name) == prototype_requests_.end()) {
     std::vector<uint8_t> prototype_request;
     if (CreatePrototypeRequest(prototype_name, &prototype_request)) {
@@ -249,29 +252,29 @@ entity::EntityRef EntityFactory::CreateEntityFromPrototype(
     } else {
       LogError("EntityFactory::CreatePrototypeRequest(%s) failed",
                prototype_name);
-      return entity::EntityRef();
+      return corgi::EntityRef();
     }
   }
-  std::vector<entity::EntityRef> entities_loaded;
+  std::vector<corgi::EntityRef> entities_loaded;
   LoadEntityListFromMemory(
       static_cast<const void*>(prototype_requests_[prototype_name].data()),
       entity_manager, &entities_loaded);
   if (entities_loaded.size() > 0)
     return entities_loaded[0];
   else
-    return entity::EntityRef();
+    return corgi::EntityRef();
 }
 
 bool EntityFactory::SerializeEntity(
-    entity::EntityRef& entity, entity::EntityManager* entity_manager,
+    corgi::EntityRef& entity, corgi::EntityManager* entity_manager,
     std::vector<uint8_t>* entity_serialized_output) {
   auto meta_component = entity_manager->GetComponent<MetaComponent>();
 
-  std::vector<entity::ComponentInterface::RawDataUniquePtr> exported_data;
+  std::vector<corgi::ComponentInterface::RawDataUniquePtr> exported_data;
   std::vector<const void*> exported_pointers;
 
   exported_pointers.resize(max_component_id() + 1, nullptr);
-  for (entity::ComponentId component_id = 0; component_id <= max_component_id();
+  for (corgi::ComponentId component_id = 0; component_id <= max_component_id();
        component_id++) {
     const MetaData* meta_data = meta_component->GetComponentData(entity);
     if (meta_data->components_from_prototype.find(component_id) ==
@@ -298,11 +301,11 @@ bool EntityFactory::SerializeEntityList(
   return CreateEntityList(entity_definition_pointers, entity_list_serialized);
 }
 
-void EntityFactory::SetComponentType(entity::ComponentId component_id,
+void EntityFactory::SetComponentType(corgi::ComponentId component_id,
                                      unsigned int data_type,
                                      const char* table_name) {
   if (data_type_to_component_id_.size() <= data_type)
-    data_type_to_component_id_.resize(data_type + 1, entity::kInvalidComponent);
+    data_type_to_component_id_.resize(data_type + 1, corgi::kInvalidComponent);
   data_type_to_component_id_[data_type] = component_id;
 
   if (component_id_to_data_type_.size() <= component_id)
@@ -326,7 +329,8 @@ void EntityFactory::SetComponentType(entity::ComponentId component_id,
 }
 
 void EntityFactory::SetFlatbufferSchema(const char* binary_schema_filename) {
-  if (!LoadFile(binary_schema_filename, &flatbuffer_binary_schema_data_)) {
+  if (!fplbase::LoadFile(binary_schema_filename,
+                         &flatbuffer_binary_schema_data_)) {
     LogInfo(
         "EntityFactory::SetFlatbufferSchema: Can't load binary schema file %s",
         binary_schema_filename);
@@ -334,4 +338,4 @@ void EntityFactory::SetFlatbufferSchema(const char* binary_schema_filename) {
 }
 
 }  // namespace component_library
-}  // namespace fpl
+}  // namespace corgi

@@ -25,7 +25,7 @@ namespace motive {
 class RigAnim;
 }
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 BREADBOARD_DECLARE_EVENT(kAnimationCompleteEventId)
@@ -103,14 +103,14 @@ struct AnimationData {
 ///
 /// @brief A Component that provides an elegant way to handle Entity animation
 /// by interacting with the Motive animation library.
-class AnimationComponent : public entity::Component<AnimationData> {
+class AnimationComponent : public Component<AnimationData> {
  public:
   /// @brief Updates all Motivators in the AnimationData, as well as, any other
   /// Motivators that were initialized with AnimationComponent's MotiveEngine.
   ///
-  /// @param[in] delta_time An entity::WorldTime representing the delta time
+  /// @param[in] delta_time An corgi::WorldTime representing the delta time
   /// since the last call to UpdateAllEntities.
-  virtual void UpdateAllEntities(entity::WorldTime delta_time);
+  virtual void UpdateAllEntities(corgi::WorldTime delta_time);
 
   /// @brief Deserialize a flat binary buffer to create and populate an Entity
   /// from raw data.
@@ -118,7 +118,7 @@ class AnimationComponent : public entity::Component<AnimationData> {
   /// @param[in,out] entity An EntityRef reference that points to an Entity that
   /// is being added from the raw data.
   /// @param[in] data A void pointer to the raw FlatBuffer data.
-  virtual void AddFromRawData(entity::EntityRef& entity, const void* data);
+  virtual void AddFromRawData(corgi::EntityRef& entity, const void* data);
 
   /// @brief Serializes an AnimationComponent's data for a given Entity.
   ///
@@ -127,7 +127,7 @@ class AnimationComponent : public entity::Component<AnimationData> {
   ///
   /// @return Returns a RawDataUniquePtr to the start of the raw data in a
   /// flat binary buffer.
-  virtual RawDataUniquePtr ExportRawData(const entity::EntityRef& entity) const;
+  virtual RawDataUniquePtr ExportRawData(const corgi::EntityRef& entity) const;
 
   /// @brief Begin playback of a given RigAnim on a given Entity.
   ///
@@ -139,7 +139,7 @@ class AnimationComponent : public entity::Component<AnimationData> {
   ///
   /// @param[in] anim A const motive::RigAnim reference to the animation that
   /// should be applied on `entity`.
-  void Animate(const entity::EntityRef& entity, const motive::RigAnim& anim);
+  void Animate(const corgi::EntityRef& entity, const motive::RigAnim& anim);
 
   /// @brief Query the AnimTable for an animation and then play it.
   ///
@@ -151,7 +151,7 @@ class AnimationComponent : public entity::Component<AnimationData> {
   /// @return Returns `true` if a new animation was successfully started.
   /// Otherwise, it returns `false` if the animation could not be found in
   /// the AnimTable.
-  bool AnimateFromTable(const entity::EntityRef& entity, int anim_idx);
+  bool AnimateFromTable(const corgi::EntityRef& entity, int anim_idx);
 
   /// @brief Check if a certain animation exists with a given index in the
   /// AnimTable for a given Entity.
@@ -164,7 +164,7 @@ class AnimationComponent : public entity::Component<AnimationData> {
   /// @return Returns `true` if the animation exists in the AnimTable with
   /// `anim_idx`. Returns `false` if the animation is not found in the
   /// AnimTable.
-  bool HasAnim(const entity::EntityRef& entity, int anim_idx) const {
+  bool HasAnim(const corgi::EntityRef& entity, int anim_idx) const {
     const AnimationData* data = Data<AnimationData>(entity);
     return anim_table_.Query(data->anim_table_object, anim_idx) != nullptr;
   }
@@ -178,7 +178,7 @@ class AnimationComponent : public entity::Component<AnimationData> {
   ///
   /// @return Returns the length of the animation, if it exists. Otherwise, it
   /// returns 0.
-  motive::MotiveTime AnimLength(const entity::EntityRef& entity,
+  motive::MotiveTime AnimLength(const corgi::EntityRef& entity,
                                 int anim_idx) const {
     const AnimationData* data = Data<AnimationData>(entity);
     const motive::RigAnim* anim = anim_table_.Query(data->anim_table_object,
@@ -194,7 +194,7 @@ class AnimationComponent : public entity::Component<AnimationData> {
   /// @return Returns the index of the last animation that was played via
   /// `AnimateFromTable()`, or returns -1 if no animation has ever been played
   /// using that function.
-  int LastAnimIdx(const entity::EntityRef& entity) const {
+  int LastAnimIdx(const corgi::EntityRef& entity) const {
     return Data<AnimationData>(entity)->last_anim_idx;
   }
 
@@ -229,7 +229,7 @@ class AnimationComponent : public entity::Component<AnimationData> {
 
  private:
   /// @brief Sets the motivator up for any of the animations on the `object`.
-  void InitializeMotivator(const entity::EntityRef& entity);
+  void InitializeMotivator(const corgi::EntityRef& entity);
 
   /// @var engine_
   ///
@@ -247,9 +247,9 @@ class AnimationComponent : public entity::Component<AnimationData> {
 };
 
 }  // component_library
-}  // fpl
+}  // corgi
 
-FPL_ENTITY_REGISTER_COMPONENT(fpl::component_library::AnimationComponent,
-                              fpl::component_library::AnimationData)
+FPL_ENTITY_REGISTER_COMPONENT(corgi::component_library::AnimationComponent,
+                              corgi::component_library::AnimationData)
 
 #endif  // COMPONENT_LIBRARY_ANIMATION_H_

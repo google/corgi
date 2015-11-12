@@ -17,7 +17,7 @@
 
 #include "mathfu/glsl_mappings.h"
 
-namespace fpl {
+namespace corgi {
 
 class CameraInterface {
   // An interface for 3D camera, allowing them to have position, facing, field
@@ -61,6 +61,6 @@ class CameraInterface {
   virtual void set_stereo(bool b) = 0;
 };
 
-}  // fpl
+}  // corgi
 
 #endif  // FPL_CAMERA_INTERFACE_H

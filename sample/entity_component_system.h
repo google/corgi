@@ -23,8 +23,7 @@
 #include "entity/component.h"
 #include "entity/entity_manager.h"
 
-namespace fpl {
-namespace entity {
+namespace corgi {
 namespace sample {
 
 // This is the Component data structure for the CounterComponent. It holds an
@@ -40,7 +39,7 @@ struct CounterComponentData {
 //
 // Every time the Component calls `UpdateAllEntities`, each Entity's counter
 // will be incremented.
-class CounterComponent : public entity::Component<CounterComponentData> {
+class CounterComponent : public corgi::Component<CounterComponentData> {
  public:
   // This function is not used in this sample. It is only implemented
   // as part of the `ComponentInterface`, which requires it as a pure,
@@ -69,7 +68,7 @@ struct ScreamingComponentData {
 // `WorldTime delta_time` since the last call. If `delta_time` is greater
 // than 10 milliseconds, each Entity registered with this component will output
 // its `battle_cry` via `printf()`.
-class ScreamingComponent : public entity::Component<ScreamingComponentData> {
+class ScreamingComponent : public corgi::Component<ScreamingComponentData> {
  public:
   // This function is not used in this sample. It is only implemented
   // as part of the `ComponentInterface`, which requires it as a pure,
@@ -83,18 +82,17 @@ class ScreamingComponent : public entity::Component<ScreamingComponentData> {
 };
 
 }  // namespace sample
-}  // namespace entity
-}  // namespace fpl
+}  // namespace corgi
 
 // Make sure you call `FPL_ENTITY_REGISTER_COMPONENT` in the header file
 // where you declare the Component and associated Component data struct. This
 // is required in order to declare the necessary constants for lookups.
 //
 // NOTE: Remember, this should be called outside of any namespaces!
-FPL_ENTITY_REGISTER_COMPONENT(fpl::entity::sample::CounterComponent,
-                              fpl::entity::sample::CounterComponentData)
+FPL_ENTITY_REGISTER_COMPONENT(corgi::sample::CounterComponent,
+                              corgi::sample::CounterComponentData)
 
-FPL_ENTITY_REGISTER_COMPONENT(fpl::entity::sample::ScreamingComponent,
-                              fpl::entity::sample::ScreamingComponentData)
+FPL_ENTITY_REGISTER_COMPONENT(corgi::sample::ScreamingComponent,
+                              corgi::sample::ScreamingComponentData)
 
 #endif  // ENTITY_SAMPLES_ENTITY_COMPONENT_SYSTEM_H_

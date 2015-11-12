@@ -14,7 +14,7 @@
 
 include "common.fbs";
 
-namespace fpl;
+namespace corgi;
 
 // Types that a physics rigid body can be.
 enum BulletCollisionType : short (bit_flags) {
@@ -33,11 +33,11 @@ table BulletSphereDef {
 }
 
 table BulletBoxDef {
-  half_extents:Vec3;
+  half_extents:fplbase.Vec3;
 }
 
 table BulletCylinderDef {
-  half_extents:Vec3;
+  half_extents:fplbase.Vec3;
 }
 
 table BulletCapsuleDef {
@@ -51,7 +51,7 @@ table BulletConeDef {
 }
 
 table BulletStaticPlaneDef {
-  normal:Vec3;
+  normal:fplbase.Vec3;
   constant:float;
 }
 
@@ -67,7 +67,7 @@ union BulletShapeUnion {
 
 table BulletShapeDef {
   data:BulletShapeUnion;
-  offset:Vec3;
+  offset:fplbase.Vec3;
   mass:float = 1;
   restitution:float;
   collision_type:BulletCollisionType;

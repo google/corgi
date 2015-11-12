@@ -20,16 +20,16 @@
 #include "component_library/common_services.h"
 #include "library_components_generated.h"
 
-FPL_ENTITY_DEFINE_COMPONENT(fpl::component_library::GraphComponent,
-                            fpl::component_library::GraphData)
+FPL_ENTITY_DEFINE_COMPONENT(corgi::component_library::GraphComponent,
+                            corgi::component_library::GraphData)
 
-BREADBOARD_DEFINE_EVENT(fpl::component_library::kAdvanceFrameEventId)
+BREADBOARD_DEFINE_EVENT(corgi::component_library::kAdvanceFrameEventId)
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 breadboard::NodeEventBroadcaster* GraphComponent::GetCreateBroadcaster(
-    entity::EntityRef entity) {
+    corgi::EntityRef entity) {
   auto graph_data = Data<GraphData>(entity);
   if (!graph_data) {
     graph_data = AddEntity(entity);
@@ -43,10 +43,10 @@ void GraphComponent::Init() {
   graph_factory_ = common_services_component->graph_factory();
 }
 
-void GraphComponent::AddFromRawData(entity::EntityRef& entity,
+void GraphComponent::AddFromRawData(corgi::EntityRef& entity,
                                     const void* raw_data) {
   GraphData* graph_data = AddEntity(entity);
-  auto graph_def = static_cast<const GraphDef*>(raw_data);
+  auto graph_def = static_cast<const corgi::GraphDef*>(raw_data);
   auto filename_list = graph_def->filename_list();
   graph_data->graphs.clear();
   if (filename_list) {
@@ -59,7 +59,7 @@ void GraphComponent::AddFromRawData(entity::EntityRef& entity,
   }
 }
 
-void GraphComponent::EntityPostLoadFixup(entity::EntityRef& entity) {
+void GraphComponent::EntityPostLoadFixup(corgi::EntityRef& entity) {
   graph_entity_ = entity;
   GraphData* graph_data = Data<GraphData>(entity);
   if (graph_data) {
@@ -81,8 +81,8 @@ void GraphComponent::PostLoadFixup() {
   }
 }
 
-entity::ComponentInterface::RawDataUniquePtr GraphComponent::ExportRawData(
-    const entity::EntityRef& entity) const {
+corgi::ComponentInterface::RawDataUniquePtr GraphComponent::ExportRawData(
+    const corgi::EntityRef& entity) const {
   const GraphData* data = GetComponentData(entity);
   if (data == nullptr) return nullptr;
 
@@ -92,7 +92,7 @@ entity::ComponentInterface::RawDataUniquePtr GraphComponent::ExportRawData(
     filenames_vector.push_back(fbb.CreateString(iter->filename));
   }
   auto filenames_vector_fb = fbb.CreateVector(filenames_vector);
-  GraphDefBuilder builder(fbb);
+  corgi::GraphDefBuilder builder(fbb);
   if (filenames_vector.size() > 0) {
     builder.add_filename_list(filenames_vector_fb);
   }
@@ -100,10 +100,10 @@ entity::ComponentInterface::RawDataUniquePtr GraphComponent::ExportRawData(
   return fbb.ReleaseBufferPointer();
 }
 
-void GraphComponent::UpdateAllEntities(entity::WorldTime /*delta_time*/) {
+void GraphComponent::UpdateAllEntities(corgi::WorldTime /*delta_time*/) {
   advance_frame_broadcaster_.BroadcastEvent(
-      fpl::component_library::kAdvanceFrameEventId);
+      corgi::component_library::kAdvanceFrameEventId);
 }
 
 }  // fpl_project
-}  // fpl
+}  // corgi

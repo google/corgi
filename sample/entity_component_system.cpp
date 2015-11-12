@@ -20,14 +20,13 @@
 // Component type and data type.
 //
 // NOTE: Calls to this function should happen outside of any namespaces!
-FPL_ENTITY_DEFINE_COMPONENT(fpl::entity::sample::CounterComponent,
-                            fpl::entity::sample::CounterComponentData)
+FPL_ENTITY_DEFINE_COMPONENT(corgi::sample::CounterComponent,
+                            corgi::sample::CounterComponentData)
 
-FPL_ENTITY_DEFINE_COMPONENT(fpl::entity::sample::ScreamingComponent,
-                            fpl::entity::sample::ScreamingComponentData)
+FPL_ENTITY_DEFINE_COMPONENT(corgi::sample::ScreamingComponent,
+                            corgi::sample::ScreamingComponentData)
 
-namespace fpl {
-namespace entity {
+namespace corgi {
 namespace sample {
 
 void CounterComponent::UpdateAllEntities(WorldTime /*delta_time*/) {
@@ -51,16 +50,15 @@ void ScreamingComponent::UpdateAllEntities(WorldTime delta_time) {
 }
 
 }  // namespace sample
-}  // namespace entity
-}  // namespace fpl
+}  // namespace corgi
 
 int main() {
-  using fpl::entity::EntityManager;
-  using fpl::entity::EntityRef;
-  using fpl::entity::sample::CounterComponent;
-  using fpl::entity::sample::CounterComponentData;
-  using fpl::entity::sample::ScreamingComponent;
-  using fpl::entity::sample::ScreamingComponentData;
+  using corgi::EntityManager;
+  using corgi::EntityRef;
+  using corgi::sample::CounterComponent;
+  using corgi::sample::CounterComponentData;
+  using corgi::sample::ScreamingComponent;
+  using corgi::sample::ScreamingComponentData;
 
   // Create the EntityManager and all of the Components.
   EntityManager entity_manager;

@@ -21,7 +21,7 @@
 #include "entity/component.h"
 #include "library_components_generated.h"
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 struct MetaData {
@@ -31,40 +31,41 @@ struct MetaData {
   std::string source_file;
   std::string comment;
   // Keep track of which of this entity's components came from the prototype.
-  std::set<entity::ComponentId> components_from_prototype;
+  std::set<corgi::ComponentId> components_from_prototype;
 };
 
-class MetaComponent : public entity::Component<MetaData> {
+class MetaComponent : public corgi::Component<MetaData> {
  public:
-  virtual void AddFromRawData(entity::EntityRef& entity, const void* raw_data);
-  void AddFromPrototypeData(entity::EntityRef& entity, const MetaDef* meta_def);
-  void AddWithSourceFile(entity::EntityRef& entity,
+  virtual void AddFromRawData(corgi::EntityRef& entity, const void* raw_data);
+  void AddFromPrototypeData(corgi::EntityRef& entity,
+                            const corgi::MetaDef* meta_def);
+  void AddWithSourceFile(corgi::EntityRef& entity,
                          const std::string& source_file);
-  virtual RawDataUniquePtr ExportRawData(const entity::EntityRef& entity) const;
+  virtual RawDataUniquePtr ExportRawData(const corgi::EntityRef& entity) const;
 
-  virtual void InitEntity(entity::EntityRef& entity);
-  virtual void CleanupEntity(entity::EntityRef& entity);
-  virtual void UpdateAllEntities(entity::WorldTime /*delta_time*/) {}
+  virtual void InitEntity(corgi::EntityRef& entity);
+  virtual void CleanupEntity(corgi::EntityRef& entity);
+  virtual void UpdateAllEntities(corgi::WorldTime /*delta_time*/) {}
 
-  const std::string& GetEntityID(const entity::EntityRef& entity);
+  const std::string& GetEntityID(const corgi::EntityRef& entity);
 
   // Non-const because if we find an invalid entity, it gets silently removed.
-  entity::EntityRef GetEntityFromDictionary(const std::string& key);
+  corgi::EntityRef GetEntityFromDictionary(const std::string& key);
 
  private:
   void AddEntityToDictionary(const std::string& key,
-                             const entity::EntityRef& entity);
+                             const corgi::EntityRef& entity);
   void RemoveEntityFromDictionary(const std::string& key);
   void GenerateRandomEntityID(std::string* output);
 
-  std::unordered_map<std::string, entity::EntityRef> entity_dictionary_;
+  std::unordered_map<std::string, corgi::EntityRef> entity_dictionary_;
   std::string empty_string;
 };
 
 }  // namespace component_library
-}  // namespace fpl
+}  // namespace corgi
 
-FPL_ENTITY_REGISTER_COMPONENT(fpl::component_library::MetaComponent,
-                              fpl::component_library::MetaData)
+FPL_ENTITY_REGISTER_COMPONENT(corgi::component_library::MetaComponent,
+                              corgi::component_library::MetaData)
 
 #endif  // COMPONENT_LIBRARY_META_H_

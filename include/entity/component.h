@@ -22,8 +22,7 @@
 #include "entity/entity_manager.h"
 #include "entity/vector_pool.h"
 
-namespace fpl {
-namespace entity {
+namespace corgi {
 
 /// @file
 /// @class Component
@@ -454,7 +453,6 @@ class Component : public ComponentInterface {
   EntityManager* entity_manager_;
 };
 
-}  // entity
-}  // fpl
+}  // corgi
 
 #endif  // FPL_COMPONENT_H_

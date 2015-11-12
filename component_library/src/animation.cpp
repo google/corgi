@@ -20,17 +20,17 @@
 #include "motive/anim.h"
 #include "motive/init.h"
 
-FPL_ENTITY_DEFINE_COMPONENT(fpl::component_library::AnimationComponent,
-                            fpl::component_library::AnimationData)
+FPL_ENTITY_DEFINE_COMPONENT(corgi::component_library::AnimationComponent,
+                            corgi::component_library::AnimationData)
 
-BREADBOARD_DEFINE_EVENT(fpl::component_library::kAnimationCompleteEventId)
+BREADBOARD_DEFINE_EVENT(corgi::component_library::kAnimationCompleteEventId)
 
-using fpl::entity::EntityRef;
+using corgi::EntityRef;
 using motive::MotiveTime;
 using motive::RigAnim;
 using motive::RigInit;
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 // TODO: Make these configurable per call, instead of const in the anim.
@@ -38,7 +38,7 @@ static const float kAnimStartTime = 0.0f;
 static const float kAnimPlaybackRate = 1.0f;
 static const float kAnimBlendTime = 200.0f;
 
-void AnimationComponent::UpdateAllEntities(entity::WorldTime delta_time) {
+void AnimationComponent::UpdateAllEntities(corgi::WorldTime delta_time) {
   // Pre-update loop.
   for (auto iter = component_data_.begin(); iter != component_data_.end();
        ++iter) {
@@ -46,11 +46,13 @@ void AnimationComponent::UpdateAllEntities(entity::WorldTime delta_time) {
     if (animation_data->motivator.Valid()) {
       // Log debug info. Only log the header the first time.
       if (animation_data->debug_state == kAnimationDebug_OutputHeaderAndState) {
-        LogInfo(animation_data->motivator.CsvHeaderForDebugging().c_str());
+        fplbase::LogInfo(
+              animation_data->motivator.CsvHeaderForDebugging().c_str());
         animation_data->debug_state = kAnimationDebug_OutputState;
       }
       if (animation_data->debug_state != kAnimationDebug_Inactive) {
-        LogInfo(animation_data->motivator.CsvValuesForDebugging().c_str());
+        fplbase::LogInfo(
+              animation_data->motivator.CsvValuesForDebugging().c_str());
       }
     }
   }
@@ -75,9 +77,9 @@ void AnimationComponent::UpdateAllEntities(entity::WorldTime delta_time) {
   }
 }
 
-void AnimationComponent::AddFromRawData(entity::EntityRef& entity,
+void AnimationComponent::AddFromRawData(corgi::EntityRef& entity,
                                         const void* raw_data) {
-  auto animation_def = static_cast<const AnimationDef*>(raw_data);
+  auto animation_def = static_cast<const corgi::AnimationDef*>(raw_data);
   AnimationData* animation_data = AddEntity(entity);
   animation_data->anim_table_object = animation_def->anim_table_object();
   animation_data->debug_state =
@@ -86,8 +88,8 @@ void AnimationComponent::AddFromRawData(entity::EntityRef& entity,
   AnimateFromTable(entity, animation_def->anim_table_start_idx());
 }
 
-entity::ComponentInterface::RawDataUniquePtr AnimationComponent::ExportRawData(
-    const entity::EntityRef& entity) const {
+corgi::ComponentInterface::RawDataUniquePtr AnimationComponent::ExportRawData(
+    const corgi::EntityRef& entity) const {
   const AnimationData* animation_data = GetComponentData(entity);
   if (animation_data == nullptr) return nullptr;
 
@@ -114,7 +116,7 @@ void AnimationComponent::InitializeMotivator(const EntityRef& entity) {
 
   // Initialize the RigMotivator to animate the `mesh` according to
   // `defining_anim`.
-  const Mesh* mesh = render_data->mesh;
+  auto mesh = render_data->mesh;
   const RigInit init(defining_anim, mesh->bone_transforms(),
                      mesh->bone_parents(), mesh->num_bones());
   data->motivator.Initialize(init, &engine_);
@@ -122,7 +124,7 @@ void AnimationComponent::InitializeMotivator(const EntityRef& entity) {
 
 void AnimationComponent::Animate(const EntityRef& entity, const RigAnim& anim) {
   AnimationData* data = Data<AnimationData>(entity);
-  fpl::SplinePlayback playback(kAnimStartTime, anim.repeat(), kAnimPlaybackRate,
+  motive::SplinePlayback playback(kAnimStartTime, anim.repeat(), kAnimPlaybackRate,
                                kAnimBlendTime);
 
   // We initialize the rig motivator only once, using the defining_anim so that
@@ -137,7 +139,7 @@ void AnimationComponent::Animate(const EntityRef& entity, const RigAnim& anim) {
   data->motivator.BlendToAnim(anim, playback);
 }
 
-bool AnimationComponent::AnimateFromTable(const entity::EntityRef& entity,
+bool AnimationComponent::AnimateFromTable(const corgi::EntityRef& entity,
                                           int anim_idx) {
   AnimationData* data = Data<AnimationData>(entity);
   const motive::RigAnim* anim =
@@ -150,4 +152,4 @@ bool AnimationComponent::AnimateFromTable(const entity::EntityRef& entity,
 }
 
 }  // component_library
-}  // fpl
+}  // corgi

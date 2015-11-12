@@ -16,8 +16,7 @@
 #include "entity/component_id_lookup.h"
 #include "entity/entity_manager.h"
 
-namespace fpl {
-namespace entity {
+namespace corgi {
 
 EntityManager::EntityManager()
     : entity_factory_(nullptr), max_component_id_(kInvalidComponent) {
@@ -122,5 +121,4 @@ EntityRef EntityManager::CreateEntityFromData(const void* data) {
   return entity_factory_->CreateEntityFromData(data, this);
 }
 
-}  // entity
-}  // fpl
+}  // corgi

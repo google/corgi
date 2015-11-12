@@ -27,7 +27,7 @@
 #include "mathfu/glsl_mappings.h"
 #include "mathfu/matrix_4x4.h"
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 // Data for scene object components.
@@ -71,8 +71,8 @@ struct RenderMeshData {
     return *this;
   }
 
-  Mesh* mesh;
-  Shader* shader;
+  fplbase::Mesh* mesh;
+  fplbase::Shader* shader;
   mathfu::vec4 tint;
   std::string mesh_filename;
   std::string shader_filename;
@@ -92,9 +92,9 @@ struct RenderMeshData {
 
 // Struct used for keeping track of and sorting our render lists:
 struct RenderlistEntry {
-  RenderlistEntry(entity::EntityRef entity_, RenderMeshData* data_)
+  RenderlistEntry(EntityRef entity_, RenderMeshData* data_)
       : entity(entity_), data(data_) {}
-  entity::EntityRef entity;
+  EntityRef entity;
   RenderMeshData* data;
 
   bool operator<(const RenderlistEntry& other) const {
@@ -106,7 +106,7 @@ struct RenderlistEntry {
   }
 };
 
-class RenderMeshComponent : public entity::Component<RenderMeshData> {
+class RenderMeshComponent : public Component<RenderMeshData> {
  public:
   static const int kDefaultCullDist = 80;
 
@@ -115,13 +115,13 @@ class RenderMeshComponent : public entity::Component<RenderMeshData> {
         culling_distance_squared_(kDefaultCullDist * kDefaultCullDist) {}
 
   virtual void Init();
-  virtual void AddFromRawData(entity::EntityRef& entity, const void* raw_data);
-  virtual RawDataUniquePtr ExportRawData(const entity::EntityRef& entity) const;
+  virtual void AddFromRawData(EntityRef& entity, const void* raw_data);
+  virtual RawDataUniquePtr ExportRawData(const EntityRef& entity) const;
 
-  virtual void InitEntity(entity::EntityRef& /*entity*/);
+  virtual void InitEntity(EntityRef& /*entity*/);
 
   // Nothing really happens per-update to these things.
-  virtual void UpdateAllEntities(entity::WorldTime /*delta_time*/) {}
+  virtual void UpdateAllEntities(WorldTime /*delta_time*/) {}
 
   // Prepares to do rendering.  (Must be called before any RenderPass calls.)
   // Pregenerates the draw lists, sorted by z-depth, and applies frustrum
@@ -134,19 +134,21 @@ class RenderMeshComponent : public entity::Component<RenderMeshData> {
   // (if provided) overrides the mesh-specified shader, and instead renders
   // the entire pass with override_shader.
   void RenderPass(int pass_id, const CameraInterface& camera,
-                  Renderer& renderer);
+                  fplbase::Renderer& renderer);
   void RenderPass(int pass_id, const CameraInterface& camera,
-                  Renderer& renderer, const Shader* shader_override);
+                  fplbase::Renderer& renderer,
+                  const fplbase::Shader* shader_override);
 
   // Goes through and renders every entity that is visible from the camera,
   // in pass order.  Is equivalent to iterating through all of the passes
   // and calling RenderPass on each one.
   // Important!  You must have called RenderPrep first, in order to
   // pre-populate the lists of things visible from the camera!
-  void RenderAllEntities(Renderer& renderer, const CameraInterface& camera);
+  void RenderAllEntities(fplbase::Renderer& renderer,
+                         const CameraInterface& camera);
 
   // Recursively sets the hidden-ness of the entity and all children.
-  void SetVisibilityRecursively(const entity::EntityRef& entity, bool visible);
+  void SetVisibilityRecursively(const EntityRef& entity, bool visible);
 
   // Get and set the light position.  This is a special uniform that is sent
   // to all shaders without having to declare it explicitly in the
@@ -171,7 +173,7 @@ class RenderMeshComponent : public entity::Component<RenderMeshData> {
   // intensity, color, etc.  (Low priority - none of our shaders support
   // these.)
   mathfu::vec3 light_position_;
-  AssetManager* asset_manager_;
+  fplbase::AssetManager* asset_manager_;
   float culling_distance_squared_;
   // An array of vectors we use for keeping track of things we're going
   // to render.
@@ -179,9 +181,9 @@ class RenderMeshComponent : public entity::Component<RenderMeshData> {
 };
 
 }  // component_library
-}  // fpl
+}  // corgi
 
-FPL_ENTITY_REGISTER_COMPONENT(fpl::component_library::RenderMeshComponent,
-                              fpl::component_library::RenderMeshData)
+FPL_ENTITY_REGISTER_COMPONENT(corgi::component_library::RenderMeshComponent,
+                              corgi::component_library::RenderMeshData)
 
 #endif  // COMPONENT_LIBRARY_RENDERMESH_H_

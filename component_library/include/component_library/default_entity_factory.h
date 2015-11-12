@@ -24,7 +24,7 @@
 #include "flatbuffers/flatbuffers.h"
 #include "fplbase/utilities.h"
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 class DefaultEntityFactory : public component_library::EntityFactory {
@@ -46,6 +46,6 @@ class DefaultEntityFactory : public component_library::EntityFactory {
 };
 
 }  // namespace component_library
-}  // namespace fpl
+}  // namespace corgi
 
 #endif  // DEFAULT_ENTITY_FACTORY_H_

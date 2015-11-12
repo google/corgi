@@ -17,8 +17,7 @@
 
 #include "entity/entity_common.h"
 
-namespace fpl {
-namespace entity {
+namespace corgi {
 
 /// @file
 /// @class Entity
@@ -90,6 +89,5 @@ class Entity {
   bool marked_for_deletion_;
 };
 
-}  // entity
-}  // fpl
+}  // corgi
 #endif  // FPL_ENTITY_H_

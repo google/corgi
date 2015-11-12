@@ -23,13 +23,13 @@
 #include "flatbuffers/flatbuffers.h"
 #include "library_components_generated.h"
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 // An EntityFactory that builds entities based on prototypes, using FlatBuffers
 // to specify the raw data for entities.
 
-class EntityFactory : public entity::EntityFactoryInterface {
+class EntityFactory : public corgi::EntityFactoryInterface {
  public:
   // Equivalent to the "*_NONE" value of the Flatbuffer union enum.
   static const unsigned int kDataTypeNone = 0;
@@ -39,7 +39,7 @@ class EntityFactory : public entity::EntityFactoryInterface {
   static const int kErrorLoadingEntities = -1;
 
   EntityFactory()
-      : max_component_id_(entity::kInvalidComponent),
+      : max_component_id_(corgi::kInvalidComponent),
         debug_entity_creation_(false) {}
 
   // Add a file from which you can then load entity prototype definitions.
@@ -54,7 +54,7 @@ class EntityFactory : public entity::EntityFactoryInterface {
   // Returns the number of entities loaded, or kErrorLoadingEntities if there
   // was an error.
   virtual int LoadEntitiesFromFile(const char* filename,
-                                   entity::EntityManager* entity_manager);
+                                   corgi::EntityManager* entity_manager);
 
   // Load a list of entities from an in-memory buffer.
   // This is what LoadEntitiesFromFile calls to do the heavy lifting.
@@ -63,8 +63,8 @@ class EntityFactory : public entity::EntityFactoryInterface {
   // Returns the number of entities loaded, or kErrorLoadingEntities if there
   // was an error.
   int LoadEntityListFromMemory(const void* raw_entity_list,
-                               entity::EntityManager* entity_manager,
-                               std::vector<entity::EntityRef>* entities_loaded);
+                               corgi::EntityManager* entity_manager,
+                               std::vector<corgi::EntityRef>* entities_loaded);
 
   // Override a cached file with data from memory; this will persist until exit.
   void OverrideCachedFile(const char* filename,
@@ -72,41 +72,41 @@ class EntityFactory : public entity::EntityFactoryInterface {
 
   // Initialize an entity from an entity definition. This is what
   // LoadRawEntityList calls for each entity definition.
-  entity::EntityRef CreateEntityFromData(const void* data,
-                                         entity::EntityManager* entity_manager);
+  corgi::EntityRef CreateEntityFromData(const void* data,
+                                         corgi::EntityManager* entity_manager);
 
   // Initialize an entity by prototype name.
-  virtual entity::EntityRef CreateEntityFromPrototype(
-      const char* prototype_name, entity::EntityManager* entity_manager);
+  virtual corgi::EntityRef CreateEntityFromPrototype(
+      const char* prototype_name, corgi::EntityManager* entity_manager);
 
   // When you register each component to the entity system, it will get
   // a component ID. This factory needs to know the component ID assigned
   // for each component data type (the data_type() in the flatbuffer union).
-  void SetComponentType(entity::ComponentId component_id,
+  void SetComponentType(corgi::ComponentId component_id,
                         unsigned int data_type, const char* table_name);
 
   // Get the component for a given data type specifier.
-  entity::ComponentId DataTypeToComponentId(unsigned int data_type) {
+  corgi::ComponentId DataTypeToComponentId(unsigned int data_type) {
     if (data_type >= data_type_to_component_id_.size())
-      return entity::kInvalidComponent;
+      return corgi::kInvalidComponent;
     return data_type_to_component_id_[data_type];
   }
   // Get the data type specifier for a given component.
-  unsigned int ComponentIdToDataType(entity::ComponentId component_id) {
+  unsigned int ComponentIdToDataType(corgi::ComponentId component_id) {
     if (component_id >= component_id_to_data_type_.size()) return kDataTypeNone;
     return component_id_to_data_type_[component_id];
   }
 
   // Get the data type specifier for a given component.
-  const char* ComponentIdToTableName(entity::ComponentId component_id) {
+  const char* ComponentIdToTableName(corgi::ComponentId component_id) {
     if (component_id >= component_id_to_table_name_.size()) return "";
     return component_id_to_table_name_[component_id].c_str();
   }
 
   // Serialize an entity into whatever binary type you are using for them.
   // Calls CreateEntityDefinition(), which you implement, to do the work.
-  virtual bool SerializeEntity(entity::EntityRef& entity,
-                               entity::EntityManager* entity_manager,
+  virtual bool SerializeEntity(corgi::EntityRef& entity,
+                               corgi::EntityManager* entity_manager,
                                std::vector<uint8_t>* entity_serialized_output);
 
   // After you call SerializeEntity on a few entities, you'll probably want
@@ -116,7 +116,7 @@ class EntityFactory : public entity::EntityFactoryInterface {
       const std::vector<std::vector<uint8_t>>& entity_definitions,
       std::vector<uint8_t>* entity_list_serialized);
 
-  entity::ComponentId max_component_id() { return max_component_id_; }
+  corgi::ComponentId max_component_id() { return max_component_id_; }
 
   bool debug_entity_creation() const { return debug_entity_creation_; }
   void set_debug_entity_creation(bool b) { debug_entity_creation_ = b; }
@@ -176,8 +176,8 @@ class EntityFactory : public entity::EntityFactoryInterface {
   //
   // You MAY override this if you want to change the way prototyping works.
   virtual void LoadEntityData(const void* def,
-                              entity::EntityManager* entity_manager,
-                              entity::EntityRef& entity, bool is_prototype);
+                              corgi::EntityManager* entity_manager,
+                              corgi::EntityRef& entity, bool is_prototype);
 
   // This factory and its subclasses need to know how to parse the entity
   // flatbuffers using reflection.
@@ -210,20 +210,20 @@ class EntityFactory : public entity::EntityFactoryInterface {
   std::unordered_map<std::string, std::vector<uint8_t>> prototype_requests_;
 
   // Look up ComponentId from data type, and vice versa.
-  std::vector<entity::ComponentId> data_type_to_component_id_;
+  std::vector<corgi::ComponentId> data_type_to_component_id_;
   std::vector<unsigned int> component_id_to_data_type_;
 
   // Look up the table name from the data type.
   std::vector<std::string> component_id_to_table_name_;
 
   // The highest component ID we've seen registered.
-  entity::ComponentId max_component_id_;
+  corgi::ComponentId max_component_id_;
 
   // Enable debug output for initializing entities.
   bool debug_entity_creation_;
 };
 
 }  // namespace component_library
-}  // namespace fpl
+}  // namespace corgi
 
 #endif  // ENTITY_FACTORY_H_

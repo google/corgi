@@ -85,7 +85,7 @@
 #include "component_library/default_entity_factory.h"
 #include "flatbuffers/reflection.h"
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 using FACTORY_TYPE_NAMESPACE::ComponentDataUnion;
@@ -111,11 +111,12 @@ bool DefaultEntityFactory::ReadEntityDefinition(
   component_defs->resize(max_component_id() + 1, nullptr);
   for (size_t i = 0; i < def->component_list()->size(); i++) {
     const ComponentDefInstance* component_def = def->component_list()->Get(i);
-    entity::ComponentId component_id =
+    corgi::ComponentId component_id =
         DataTypeToComponentId(component_def->data_type());
-    if (component_id == entity::kInvalidComponent) {
-      LogError("ReadEntityDefinition: Error, unknown component data type %d\n",
-               component_def->data_type());
+    if (component_id == corgi::kInvalidComponent) {
+      fplbase::LogError(
+        "ReadEntityDefinition: Error, unknown component data type %d\n",
+        component_def->data_type());
       return false;
     }
     (*component_defs)[component_id] = component_def->data();
@@ -129,11 +130,11 @@ bool DefaultEntityFactory::CreatePrototypeRequest(
   // for future use.
   flatbuffers::FlatBufferBuilder fbb;
   auto prototype = fbb.CreateString(prototype_name);
-  MetaDefBuilder builder(fbb);
+  corgi::MetaDefBuilder builder(fbb);
   builder.add_prototype(prototype);
   auto component = CreateComponentDefInstance(
       fbb, ComponentDataUnion(ComponentIdToDataType(
-               ::fpl::component_library::MetaComponent::GetComponentId())),
+               ::corgi::component_library::MetaComponent::GetComponentId())),
       builder.Finish().Union());
   std::vector<flatbuffers::Offset<ComponentDefInstance>> component_vec;
   component_vec.push_back(component);
@@ -159,19 +160,20 @@ bool DefaultEntityFactory::CreateEntityDefinition(
   // component ID to get the table type to copy, and to set the union data type
   // to the correct value.
   if (flatbuffer_binary_schema_data() == "") {
-    LogError("CreateEntityDefinition: No schema loaded, can't CopyTable");
+    fplbase::LogError(
+      "CreateEntityDefinition: No schema loaded, can't CopyTable");
     return false;
   }
   auto schema = reflection::GetSchema(flatbuffer_binary_schema_data().c_str());
   if (schema == nullptr) {
-    LogError(
+    fplbase::LogError(
         "CreateEntityDefinition: GetSchema() failed, is it a binary schema?");
     return false;
   }
 
   flatbuffers::FlatBufferBuilder fbb;
   std::vector<flatbuffers::Offset<ComponentDefInstance>> component_list;
-  for (entity::ComponentId i = 0; i <= max_component_id(); i++) {
+  for (corgi::ComponentId i = 0; i <= max_component_id(); i++) {
     // For each non-null component ID, create a ComponentDefInstance and copy
     // the data for that component in, using reflection.
     if (component_data[i] != nullptr) {
@@ -187,7 +189,7 @@ bool DefaultEntityFactory::CreateEntityDefinition(
                                    *flatbuffers::GetAnyRoot(raw_data))
                 .o));
       } else {
-        LogError(
+        fplbase::LogError(
             "CreateEntityDefinition: Unknown table for component %d with data "
             "type %d: '%s'",
             i, data_type, table_name);
@@ -208,17 +210,18 @@ bool DefaultEntityFactory::CreateEntityList(
   // EntityListDef. Similar to CreateEntityDefinition, this function uses
   // flatbuffers deep copy to put the entity definitions in the new flatbuffer.
   if (flatbuffer_binary_schema_data() == "") {
-    LogError("CreateEntityList: No schema loaded, can't CopyTable");
+    fplbase::LogError("CreateEntityList: No schema loaded, can't CopyTable");
     return false;
   }
   auto schema = reflection::GetSchema(flatbuffer_binary_schema_data().c_str());
   if (schema == nullptr) {
-    LogError("CreateEntityList: GetSchema() failed, is it a binary schema?");
+    fplbase::LogError(
+      "CreateEntityList: GetSchema() failed, is it a binary schema?");
     return false;
   }
   auto table_def = schema->objects()->LookupByKey("EntityDef");
   if (table_def == nullptr) {
-    LogError("CreateEntityList: Can't look up EntityDef");
+    fplbase::LogError("CreateEntityList: Can't look up EntityDef");
     return false;
   }
   flatbuffers::FlatBufferBuilder fbb;
@@ -241,4 +244,4 @@ bool DefaultEntityFactory::CreateEntityList(
 }
 
 }  // namespace component_library
-}  // namespace fpl
+}  // namespace corgi

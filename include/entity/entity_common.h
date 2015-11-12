@@ -18,8 +18,7 @@
 #ifndef FPL_ENTITY_COMMON_H_
 #define FPL_ENTITY_COMMON_H_
 
-namespace fpl {
-namespace entity {
+namespace corgi {
 
 /// @file
 /// @def FPL_ENTITY_MAX_COMPONENT_COUNT
@@ -87,6 +86,5 @@ typedef uint16_t ComponentIndex;
 static const ComponentIndex kUnusedComponentIndex =
     static_cast<ComponentIndex>(-1);
 
-}  // entity
-}  // fpl
+}  // corgi
 #endif  // FPL_ENTITY_COMMON_H_

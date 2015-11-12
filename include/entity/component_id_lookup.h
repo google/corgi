@@ -17,8 +17,7 @@
 
 #include "entity/entity_common.h"
 
-namespace fpl {
-namespace entity {
+namespace corgi {
 
 /// @file
 /// @struct ComponentIdLookup
@@ -69,13 +68,11 @@ struct ComponentIdLookup {};
 /// @param DataType The name of the struct that holds the Component data.
 /// (i.e. The type that the Component was specialized for.)
 #define FPL_ENTITY_REGISTER_COMPONENT_ID_LOOKUP(DataType) \
-  namespace fpl {                                         \
-  namespace entity {                                      \
+  namespace corgi {                                       \
   template <>                                             \
   struct ComponentIdLookup<DataType> {                    \
     static ComponentId component_id;                      \
   };                                                      \
-  }                                                       \
   }
 
 /// @def FPL_ENTITY_DEFINE_COMPONENT_ID_LOOKUP(DataType)
@@ -86,11 +83,8 @@ struct ComponentIdLookup {};
 /// @param DataType The name of the struct that holds the Component data.
 /// (i.e. The type that the Component was specialized for.)
 #define FPL_ENTITY_DEFINE_COMPONENT_ID_LOOKUP(DataType)                      \
-  namespace fpl {                                                            \
-  namespace entity {                                                         \
+  namespace corgi {                                                          \
   ComponentId ComponentIdLookup<DataType>::component_id = kInvalidComponent; \
-  }                                                                          \
   }
-}  // entity
-}  // fpl
+}  // corgi
 #endif  // FPL_COMPONENT_ID_LOOKUP_H_

@@ -20,10 +20,10 @@
 #include "component_library/common_services.h"
 #include "fplbase/utilities.h"
 
-FPL_ENTITY_DEFINE_COMPONENT(fpl::component_library::TransformComponent,
-                            fpl::component_library::TransformData)
+FPL_ENTITY_DEFINE_COMPONENT(corgi::component_library::TransformComponent,
+                            corgi::component_library::TransformData)
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
 static const float kDegreesToRadians = static_cast<float>(M_PI) / 180.0f;
@@ -37,7 +37,7 @@ TransformData::TransformData()
       child_node(),
       children(&TransformData::child_node) {}
 
-mathfu::vec3 TransformComponent::WorldPosition(entity::EntityRef entity) {
+mathfu::vec3 TransformComponent::WorldPosition(corgi::EntityRef entity) {
   TransformData* transform_data = Data<TransformData>(entity);
   if (transform_data->parent) {
     return WorldTransform(transform_data->parent) * transform_data->position;
@@ -46,7 +46,7 @@ mathfu::vec3 TransformComponent::WorldPosition(entity::EntityRef entity) {
   }
 }
 
-mathfu::quat TransformComponent::WorldOrientation(entity::EntityRef entity) {
+mathfu::quat TransformComponent::WorldOrientation(corgi::EntityRef entity) {
   TransformData* transform_data = Data<TransformData>(entity);
   if (transform_data->parent) {
     return transform_data->orientation *
@@ -56,7 +56,7 @@ mathfu::quat TransformComponent::WorldOrientation(entity::EntityRef entity) {
   }
 }
 
-mathfu::mat4 TransformComponent::WorldTransform(entity::EntityRef entity) {
+mathfu::mat4 TransformComponent::WorldTransform(corgi::EntityRef entity) {
   TransformData* transform_data = Data<TransformData>(entity);
   if (transform_data->parent) {
     return WorldTransform(transform_data->parent) *
@@ -66,9 +66,9 @@ mathfu::mat4 TransformComponent::WorldTransform(entity::EntityRef entity) {
   }
 }
 
-entity::EntityRef TransformComponent::GetRootParent(
-    const entity::EntityRef& entity) const {
-  entity::EntityRef result = entity;
+corgi::EntityRef TransformComponent::GetRootParent(
+    const corgi::EntityRef& entity) const {
+  corgi::EntityRef result = entity;
   for (;;) {
     TransformData* transform_data = Data<TransformData>(result);
     if (!transform_data->parent.IsValid()) break;
@@ -77,15 +77,15 @@ entity::EntityRef TransformComponent::GetRootParent(
   return result;
 }
 
-void TransformComponent::InitEntity(entity::EntityRef& entity) {
+void TransformComponent::InitEntity(corgi::EntityRef& entity) {
   TransformData* transform_data = Data<TransformData>(entity);
   transform_data->owner = entity;
 }
 
-void TransformComponent::UpdateAllEntities(entity::WorldTime /*delta_time*/) {
+void TransformComponent::UpdateAllEntities(corgi::WorldTime /*delta_time*/) {
   for (auto iter = component_data_.begin(); iter != component_data_.end();
        ++iter) {
-    entity::EntityRef entity = iter->entity;
+    corgi::EntityRef entity = iter->entity;
     TransformData* transform_data = Data<TransformData>(entity);
     // Go through and start updating everything that has no parent:
     if (!transform_data->parent) {
@@ -97,12 +97,12 @@ void TransformComponent::UpdateAllEntities(entity::WorldTime /*delta_time*/) {
 void TransformComponent::PostLoadFixup() {
   for (auto iter = component_data_.begin(); iter != component_data_.end();
        ++iter) {
-    entity::EntityRef entity = iter->entity;
+    corgi::EntityRef entity = iter->entity;
     UpdateChildLinks(entity);
   }
 }
 
-void TransformComponent::UpdateChildLinks(entity::EntityRef& entity) {
+void TransformComponent::UpdateChildLinks(corgi::EntityRef& entity) {
   TransformData* transform_data = Data<TransformData>(entity);
   if (transform_data->pending_child_ids.size() != 0) {
     // Now connect up the children we had listed, as they should
@@ -119,7 +119,7 @@ void TransformComponent::UpdateChildLinks(entity::EntityRef& entity) {
       // If so, just connect it up as a child.
       // Otherwise, instantiate a prototype with that entity ID and map it
       // as a child.
-      entity::EntityRef child = entity_manager_->GetComponent<MetaComponent>()
+      corgi::EntityRef child = entity_manager_->GetComponent<MetaComponent>()
                                     ->GetEntityFromDictionary(child_id);
 
       if (!child.IsValid()) {
@@ -140,7 +140,7 @@ void TransformComponent::UpdateChildLinks(entity::EntityRef& entity) {
   }
 }
 
-void TransformComponent::UpdateWorldPosition(entity::EntityRef& entity,
+void TransformComponent::UpdateWorldPosition(corgi::EntityRef& entity,
                                              const mathfu::mat4& transform) {
   TransformData* transform_data = GetComponentData(entity);
   transform_data->world_transform =
@@ -152,7 +152,7 @@ void TransformComponent::UpdateWorldPosition(entity::EntityRef& entity,
   }
 }
 
-void TransformComponent::CleanupEntity(entity::EntityRef& entity) {
+void TransformComponent::CleanupEntity(corgi::EntityRef& entity) {
   // Remove and cleanup children, if any exist:
   TransformData* transform_data = GetComponentData(entity);
   if (transform_data) {
@@ -163,7 +163,7 @@ void TransformComponent::CleanupEntity(entity::EntityRef& entity) {
   }
 }
 
-void TransformComponent::AddFromRawData(entity::EntityRef& entity,
+void TransformComponent::AddFromRawData(corgi::EntityRef& entity,
                                         const void* raw_data) {
   auto transform_def = static_cast<const TransformDef*>(raw_data);
   auto pos = transform_def->position();
@@ -204,8 +204,8 @@ void TransformComponent::AddFromRawData(entity::EntityRef& entity,
   }
 }
 
-entity::ComponentInterface::RawDataUniquePtr TransformComponent::ExportRawData(
-    const entity::EntityRef& entity) const {
+corgi::ComponentInterface::RawDataUniquePtr TransformComponent::ExportRawData(
+    const corgi::EntityRef& entity) const {
   const TransformData* data = GetComponentData(entity);
   if (data == nullptr) return nullptr;
 
@@ -215,10 +215,10 @@ entity::ComponentInterface::RawDataUniquePtr TransformComponent::ExportRawData(
   fbb.ForceDefaults(defaults);
 
   mathfu::vec3 euler = data->orientation.ToEulerAngles() / kDegreesToRadians;
-  fpl::Vec3 position(data->position.x(), data->position.y(),
+  fplbase::Vec3 position(data->position.x(), data->position.y(),
                      data->position.z());
-  fpl::Vec3 scale(data->scale.x(), data->scale.y(), data->scale.z());
-  fpl::Vec3 orientation(euler.x(), euler.y(), euler.z());
+  fplbase::Vec3 scale(data->scale.x(), data->scale.y(), data->scale.z());
+  fplbase::Vec3 orientation(euler.x(), euler.y(), euler.z());
 
   std::vector<flatbuffers::Offset<flatbuffers::String>> child_ids_vector;
   for (auto iter = data->child_ids.begin(); iter != data->child_ids.end();
@@ -241,8 +241,8 @@ entity::ComponentInterface::RawDataUniquePtr TransformComponent::ExportRawData(
   return fbb.ReleaseBufferPointer();
 }
 
-void TransformComponent::AddChild(entity::EntityRef& child,
-                                  entity::EntityRef& parent) {
+void TransformComponent::AddChild(corgi::EntityRef& child,
+                                  corgi::EntityRef& parent) {
   TransformData* child_data = GetComponentData(child);
   TransformData* parent_data = GetComponentData(parent);
 
@@ -254,25 +254,25 @@ void TransformComponent::AddChild(entity::EntityRef& child,
   child_data->parent = parent;
 }
 
-void TransformComponent::RemoveChild(entity::EntityRef& child) {
+void TransformComponent::RemoveChild(corgi::EntityRef& child) {
   TransformData* child_data = GetComponentData(child);
   assert(child_data->parent);
 
-  child_data->parent = entity::EntityRef();
+  child_data->parent = corgi::EntityRef();
   child_data->child_node.remove();
 }
 
-entity::EntityRef TransformComponent::ChildWithComponents(
-    const entity::EntityRef& entity, const entity::ComponentId* ids,
+corgi::EntityRef TransformComponent::ChildWithComponents(
+    const corgi::EntityRef& entity, const corgi::ComponentId* ids,
     size_t num_ids) const {
   // Breadth-first search on child-tree.
   // Seed the search queue with current entity.
-  std::queue<entity::EntityRef> entities_to_search;
+  std::queue<corgi::EntityRef> entities_to_search;
   entities_to_search.push(entity);
 
   while (!entities_to_search.empty()) {
     // Grab the oldest element in the search queue.
-    const entity::EntityRef e = entities_to_search.front();
+    const corgi::EntityRef e = entities_to_search.front();
     entities_to_search.pop();
 
     // If this entity has the components we're looking for, return it.
@@ -292,8 +292,8 @@ entity::EntityRef TransformComponent::ChildWithComponents(
     }
   }
 
-  return entity::EntityRef();
+  return corgi::EntityRef();
 }
 
 }  // component_library
-}  // fpl
+}  // corgi

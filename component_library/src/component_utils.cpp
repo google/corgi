@@ -19,11 +19,11 @@
 
 using mathfu::vec3;
 
-namespace fpl {
+namespace corgi {
 namespace component_library {
 
-bool GetMaxMinPositionsForEntity(entity::EntityRef& entity,
-                                 entity::EntityManager& entity_manager,
+bool GetMaxMinPositionsForEntity(corgi::EntityRef& entity,
+                                 corgi::EntityManager& entity_manager,
                                  vec3* max, vec3* min) {
   bool found_mesh = false;
   auto transform_data = entity_manager.GetComponentData<TransformData>(entity);
@@ -57,4 +57,4 @@ bool GetMaxMinPositionsForEntity(entity::EntityRef& entity,
 }
 
 }  // component_library
-}  // fpl
+}  // corgi

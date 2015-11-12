@@ -21,8 +21,7 @@
 #include "entity/entity_common.h"
 #include "entity/vector_pool.h"
 
-namespace fpl {
-namespace entity {
+namespace corgi {
 
 /// @file
 /// @typedef EntityRef
@@ -407,6 +406,5 @@ class EntityFactoryInterface {
                                          EntityManager* entity_manager) = 0;
 };
 
-}  // entity
-}  // fpl
+}  // corgi
 #endif  // FPL_ENTITY_MANAGER_H_

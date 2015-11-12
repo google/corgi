@@ -23,8 +23,7 @@
 #include "entity/entity_manager.h"
 #include "entity/vector_pool.h"
 
-namespace fpl {
-namespace entity {
+namespace corgi {
 
 class EntityManager;
 
@@ -44,7 +43,7 @@ class EntityManager;
 /// EntityRefs are typically passed by reference or const reference. If an
 /// EntityRef is const, then you can only access the underlying Entity data
 /// in a read-only manner.
-typedef VectorPool<entity::Entity>::VectorPoolReference EntityRef;
+typedef VectorPool<corgi::Entity>::VectorPoolReference EntityRef;
 
 /// @class ComponentInterface
 ///
@@ -182,7 +181,6 @@ class ComponentInterface {
   virtual void SetComponentIdOnDataType(ComponentId id) = 0;
 };
 
-}  // entity
-}  // fpl
+}  // corgi
 
 #endif  // FPL_BASE_COMPONENT_H_
