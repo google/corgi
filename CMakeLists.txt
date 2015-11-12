@@ -232,5 +232,5 @@ if (entity_build_component_library)
 endif()  # entity_build_component_library
 
 if(entity_build_samples)
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/samples)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/sample)
 endif()

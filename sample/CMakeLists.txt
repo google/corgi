@@ -20,7 +20,7 @@ set(Entity_Sample_Binary_SRCS
     entity_component_system.h)
 
 # This is the directory into which the executables are built.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../../bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../bin)
 
 add_executable(entity_component_system_sample ${Entity_Sample_Binary_SRCS})
 

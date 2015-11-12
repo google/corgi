@@ -14,7 +14,7 @@
 
 LOCAL_PATH := $(call my-dir)/..
 
-ENTITY_DIR := $(LOCAL_PATH)/../..
+ENTITY_DIR := $(LOCAL_PATH)/..
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := entity_component_system_sample
