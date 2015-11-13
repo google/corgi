@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-APP_PLATFORM := android-15
+APP_PLATFORM := android-9
 APP_ABI:=armeabi armeabi-v7a-hard mips x86 x86_64
 APP_STL := gnustl_static
 APP_MODULES := entity_component_system_sample

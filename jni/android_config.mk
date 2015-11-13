@@ -32,3 +32,5 @@ endif
 # NOTE: This is only required as the CORGI's component library and Breadboard's
 # entity library have a circular dependency.
 DEPENDENCIES_ENTITY_DIR:=$(ENTITY_DIR)
+# Location of the fplutil library (only for sample code).
+DEPENDENCIES_FPLUTIL_DIR:=$(FPL_ROOT)/fplutil

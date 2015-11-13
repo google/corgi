@@ -16,6 +16,8 @@ LOCAL_PATH := $(call my-dir)/..
 
 ENTITY_DIR := $(LOCAL_PATH)/..
 
+include $(ENTITY_DIR)/jni/android_config.mk
+
 include $(CLEAR_VARS)
 LOCAL_MODULE := entity_component_system_sample
 LOCAL_ARM_MODE := arm
@@ -25,8 +27,8 @@ LOCAL_WHOLE_STATIC_LIBRARIES := android_native_app_glue libfplutil_main \
         libfplutil_print
 include $(BUILD_SHARED_LIBRARY)
 
-$(call import-add-path, $(ENTITY_DIR)/..)
+$(call import-add-path, $(DEPENDENCIES_ENTITY_DIR)/..)
+$(call import-add-path, $(DEPENDENCIES_FPLUTIL_DIR)/..)
 $(call import-module, entity/jni)
-$(call import-add-path, $(ENTITY_DIR)/../fplutil/)
+$(call import-module, fplutil/libfplutil/jni)
 $(call import-module, android/native_app_glue)
-$(call import-module, libfplutil/jni)
