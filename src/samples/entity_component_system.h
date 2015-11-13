@@ -31,7 +31,8 @@ namespace sample {
 // `int` counter for each Entity that will be incremented on calls to
 // `UpdateAllEntities`.
 struct CounterComponentData {
-  int counter = 0;
+  CounterComponentData() : counter(0) {}
+  int counter;
 };
 
 // The first Component is called `CounterComponent`. It will
@@ -56,7 +57,8 @@ class CounterComponent : public entity::Component<CounterComponentData> {
 // ScreamingComponent. This string will be output via `printf()` during calls
 // to `UpdateAllEntities`.
 struct ScreamingComponentData {
-  std::string battle_cry = "Prepare to battle!!!!!!!";
+  ScreamingComponentData() : battle_cry("Prepare to battle!!!!!!!") {}
+  std::string battle_cry;
 };
 
 // The second Component is called `ScreamingComponent`. It will
