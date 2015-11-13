@@ -14,8 +14,32 @@
 
 LOCAL_PATH := $(call my-dir)/..
 
-include $(CLEAR_VARS)
+COMPONENTS_DIR := $(LOCAL_PATH)
+ENTITY_DIR := $(COMPONENTS_DIR)/..
+include $(COMPONENTS_DIR)/jni/android_config.mk
+include $(DEPENDENCIES_FLATBUFFERS_DIR)/android/jni/include.mk
 
+COMPONENTS_SCHEMA_DIR := $(COMPONENTS_DIR)/schemas
+COMPONENTS_SCHEMA_INCLUDE_DIRS := $(DEPENDENCIES_FPLBASE_DIR)/schemas
+
+COMPONENTS_SCHEMA_FILES := \
+  $(COMPONENTS_SCHEMA_DIR)/library_components.fbs \
+  $(COMPONENTS_SCHEMA_DIR)/bullet_def.fbs
+
+ifeq (,$(COMPONENTS_RUN_ONCE))
+COMPONENTS_RUN_ONCE := 1
+$(call flatbuffers_header_build_rules, \
+  $(COMPONENTS_SCHEMA_FILES), \
+  $(COMPONENTS_SCHEMA_DIR), \
+  $(COMPONENTS_GENERATED_OUTPUT_DIR), \
+  $(COMPONENTS_SCHEMA_INCLUDE_DIRS), \
+  $(LOCAL_SRC_FILES),\
+  component_library_generated_includes,\
+  fplbase_generated_includes)
+endif
+
+
+include $(CLEAR_VARS)
 LOCAL_MODULE := component_library
 LOCAL_ARM_MODE := arm
 LOCAL_STATIC_LIBRARIES := \
@@ -24,11 +48,6 @@ LOCAL_STATIC_LIBRARIES := \
   libentity \
   libfplbase \
   libmotive
-
-COMPONENTS_DIR := $(LOCAL_PATH)
-ENTITY_DIR := $(COMPONENTS_DIR)/..
-include $(COMPONENTS_DIR)/jni/android_config.mk
-include $(DEPENDENCIES_FLATBUFFERS_DIR)/android/jni/include.mk
 
 LOCAL_EXPORT_C_INCLUDES := \
   $(COMPONENTS_DIR)/include \
@@ -50,26 +69,6 @@ LOCAL_SRC_FILES := \
   src/physics.cpp \
   src/rendermesh.cpp \
   src/transform.cpp
-
-COMPONENTS_SCHEMA_DIR := $(COMPONENTS_DIR)/schemas
-COMPONENTS_SCHEMA_INCLUDE_DIRS := $(DEPENDENCIES_FPLBASE_DIR)/schemas
-
-COMPONENTS_SCHEMA_FILES := \
-  $(COMPONENTS_SCHEMA_DIR)/library_components.fbs \
-  $(COMPONENTS_SCHEMA_DIR)/bullet_def.fbs
-
-ifeq (,$(COMPONENTS_RUN_ONCE))
-COMPONENTS_RUN_ONCE := 1
-$(call flatbuffers_header_build_rules, \
-  $(COMPONENTS_SCHEMA_FILES), \
-  $(COMPONENTS_SCHEMA_DIR), \
-  $(COMPONENTS_GENERATED_OUTPUT_DIR), \
-  $(COMPONENTS_SCHEMA_INCLUDE_DIRS), \
-  $(LOCAL_SRC_FILES),\
-  component_library_generated_includes,\
-  fplbase_generated_includes)
-endif
-
 include $(BUILD_STATIC_LIBRARY)
 
 $(call import-add-path,$(DEPENDENCIES_BREADBOARD_DIR)/..)
@@ -86,3 +85,4 @@ $(call import-module,fplbase/jni)
 $(call import-module,mathfu/jni)
 $(call import-module,motive/jni)
 $(call import-module,android/cpufeatures)
+$(call import-module,entity/component_library/jni/bullet)
