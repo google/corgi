@@ -114,6 +114,11 @@ if (entity_build_component_library)
   # The component library uses a bunch of Flatbuffers, so we should build them.
   # Generate source files for all FlatBuffers schema files under the src
   # directory.
+  if(NOT TARGET flatc)
+    set(FLATBUFFERS_BUILD_TESTS OFF CACHE BOOL "")
+    add_subdirectory("${dependencies_flatbuffers_dir}" ${tmp_dir}/flatbuffers)
+  endif()
+
   set(COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR
      ${COMPONENT_COLLECTION_DIR}/${CMAKE_FILES_DIRECTORY}/include)
   file(GLOB_RECURSE
