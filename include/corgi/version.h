@@ -17,6 +17,8 @@
 
 namespace corgi {
 
+/// @cond CORGI_INTERNAL
+
 struct CorgiVersion {
   // Version number, updated only on major releases.
   unsigned char major;
@@ -32,6 +34,8 @@ struct CorgiVersion {
 };
 
 const CorgiVersion& Version();
+
+/// @endcond
 
 }  // namespace corgi
 
