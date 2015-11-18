@@ -17,5 +17,6 @@ var searchData=
   ['viewport_5fangle',['viewport_angle',['../classcorgi_1_1_camera_interface.html#ac4a56c6862cab41ae231dfebb3257831',1,'corgi::CameraInterface']]],
   ['viewport_5ffar_5fplane',['viewport_far_plane',['../classcorgi_1_1_camera_interface.html#afcd5b0017e4e220635cc6e23fead980a',1,'corgi::CameraInterface']]],
   ['viewport_5fnear_5fplane',['viewport_near_plane',['../classcorgi_1_1_camera_interface.html#a102b4acea0384801f4cc86bf2def2d0f',1,'corgi::CameraInterface']]],
-  ['viewport_5fresolution',['viewport_resolution',['../classcorgi_1_1_camera_interface.html#a157429a722d8407a8e19cbccbf6cf06a',1,'corgi::CameraInterface']]]
+  ['viewport_5fresolution',['viewport_resolution',['../classcorgi_1_1_camera_interface.html#a157429a722d8407a8e19cbccbf6cf06a',1,'corgi::CameraInterface']]],
+  ['visible',['visible',['../structcorgi_1_1component__library_1_1_render_mesh_data.html#a6c8ada239c746683e4e7e45d3aedda0f',1,'corgi::component_library::RenderMeshData']]]
 ];

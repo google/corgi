@@ -18,7 +18,7 @@ var files =
     [ "graph.h", "graph_8h.html", null ],
     [ "meta.h", "meta_8h.html", null ],
     [ "physics.h", "physics_8h.html", "physics_8h" ],
-    [ "rendermesh.h", "rendermesh_8h_source.html", null ],
+    [ "rendermesh.h", "rendermesh_8h.html", null ],
     [ "transform.h", "transform_8h.html", null ],
     [ "vector_pool.h", "vector__pool_8h.html", "vector__pool_8h" ],
     [ "version.h", "version_8h_source.html", null ]
