@@ -37,8 +37,8 @@ namespace corgi {
 ///
 static const CorgiVersion kVersion = {
     CORGI_VERSION_MAJOR, CORGI_VERSION_MINOR, CORGI_VERSION_REVISION,
-    "Corgi Entity Library " CORGI_STRING(MOTIVE_VERSION_MAJOR) "." CORGI_STRING(
-        MOTIVE_VERSION_MINOR) "." CORGI_STRING(MOTIVE_VERSION_REVISION)};
+    "Corgi Entity Library " CORGI_STRING(CORGI_VERSION_MAJOR) "." CORGI_STRING(
+        CORGI_VERSION_MINOR) "." CORGI_STRING(CORGI_VERSION_REVISION)};
 
 const CorgiVersion& Version() { return kVersion; }
 
