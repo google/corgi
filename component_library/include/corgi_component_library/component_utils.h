@@ -25,6 +25,10 @@ namespace component_library {
 /// @addtogroup corgi_component_library
 /// @{
 ///
+/// @fn bool GetMaxMinPositionsForEntity(corgi::EntityRef& entity,
+/// corgi::EntityManager& entity_manager, mathfu::vec3* max,
+/// mathfu::vec3* min)
+///
 /// @brief Get the minimum and maximum positions of an Entity, based on its
 /// and its children's rendermeshes.
 ///
