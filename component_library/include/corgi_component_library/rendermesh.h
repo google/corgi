@@ -30,9 +30,16 @@
 namespace corgi {
 namespace component_library {
 
-// Data for scene object components.
+/// @file
+/// @addtogroup corgi_component_library
+/// @{
+///
+/// @struct RenderMeshData
+///
+/// @brief The per-Entity mesh and shader data.
 struct RenderMeshData {
  public:
+  /// @brief Default constructor for RenderMeshData.
   RenderMeshData()
       : mesh(nullptr),
         shader(nullptr),
@@ -46,13 +53,28 @@ struct RenderMeshData {
         default_pose(false),
         num_shader_transforms(0),
         shader_transforms(nullptr) {}
+
+  /// @brief Destructor for RenderMeshData.
   ~RenderMeshData() {
     delete[] shader_transforms;
     shader_transforms = nullptr;
   }
 
-  // Implement move operator to avoid reallocating shader_transforms.
+  /// @brief The move constructor for RenderMeshData to avoid reallocating
+  /// shader transforms.
+  ///
+  /// @param[in] other The other RenderMeshData whose data should be moved
+  /// into this RenderMeshData.
   RenderMeshData(RenderMeshData&& other) { *this = std::move(other); }
+
+  /// @brief The move assignment operator for RenderMeshData to avoid
+  /// reallocating shader transforms.
+  ///
+  /// @param[in] other The other RenderMeshData whose data should be moved
+  /// into this RenderMeshData.
+  ///
+  /// @return Returns a reference to the RenderMeshData that received the
+  /// data from `other`.
   RenderMeshData& operator=(RenderMeshData&& other) {
     mesh = std::move(other.mesh);
     shader = std::move(other.shader);
@@ -71,17 +93,46 @@ struct RenderMeshData {
     return *this;
   }
 
+  /// @brief The fplbase::Mesh for this Entity.
   fplbase::Mesh* mesh;
+
+  /// @brief The fplbase::Shader for this Entity.
   fplbase::Shader* shader;
+
+  /// @brief A mathfu::vec4 specifying the tinting for the Entity in RGBA.
   mathfu::vec4 tint;
+
+  /// @brief A std::string of the filename for the mesh, used for exporting.
   std::string mesh_filename;
+
+  /// @brief A std::string of the filename for the shader, used for exporting.
   std::string shader_filename;
+
+  /// @brief The z distance corresponding to the depth of where the
+  /// Entity should be rendered.
   float z_depth;
+
+  /// @brief A bit field determining which types of culling are applied to the
+  /// Entity.
   unsigned char culling_mask;
+
+  /// @brief A bit field determining during which render passes to render this
+  /// Entity.
   unsigned char pass_mask;
+
+  /// @brief A bool determining if this Entity should be rendered.
   bool visible;
+
+  /// @brief A bool determining if the Entity should be rendered in the
+  /// default pose.
   bool default_pose;
+
+  /// @brief The number of shader transforms in the `shader_transforms`
+  /// array.
   uint8_t num_shader_transforms;
+
+  /// @brief A mathfu::AffineTransform array that contains the shader
+  /// transforms.
   mathfu::AffineTransform* shader_transforms;
 
  private:
@@ -90,80 +141,182 @@ struct RenderMeshData {
   RenderMeshData& operator=(const RenderMeshData&);
 };
 
-// Struct used for keeping track of and sorting our render lists:
+/// @brief Struct used for keeping track of and sorting our render lists.
 struct RenderlistEntry {
+  /// @brief Constructor for RenderlistEntry.
   RenderlistEntry(EntityRef entity_, RenderMeshData* data_)
       : entity(entity_), data(data_) {}
+
+  /// @brief The Entity associated with this RenderlistEntry.
   EntityRef entity;
+
+  /// @brief The RenderMeshData associated with the `entity` in this
+  /// RenderlistEntry.
   RenderMeshData* data;
 
+  /// @brief The greater than operator for RenderlistEntry.
+  ///
+  /// @param[in] other The other RenderlistEntry to compare if its
+  /// `RenderMeshData->z_depth` is greater than this RenderlistEntry's.
+  ///
+  /// @return Returns `true` if `other`'s `RenderMeshData->z_depth` is greater
+  /// than this RenderlistEntry's. Otherwise, it returns `false`.
   bool operator<(const RenderlistEntry& other) const {
     return (data->z_depth < other.data->z_depth);
   }
 
+  /// @brief The less than operator for RenderlistEntry.
+  ///
+  /// @param[in] other The other RenderlistEntry to compare if its
+  /// `RenderMeshData->z_depth` is less than this RenderlistEntry's.
+  ///
+  /// @return Returns `true` if `other`'s `RenderMeshData->z_depth` is less
+  /// than this RenderlistEntry's. Otherwise, it returns `false`.
   bool operator>(const RenderlistEntry& other) const {
     return (data->z_depth > other.data->z_depth);
   }
 };
 
+/// @brief A Component that handles the rendering of each Entities
+/// mesh that is registered with this Component.
 class RenderMeshComponent : public Component<RenderMeshData> {
  public:
+  /// @brief The default distance to start culling.
   static const int kDefaultCullDist = 80;
 
+  /// @brief Default constructor for RenderMeshComponent.
   RenderMeshComponent()
       : asset_manager_(nullptr),
         culling_distance_squared_(kDefaultCullDist * kDefaultCullDist) {}
+
+  /// @brief Destructor for RenderMeshComponent.
   virtual ~RenderMeshComponent() {}
 
+  /// @brief Initialize the RenderMeshComponent with the AssetManager from
+  /// the EntityManager.
   virtual void Init();
+
+  /// @brief Deserialize a flat binary buffer to create and populate an Entity
+  /// from raw data.
+  ///
+  /// @param[in,out] entity An EntityRef reference that points to the Entity
+  /// that is being added from the raw data.
+  /// @param[in] raw_data A void pointer to the raw FlatBuffer data.
   virtual void AddFromRawData(EntityRef& entity, const void* raw_data);
+
+  /// @brief Serializes a RenderMeshComponent's data for a given Entity.
+  ///
+  /// @param[in] entity An EntityRef reference that points to the Entity whose
+  /// corresponding RenderMeshData will be serialized.
+  ///
+  /// @return Returns a RawDataUniquePtr to the start of the raw data in a
+  /// flat binary buffer.
   virtual RawDataUniquePtr ExportRawData(const EntityRef& entity) const;
 
+  /// @brief Initialize an Entity by also adding it to the TransformComponent.
   virtual void InitEntity(EntityRef& /*entity*/);
 
-  // Nothing really happens per-update to these things.
+  /// @brief Nothing happens per frame for these Entities.
   virtual void UpdateAllEntities(WorldTime /*delta_time*/) {}
 
-  // Prepares to do rendering.  (Must be called before any RenderPass calls.)
-  // Pregenerates the draw lists, sorted by z-depth, and applies frustrum
-  // culling.  (So that renderpass can just iterate through the list and draw
-  // everything with minimum of fuss.)
+  /// @brief Prepares to do rendering.
+  ///
+  /// @note Must be called before any `RenderPass()` calls.
+  ///
+  /// Pre-generates the draw lists, sorted by z-depth, and applies frustrum
+  /// culling.  (So that `RenderPass` can just iterate through the list and draw
+  /// everything easily.)
+  ///
+  /// @param[in] camera A CameraInterface reference to the camera used to render
+  /// within the field of view.
   void RenderPrep(const CameraInterface& camera);
 
-  // Renders all entities marked as being part of the specified renderpass to
-  // the current output buffer.  Shader_override is an optional parameter, which
-  // (if provided) overrides the mesh-specified shader, and instead renders
-  // the entire pass with override_shader.
+  /// @brief Renders all Entities that are marked as being part of a given
+  /// render pass to the current output buffer.
+  ///
+  /// @param[in] pass_id An int used to identify and index the desired render
+  /// pass.
+  /// @param[in] camera A CameraInterface reference to the camera used to render
+  /// within the field of view.
+  /// @param[out] renderer A reference to the fplbase::Renderer to capture the
+  /// output of the render pass.
   void RenderPass(int pass_id, const CameraInterface& camera,
                   fplbase::Renderer& renderer);
+
+  /// @brief Renders all Entities that are marked as being part of a given
+  /// render pass to the current output buffer.
+  ///
+  /// @param[in] pass_id An int used to identify and index the desired render
+  /// pass.
+  /// @param[in] camera A CameraInterface reference to the camera used to render
+  /// within the field of view.
+  /// @param[out] renderer A reference to the fplbase::Renderer to capture the
+  /// output of the render pass.
+  /// @param[in] shader_override A fplbase::Shader to use as the mesh shader
+  /// for this render pass.
   void RenderPass(int pass_id, const CameraInterface& camera,
                   fplbase::Renderer& renderer,
                   const fplbase::Shader* shader_override);
 
-  // Goes through and renders every entity that is visible from the camera,
-  // in pass order.  Is equivalent to iterating through all of the passes
-  // and calling RenderPass on each one.
-  // Important!  You must have called RenderPrep first, in order to
-  // pre-populate the lists of things visible from the camera!
+  /// @brief Goes through and renders every Entity that is visible from the
+  /// camera, in pass order.
+  ///
+  /// It Is equivalent to iterating through all of the passes and calling
+  /// `RenderPass()` on each one.
+  ///
+  /// @warning You must have called `RenderPrep()` first, in order to
+  /// pre-populate the lists of things visible from the camera!
+  ///
+  /// @param[out] renderer A reference to the fplbase::Renderer to capture the
+  /// output of the render pass.
+  /// @param[in] camera A CameraInterface reference to the camera used to
+  /// render within the field of view.
   void RenderAllEntities(fplbase::Renderer& renderer,
                          const CameraInterface& camera);
 
-  // Recursively sets the hidden-ness of the entity and all children.
+  /// @brief Recursively sets the visibility of the Entity and all of its
+  /// children.
+  ///
+  /// @param[in] entity An EntityRef reference to the Entity that should have
+  /// itself and its children's visibility set.
+  /// @param[in] visible A bool determining if the Entities should be rendered.
   void SetVisibilityRecursively(const EntityRef& entity, bool visible);
 
-  // Get and set the light position.  This is a special uniform that is sent
-  // to all shaders without having to declare it explicitly in the
-  // shader_instance variable.
+  /// @brief Get the light position uniform.
+  ///
+  /// @note This is a special uniform that is sent to all shaders without having
+  /// to declare it explicitly in the shader.
+  ///
+  /// @return Returns the light position uniform as a mathfu::vec3.
   mathfu::vec3 light_position() { return light_position_; }
+
+  /// @brief Set the light position uniform.
+  ///
+  /// @note This is a special uniform that is sent to all shaders without having
+  /// to declare it explicitly in the shader.
+  ///
+  /// @param[in] light_position A const mathfu::vec3 reference to the uniform to
+  /// set for the light position.
   void set_light_position(const mathfu::vec3& light_position) {
     light_position_ = light_position;
   }
 
+  /// @brief Set the culling distance.
+  ///
+  /// @param[in] distance A float representing the new culling distance to set.
   void SetCullDistance(float distance) {
     culling_distance_squared_ = distance * distance;
   }
 
+  /// @brief Get the culling distance squared.
+  ///
+  /// @return Returns the square of the culling distance.
   float culling_distance_squared() const { return culling_distance_squared_; }
+
+  /// @brief Set the square of the culling distance.
+  ///
+  /// @param[in] culling_distance_squared A float representing the square of the
+  /// culling distance that should be set.
   void set_culling_distance_squared(float culling_distance_squared) {
     culling_distance_squared_ = culling_distance_squared;
   }
@@ -180,6 +333,8 @@ class RenderMeshComponent : public Component<RenderMeshData> {
   // to render.
   std::vector<RenderlistEntry> pass_render_list_[RenderPass_Count];
 };
+
+/// @}
 
 }  // component_library
 }  // corgi
