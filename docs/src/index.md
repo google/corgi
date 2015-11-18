@@ -13,8 +13,8 @@ for your use.
 
 [CORGI][] can be downloaded from [GitHub][] or the [releases page][].
 
-**Important**: CORGI uses submodules to reference other libraries that it
-depends upon, so download the source using:
+**Important**: The CORGI component library uses submodules, so download the
+source using:
 
 ~~~{.sh}
   git clone --recursive https://github.com/google/corgi.git
