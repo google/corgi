@@ -12,7 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-LOCAL_PATH := $(realpath $(call my-dir)/..)
+# TODO: Remove when the LOCAL_PATH expansion bug in the NDK is fixed.
+# Portable version of $(realpath) that omits drive letters on Windows.
+realpath-portable = $(join $(filter %:,$(subst :,: ,$1)),\
+                      $(realpath $(filter-out %:,$(subst :,: ,$1))))
+
+LOCAL_PATH := $(call realpath-portable,$(call my-dir)/..)
 
 CORGI_DIR := $(LOCAL_PATH)
 include $(CORGI_DIR)/jni/android_config.mk

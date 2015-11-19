@@ -19,6 +19,10 @@ CORGI_DIR := $(CORGI_COMPONENTS_DIR)/..
 include $(CORGI_COMPONENTS_DIR)/jni/android_config.mk
 include $(DEPENDENCIES_FLATBUFFERS_DIR)/android/jni/include.mk
 
+# realpath-portable From flatbuffers/android/jni/include.mk
+LOCAL_PATH := $(call realpath-portable,$(LOCAL_PATH))
+CORGI_DIR := $(call realpath-portable,$(CORGI_DIR))
+
 CORGI_COMPONENTS_SCHEMA_DIR := $(CORGI_COMPONENTS_DIR)/schemas
 CORGI_COMPONENTS_SCHEMA_INCLUDE_DIRS := $(DEPENDENCIES_FPLBASE_DIR)/schemas
 
