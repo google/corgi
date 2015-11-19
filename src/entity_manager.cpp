@@ -30,8 +30,13 @@ EntityManager::EntityManager()
   }
 }
 
+// Allocates a new entity and returns it
 EntityRef EntityManager::AllocateNewEntity() {
-  return EntityRef(entities_.GetNewElement(kAddToBack));
+  EntityRef result = EntityRef(entities_.GetNewElement(kAddToBack));
+  // Indexes are guaranteed to be unique and stable in vector pools.
+  // May need to revisit this if we implement defragging though.
+  result->set_entity_id(result.index());
+  return result;
 }
 
 // Note: This function doesn't actually delete the entity immediately -
@@ -64,7 +69,7 @@ void EntityManager::DeleteMarkedEntities() {
 
 void EntityManager::RemoveAllComponents(EntityRef entity) {
   for (ComponentId i = 0; i < kMaxComponentCount; i++) {
-    if (entity->IsRegisteredForComponent(i)) {
+    if (components_[i] != nullptr && components_[i]->HasDataForEntity(entity)) {
       components_[i]->RemoveEntity(entity);
     }
   }

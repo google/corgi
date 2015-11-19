@@ -86,8 +86,27 @@ typedef uint16_t ComponentIndex;
 /// Component in the system, this value is used as a default value
 /// to indicate that a specific Component is not registered with
 /// a given Entity.
-static const ComponentIndex kUnusedComponentIndex =
+static const ComponentIndex kInvalidComponentIndex =
     static_cast<ComponentIndex>(-1);
+
+/// @typedef EntityIdType
+///
+/// @brief A EntityIdType is a value used to uniquely represent an entity
+/// in various internal structures.  In general, CORGI users should avoid
+/// using this directly, and should instead refer to entities via EntityRefs.
+typedef uint16_t EntityIdType;
+
+/// @var kInvalidEntityId
+///
+/// @brief A sentinel value to represent an invalid entity.
+///
+/// Entities have a unique ID that is used reference them internally.  This
+/// value represents an invalid entity.  It is usually either used for
+/// uninitialized values, or to indicate a null return value.
+static const EntityIdType kInvalidEntityId = static_cast<EntityIdType>(-1);
+
+
+
 /// @}
 
 }  // corgi

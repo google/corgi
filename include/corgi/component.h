@@ -15,6 +15,7 @@
 #ifndef CORGI_COMPONENT_H_
 #define CORGI_COMPONENT_H_
 
+#include <unordered_map>
 #include "corgi/component_id_lookup.h"
 #include "corgi/component_interface.h"
 #include "corgi/entity.h"
@@ -128,13 +129,13 @@ class Component : public ComponentInterface {
   /// will just return a reference to the existing data and will not change
   /// anything.
   T* AddEntity(EntityRef& entity, AllocationLocation alloc_location) {
-    if (entity->IsRegisteredForComponent(GetComponentId())) {
+    if (HasDataForEntity(entity)) {
       return GetComponentData(entity);
     }
     // No existing data, so we allocate some and return it:
     ComponentIndex index = static_cast<ComponentIndex>(
         component_data_.GetNewElement(alloc_location).index());
-    entity->SetComponentDataIndex(GetComponentId(), index);
+    component_index_lookup_[entity->entity_id()] = index;
     ComponentData* component_data = component_data_.GetElementData(index);
     component_data->entity = entity;
     InitEntity(entity);
@@ -161,9 +162,14 @@ class Component : public ComponentInterface {
   /// @param[in,out] entity An EntityRef reference used to remove an Entity
   /// from the list of Entities that this Component keeps track of.
   virtual void RemoveEntity(EntityRef& entity) {
+    // Calling remove when there is no data is generally a sign that
+    // something has gone wrong and that something has lost track of which
+    // entities are associated with which components.  Use HasDataForEntity()
+    // if you want to double-check if data exists before removing it.
+    assert(HasDataForEntity(entity));
     RemoveEntityInternal(entity);
     component_data_.FreeElement(GetComponentDataIndex(entity));
-    entity->SetComponentDataIndex(GetComponentId(), kUnusedComponentIndex);
+    component_index_lookup_.erase(entity->entity_id());
   }
 
   /// @brief Removes an Entity from the list of Entities.
@@ -182,7 +188,7 @@ class Component : public ComponentInterface {
     EntityRef entity = iter->entity;
     RemoveEntityInternal(entity);
     EntityIterator new_iter = component_data_.FreeElement(iter);
-    entity->SetComponentDataIndex(GetComponentId(), kUnusedComponentIndex);
+    component_index_lookup_.erase(entity->entity_id());
     return new_iter;
   }
 
@@ -203,6 +209,12 @@ class Component : public ComponentInterface {
   /// @brief Updates all Entities. This is normally called, once per frame,
   /// by the EntityManager.
   virtual void UpdateAllEntities(WorldTime /*delta_time*/) {}
+
+  /// @brief Checks if this component contains any data associated with the
+  /// supplied entity.
+  virtual bool HasDataForEntity(const EntityRef& entity) {
+    return GetComponentDataIndex(entity) != kInvalidComponentIndex;
+  }
 
   /// @brief Gets the data for a given Entity as a void pointer.
   ///
@@ -253,7 +265,7 @@ class Component : public ComponentInterface {
   /// @return Returns a pointer of the data structure associated with the
   /// Component data, or returns a nullptr if given an invalid data_index.
   T* GetComponentData(size_t data_index) {
-    if (data_index == kUnusedComponentIndex) {
+    if (data_index == kInvalidComponentIndex) {
       return nullptr;
     }
     ComponentData* element_data = component_data_.GetElementData(data_index);
@@ -333,6 +345,24 @@ class Component : public ComponentInterface {
   template <typename ComponentDataType>
   ComponentDataType* Data(const EntityRef& entity) {
     return entity_manager_->GetComponentData<ComponentDataType>(entity);
+  }
+
+  /// @brief A utility function for checking if an entity is registered with
+  /// a particular component.
+  ///
+  /// @tparam ComponentDataType The data type of the Component to be checked
+  /// for registration.
+  ///
+  /// @param[in] entity An EntityRef reference to the Entity whose Component
+  /// data is checked.
+  ///
+  /// @return Returns true if the entity has been registered with the Component,
+  /// false otherwise.
+  template <typename ComponentDataType>
+  bool IsRegisteredWithComponent(const EntityRef& entity) {
+    return entity_manager_
+        ->GetComponent(entity_manager_->GetComponentId<ComponentDataType>())
+        ->HasDataForEntity(entity);
   }
 
   /// @brief A utility function for retrieving the Component data for an
@@ -438,9 +468,11 @@ class Component : public ComponentInterface {
   /// index will be returned.
   ///
   /// @return Returns a size_t corresponding to the index of the
-  /// Component data.
+  /// Component data, or kInvalidComponentIndex if no data could be found.
   size_t GetComponentDataIndex(const EntityRef& entity) const {
-    return entity->GetComponentDataIndex(GetComponentId());
+    auto result = component_index_lookup_.find(entity->entity_id());
+    return (result != component_index_lookup_.end()) ? result->second
+                                                     : kInvalidComponentIndex;
   }
 
   /// @var component_data_
@@ -453,6 +485,12 @@ class Component : public ComponentInterface {
   /// @brief A pointer to the EntityManager for this Component. This is the
   /// main point of contact for Components that need to talk to other things.
   EntityManager* entity_manager_;
+
+  /// @var component_index_lookup_
+  ///
+  /// @brief A map, for translating unique entity IDs into vectorpool
+  /// indexes.
+  std::unordered_map<EntityIdType, ComponentIndex> component_index_lookup_;
 };
 /// @}
 
