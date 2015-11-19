@@ -15,13 +15,13 @@
 # 3. This notice may not be removed or altered from any source distribution.
 cmake_minimum_required(VERSION 2.8.12)
 
-set(Entity_Sample_Binary_SRCS
+set(CORGI_SAMPLE_BINARY_SRCS
     entity_component_system.cpp
     entity_component_system.h)
 
 # This is the directory into which the executables are built.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../bin)
 
-add_executable(entity_component_system_sample ${Entity_Sample_Binary_SRCS})
+add_executable(entity_component_system_sample ${CORGI_SAMPLE_BINARY_SRCS})
 
-target_link_libraries(entity_component_system_sample entity)
+target_link_libraries(entity_component_system_sample corgi)

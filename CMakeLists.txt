@@ -221,6 +221,6 @@ if (corgi_build_component_library)
   restore_compiler_flags()
 endif()  # corgi_build_component_library
 
-if(entity_build_samples)
+if(corgi_build_samples)
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/sample)
 endif()
