@@ -79,7 +79,7 @@ int main() {
   entity_manager.AddEntityToComponent<ScreamingComponent>(new_entity);
 
   // Simulate a game-loop that executes 10 times with a random delta_time.
-  std::srand(std::time(0));
+  std::srand(static_cast<unsigned>(std::time(0)));
 
   for (int x = 0; x < 10; x++) {
     int mock_delta_time = std::rand() % 20 + 1;  // Random delta_time from 1-20.
