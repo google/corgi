@@ -194,7 +194,7 @@ void EntityFactory::LoadEntityData(const void* def,
     if (component_data != nullptr) {
       if (debug_entity_creation()) {
         LogInfo("...reading %s from %s", ComponentIdToTableName(i),
-                is_prototype ? "prototype" : "entity", i);
+                is_prototype ? "prototype" : "entity");
       }
       overridden_components.insert(i);
       if (is_prototype && i == meta_id) {
