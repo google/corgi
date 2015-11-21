@@ -193,7 +193,8 @@ void EntityFactory::LoadEntityData(const void* def,
     const void* component_data = components[i];
     if (component_data != nullptr) {
       if (debug_entity_creation()) {
-        LogInfo("...reading %s from %s", ComponentIdToTableName(i),
+        LogInfo("...reading %s from %s",
+                ComponentIdToTableName(static_cast<corgi::ComponentId>(i)),
                 is_prototype ? "prototype" : "entity");
       }
       overridden_components.insert(i);
@@ -202,7 +203,8 @@ void EntityFactory::LoadEntityData(const void* def,
         meta_component->AddFromPrototypeData(
             entity, static_cast<const MetaDef*>(component_data));
       } else {
-        corgi::ComponentInterface* component = entity_manager->GetComponent(i);
+        corgi::ComponentInterface* component =
+            entity_manager->GetComponent(static_cast<corgi::ComponentId>(i));
         assert(component != nullptr);
         component->AddFromRawData(entity, component_data);
       }

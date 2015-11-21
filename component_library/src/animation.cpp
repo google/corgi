@@ -118,7 +118,8 @@ void AnimationComponent::InitializeMotivator(const EntityRef& entity) {
   // `defining_anim`.
   auto mesh = render_data->mesh;
   const RigInit init(defining_anim, mesh->bone_transforms(),
-                     mesh->bone_parents(), mesh->num_bones());
+                     mesh->bone_parents(),
+                     static_cast<motive::BoneIndex>(mesh->num_bones()));
   data->motivator.Initialize(init, &engine_);
 }
 
