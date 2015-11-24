@@ -20,6 +20,13 @@ source using:
   git clone --recursive https://github.com/google/corgi.git
 ~~~
 
+   * Discuss CORGI with other developers and users on the
+     [CORGI Google Group][].
+   * File issues on the [CORGI Issues Tracker][].
+   * Post your questoins to [stackoverflow.com][] with a mention of **corgi**.
+
+To contribute to this project see [CONTRIBUTING][].
+
 # Concepts
 
 The core functionality of [CORGI][] is provided by the following classes:
@@ -54,6 +61,9 @@ Each class is described in the folloiwing sections of the [Programmer's Guide][]
    [API Reference]: @ref corgi_api_reference
    [Component]: @ref corgi_component
    [Component Library]: @ref corgi_component_library
+   [CONTRIBUTING]: @ref contributing
+   [CORGI Google Group]: http://group.google.com/group/corgi-lib
+   [CORGI Issues Tracker]: http://github.com/google/corgi/issues
    [CORGI]: @ref corgi_index
    [Entity]: @ref corgi_entity
    [Entity Manager]: @ref corgi_entity_manager
@@ -63,4 +73,5 @@ Each class is described in the folloiwing sections of the [Programmer's Guide][]
    [OS X]: http://www.apple.com/osx/
    [Programmer's Guide]: usergroup0.html
    [releases page]: http://github.com/google/corgi/releases
+   [stackoverflow.com]: http://www.stackoverflow.com
    [Windows]: http://windows.microsoft.com/
