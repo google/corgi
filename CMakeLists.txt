@@ -18,7 +18,16 @@ project(corgi)
 option(corgi_build_component_library
   "Build a library of standard components along with the entity system"
   ON)
-option(corgi_build_samples "Build samples for this project." ON)
+
+set(corgi_standalone_mode OFF)
+if("${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
+  set(corgi_standalone_mode ON)
+  message(STATUS "corgi standalone: building library and samples")
+else()
+  message(STATUS "corgi library: not building samples")
+endif()
+option(corgi_build_samples "Build the corgi sample executables."
+       ${corgi_standalone_mode})
 
 # Compile the game with the debug flag
 set(corgi_DEBUG ON)
@@ -88,7 +97,7 @@ set(corgi_SRCS
 include_directories(src include)
 
 # Detect clang
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL Clang)
   set(CMAKE_COMPILER_IS_CLANGXX 1)
 endif()
 
