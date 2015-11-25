@@ -70,6 +70,27 @@ table PhysicsDef {
   kinematic:bool = false;
 }
 
+// Debug information to log each frame.
+enum AnimationDebugState:ubyte {
+  // No debug information should be output.
+  None,
+
+  // Logs a header containing column labels in CSV (comma separated value)
+  // format. Once the header is output, the state automatically changes
+  // to AllChannels, so that the header will only be output once.
+  AllChannelsWithHeader,
+
+  // Logs all channels of animation data in CSV format.
+  // This is a lot of data. You should pipe it to a file and then view it
+  // in a spreadsheet (all spreadsheets can import CSV).
+  AllChannels,
+
+  // Logs the local transforms of all bones from `debug_bone` to the root node.
+  // The final global transform of the `debug_bone` is the product of the
+  // logged local transforms.
+  OneBone,
+}
+
 table AnimationDef {
   // Object in the AnimTable that holds the array of animations.
   anim_table_object:int;
@@ -79,11 +100,15 @@ table AnimationDef {
   // AnimationComponent::AnimateFromTable().
   anim_table_start_idx:int;
 
-  // If true, output animation values for every scale, rotate, and translate,
-  // on every bone for this entity. It's a lot of information, but can be
-  // piped into a .csv (comma separated values) file and opened in a
-  // spreadsheet.
-  debug:bool = false;
+  // Replaced by `debug_output` below.
+  debug:bool = false (deprecated);
+
+  // Debug information that is logged every frame.
+  debug_state:AnimationDebugState = None;
+
+  // If `debug_state` is specific to a bone, the index of that bone.
+  // You can see the bone indices by running mesh_pipeline --info on the FBX.
+  debug_bone:ubyte;
 }
 
 table GraphDef {

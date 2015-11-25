@@ -17,6 +17,7 @@
 
 #include "breadboard/event.h"
 #include "corgi/component.h"
+#include "library_components_generated.h"
 #include "motive/anim_table.h"
 #include "motive/engine.h"
 #include "motive/motivator.h"
@@ -33,27 +34,6 @@ BREADBOARD_DECLARE_EVENT(kAnimationCompleteEventId)
 /// @file
 /// @addtogroup corgi_component_library
 /// @{
-///
-/// @enum AnimationDebugState
-///
-/// @brief `kAnimationDebug_Inactive` indicates that no debug information should
-/// be output. Both `kAnimationDebug_OutputHeaderAndState` and
-/// `kAnimationDebug_OutputState` indicate that debug information should be
-/// output on every frame.
-///
-/// `kAnimationDebug_OutputHeaderAndState` is used for the initial output, as
-/// it prints a header row, containing column labels for the table. After the
-/// header row is output, the state is automatically changed to
-/// `kAnimationDebug_OutputState`.
-///
-/// `kAnimationDebug_OutputState` is automatically used after the header row is
-/// output from `kAnimationDebug_OutputHeaderAndState`. It will only print out
-/// the animation data for each frame.
-enum AnimationDebugState {
-  kAnimationDebug_Inactive,
-  kAnimationDebug_OutputHeaderAndState,
-  kAnimationDebug_OutputState,
-};
 
 /// @struct AnimationData
 ///
@@ -65,7 +45,8 @@ struct AnimationData {
       : anim_table_object(-1),
         last_anim_idx(-1),
         previous_time_remaining(motive::kMotiveTimeEndless),
-        debug_state(kAnimationDebug_Inactive) {}
+        debug_state(AnimationDebugState_None),
+        debug_bone(motive::kInvalidBoneIdx) {}
 
   /// @var motivator
   ///
@@ -94,11 +75,16 @@ struct AnimationData {
 
   /// @var debug_state
   ///
-  /// @brief This variable can be thought of like a `bool`, where it is either
-  /// active or inactive. If it is inactive, then no debug information will be
-  /// printed. If it is active, then it will output debug information on every
-  /// frame.
+  /// @brief The debug information output to the log every frame, for this
+  /// animating object. You probably want this to be None for all but one
+  /// animating object, since it outputs a lot of data.
   AnimationDebugState debug_state;
+
+  /// @var debug_bone
+  ///
+  /// @brief When `debug_state` outputs bone-specific information, this
+  /// member specifies the bone. Ignored otherwise.
+  motive::BoneIndex debug_bone;
 };
 
 /// @class AnimationComponent
