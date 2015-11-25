@@ -20,7 +20,7 @@ option(corgi_build_component_library
   ON)
 
 set(corgi_standalone_mode OFF)
-if("${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
+if("${CMAKE_CURRENT_LIST_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
   set(corgi_standalone_mode ON)
   message(STATUS "corgi standalone: building library and samples")
 else()
@@ -37,20 +37,20 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 # Directory which contains the source for 3rd party libraries.
 if(NOT DEFINED third_party_root)
   get_filename_component(
-    third_party_root "${CMAKE_CURRENT_SOURCE_DIR}/../../../../external"
+    third_party_root "${CMAKE_CURRENT_LIST_DIR}/../../../../external"
     REALPATH)
 endif()
 
 # Directory which contains source for FPL libraries.
 if(NOT DEFINED fpl_root)
   get_filename_component(
-      fpl_root "${CMAKE_CURRENT_SOURCE_DIR}/../../libs" REALPATH)
+      fpl_root "${CMAKE_CURRENT_LIST_DIR}/../../libs" REALPATH)
 endif()
 
 # If the dependencies directory exists, assume this is the root directory for
 # all libraries required by this project.
 if(NOT DEFINED dependencies_root)
-  set(dependencies_root "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
+  set(dependencies_root "${CMAKE_CURRENT_LIST_DIR}/dependencies")
   if(EXISTS "${dependencies_root}")
     set(third_party_root "${dependencies_root}")
     set(fpl_root "${dependencies_root}")
@@ -75,7 +75,7 @@ set(dependencies_bulletphysics_distr_dir "${third_party_root}/bulletphysics"
     CACHE PATH "Directory containing the Bullet Physics distribution.")
 # NOTE: This is only required as the breadboard module library and CORGI's
 # component library have a circular dependency.
-set(dependencies_corgi_dir "${CMAKE_CURRENT_SOURCE_DIR}"
+set(dependencies_corgi_dir "${CMAKE_CURRENT_LIST_DIR}"
     CACHE PATH "Directory containing the CORGI library.")
 
 # Temporary files (like object files) created while compiling projects.
@@ -120,7 +120,7 @@ set(CMAKE_C_FLAGS_DEFAULT "${CMAKE_C_FLAGS}")
 add_library(corgi ${corgi_SRCS})
 
 if (corgi_build_component_library)
-  set(CORGI_COMPONENT_LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/component_library)
+  set(CORGI_COMPONENT_LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR}/component_library)
   # The component library uses a bunch of Flatbuffers, so we should build them.
   # Generate source files for all FlatBuffers schema files under the src
   # directory.
@@ -231,5 +231,5 @@ if (corgi_build_component_library)
 endif()  # corgi_build_component_library
 
 if(corgi_build_samples)
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/sample)
+  add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/sample)
 endif()
