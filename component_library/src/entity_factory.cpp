@@ -219,8 +219,10 @@ void EntityFactory::LoadEntityData(const void* def,
     for (int component_id = 0; component_id <= max_component_id();
          component_id++) {
       // If we don't already have a MetaComponent, we should get one added.
-      if (entity_manager->GetComponent(component_id) != nullptr &&
-          entity->IsRegisteredForComponent(component_id) &&
+      corgi::ComponentInterface* component_ptr =
+          entity_manager->GetComponent(component_id);
+      if (component_ptr != nullptr &&
+          component_ptr->HasDataForEntity(entity) &&
           overridden_components.find(component_id) ==
               overridden_components.end()) {
         meta_data->components_from_prototype.insert(component_id);

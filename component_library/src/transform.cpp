@@ -188,7 +188,7 @@ void TransformComponent::AddFromRawData(corgi::EntityRef& entity,
   // The physics component is initialized first, so it needs to be updated with
   // the correct initial transform.
   auto physics_component = entity_manager_->GetComponent<PhysicsComponent>();
-  if (entity->IsRegisteredForComponent(physics_component->GetComponentId())) {
+  if (IsRegisteredWithComponent<PhysicsComponent>(entity)) {
     physics_component->UpdatePhysicsFromTransform(entity);
   }
 
@@ -281,7 +281,8 @@ corgi::EntityRef TransformComponent::ChildWithComponents(
     // If this entity has the components we're looking for, return it.
     bool has_components = true;
     for (size_t i = 0; i < num_ids; ++i) {
-      has_components = has_components && e->IsRegisteredForComponent(ids[i]);
+      has_components = has_components &&
+          entity_manager_->GetComponent(ids[i])->HasDataForEntity(e);
     }
     if (has_components) return e;
 
