@@ -32,45 +32,7 @@ namespace corgi {
 class Entity {
  public:
   /// @brief Constructor for creating an Entity.
-  Entity() : marked_for_deletion_(false) {
-    for (int i = 0; i < kMaxComponentCount; i++) {
-      componentDataIndex_[i] = kUnusedComponentIndex;
-    }
-  }
-
-  /// @brief Gets the index of the data in the corresponding Component
-  /// system.
-  ///
-  /// @param[in] componentId The ID of the Component whose data
-  /// index will be returned.
-  ///
-  /// @return Returns an int index of the data in the corresponding
-  /// Component system.
-  int GetComponentDataIndex(ComponentId componentId) const {
-    return componentDataIndex_[componentId];
-  }
-
-  /// @brief Sets the index for the data associated with this Entity in the
-  /// given Component.
-  ///
-  /// @param[in] componentId The ID of the Component whose data index will
-  /// be set.
-  /// @param[in] value The ComponentIndex value to set for the given Component.
-  void SetComponentDataIndex(ComponentId componentId, ComponentIndex value) {
-    componentDataIndex_[componentId] = value;
-  }
-
-  /// @brief A utility function for checking if this Entity is associated
-  /// with a given Component.
-  ///
-  /// @param[in] componentId The ID of the Component to check whether or not
-  /// it is associated with this Entity.
-  ///
-  /// @return Returns a bool of whether or not this Entity is associated
-  /// with the given Component.
-  bool IsRegisteredForComponent(ComponentId componentId) const {
-    return componentDataIndex_[componentId] != kUnusedComponentIndex;
-  }
+  Entity() : entity_id_(kInvalidEntityId), marked_for_deletion_(false) {}
 
   /// @brief An accessor function to check if this Entity has been
   /// marked for deletion.
@@ -87,8 +49,19 @@ class Entity {
     marked_for_deletion_ = marked_for_deletion;
   }
 
+
+  /// @brief Returns the unique entity id that represents this entity.  Should
+  /// generally only be used by internal CORGI functions.  Users of the library
+  /// should usually refer to entities as EntityRefs.
+  EntityIdType entity_id() const { return entity_id_; }
+
+  /// @brief Sets an entity's unique ID.
+  ///
+  /// Normally only used internally by the entitymanager for bookkeeping.
+  void set_entity_id(EntityIdType entity_id) { entity_id_ = entity_id; }
+
  private:
-  ComponentIndex componentDataIndex_[kMaxComponentCount];
+  EntityIdType entity_id_;
   bool marked_for_deletion_;
 };
 /// @}

@@ -44,15 +44,26 @@ void AnimationComponent::UpdateAllEntities(corgi::WorldTime delta_time) {
        ++iter) {
     AnimationData* animation_data = GetComponentData(iter->entity);
     if (animation_data->motivator.Valid()) {
-      // Log debug info. Only log the header the first time.
-      if (animation_data->debug_state == kAnimationDebug_OutputHeaderAndState) {
-        fplbase::LogInfo(
-            animation_data->motivator.CsvHeaderForDebugging().c_str());
-        animation_data->debug_state = kAnimationDebug_OutputState;
-      }
-      if (animation_data->debug_state != kAnimationDebug_Inactive) {
-        fplbase::LogInfo(
-            animation_data->motivator.CsvValuesForDebugging().c_str());
+      switch (animation_data->debug_state) {
+        case AnimationDebugState_AllChannelsWithHeader:
+          // Log debug info. Only log the header the first time.
+          fplbase::LogInfo(
+              animation_data->motivator.CsvHeaderForDebugging().c_str());
+          animation_data->debug_state = AnimationDebugState_AllChannels;
+          //fallthrough
+
+        case AnimationDebugState_AllChannels:
+          fplbase::LogInfo(
+              animation_data->motivator.CsvValuesForDebugging().c_str());
+          break;
+
+        case AnimationDebugState_OneBone:
+          fplbase::LogInfo("\n%s",
+              animation_data->motivator.LocalTransformsForDebugging(
+                  animation_data->debug_bone).c_str());
+          break;
+
+        default: break;
       }
     }
   }
@@ -82,10 +93,11 @@ void AnimationComponent::AddFromRawData(corgi::EntityRef& entity,
   auto animation_def = static_cast<const corgi::AnimationDef*>(raw_data);
   AnimationData* animation_data = AddEntity(entity);
   animation_data->anim_table_object = animation_def->anim_table_object();
-  animation_data->debug_state = animation_def->debug()
-                                    ? kAnimationDebug_OutputHeaderAndState
-                                    : kAnimationDebug_Inactive;
-  AnimateFromTable(entity, animation_def->anim_table_start_idx());
+  animation_data->debug_state = animation_def->debug_state();
+  animation_data->debug_bone = animation_def->debug_bone();
+  if (animation_def->anim_table_start_idx() >= 0) {
+    AnimateFromTable(entity, animation_def->anim_table_start_idx());
+  }
 }
 
 corgi::ComponentInterface::RawDataUniquePtr AnimationComponent::ExportRawData(
@@ -99,8 +111,8 @@ corgi::ComponentInterface::RawDataUniquePtr AnimationComponent::ExportRawData(
   fbb.ForceDefaults(defaults);
 
   auto anim_def = CreateAnimationDef(
-      fbb, animation_data->anim_table_object, 0,
-      animation_data->debug_state != kAnimationDebug_Inactive);
+      fbb, animation_data->anim_table_object, 0, animation_data->debug_state,
+      animation_data->debug_bone);
   fbb.Finish(anim_def);
   return fbb.ReleaseBufferPointer();
 }
@@ -118,7 +130,8 @@ void AnimationComponent::InitializeMotivator(const EntityRef& entity) {
   // `defining_anim`.
   auto mesh = render_data->mesh;
   const RigInit init(defining_anim, mesh->bone_transforms(),
-                     mesh->bone_parents(), mesh->num_bones());
+                     mesh->bone_parents(),
+                     static_cast<motive::BoneIndex>(mesh->num_bones()));
   data->motivator.Initialize(init, &engine_);
 }
 

@@ -86,13 +86,12 @@ class ComponentInterface {
   /// delta time for this frame.
   virtual void UpdateAllEntities(WorldTime delta_time) = 0;
 
+  /// @brief Returns true if this component has data associated with the
+  /// entity provided.
+  virtual bool HasDataForEntity(const EntityRef&) = 0;
+
   /// @brief Clears all Component data, effectively disassociating this
   /// Component from any Entities.
-  ///
-  /// @note This does NOT change Entities, so they may still think that this
-  /// Component has data for them. Normally this is not something you want
-  /// to invoke directly. It is usually used by other things like
-  /// Entity.Clear(), when something wants to purge all data and start over.
   virtual void ClearComponentData() = 0;
 
   /// @brief Gets the data for a given Entity as a void pointer.
