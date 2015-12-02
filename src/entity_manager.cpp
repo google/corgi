@@ -124,6 +124,7 @@ void EntityManager::Clear() {
     components_[i] = nullptr;
   }
   entities_.Clear();
+  max_component_id_ = 0;
 }
 
 EntityRef EntityManager::CreateEntityFromData(const void* data) {
