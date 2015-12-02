@@ -35,7 +35,7 @@ EntityRef EntityManager::AllocateNewEntity() {
   EntityRef result = EntityRef(entities_.GetNewElement(kAddToBack));
   // Indexes are guaranteed to be unique and stable in vector pools.
   // May need to revisit this if we implement defragging though.
-  result->set_entity_id(result.index());
+  result->set_entity_id(static_cast<EntityIdType>(result.index()));
   return result;
 }
 
