@@ -29,6 +29,9 @@ endif()
 option(corgi_build_samples "Build the corgi sample executables."
        ${corgi_standalone_mode})
 
+# Option to enable / disable the test build.
+option(corgi_build_tests "Build tests for this project." ON)
+
 # Compile the game with the debug flag
 set(corgi_DEBUG ON)
 
@@ -233,3 +236,37 @@ endif()  # corgi_build_component_library
 if(corgi_build_samples)
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/sample)
 endif()
+
+# gtest seems to prefer the non-DLL runtime on Windows, which conflicts with
+# everything else.
+option(
+  gtest_force_shared_crt
+  "Use shared (DLL) run-time lib even when Google Test is built as static lib."
+  ON)
+
+# Tests.
+if(corgi_build_tests)
+  set(GUNIT_INCDIR "${dependencies_gtest_dir}/include")
+  set(GTEST_LIBDIR "${dependencies_gtest_dir}")
+  add_subdirectory("${dependencies_gtest_dir}" ${tmp_dir}/googletest)
+
+  include(${GTEST_LIBDIR}/cmake/internal_utils.cmake)
+  config_compiler_and_linker()
+  string(REPLACE "-W4" "-W3" cxx_default "${cxx_default}")
+  string(REPLACE "-Wshadow" "" cxx_default "${cxx_default}")
+  string(REPLACE "-Wextra" "" cxx_default "${cxx_default}")
+
+  include_directories(${GUNIT_INCDIR}
+                      ${CMAKE_CURRENT_SOURCE_DIR})
+
+  function(test_executable name libs)
+    cxx_executable_with_flags(${name}_test "${cxx_default}"
+        "${libs}" ${CMAKE_CURRENT_SOURCE_DIR}/unit_tests/${name}_test.cpp
+        ${ARGN})
+    mathfu_configure_flags(${name}_test)
+  endfunction()
+
+  test_executable(vector_pool "gtest")
+endif()
+
+
