@@ -30,7 +30,8 @@ option(corgi_build_samples "Build the corgi sample executables."
        ${corgi_standalone_mode})
 
 # Option to enable / disable the test build.
-option(corgi_build_tests "Build tests for this project." ON)
+option(corgi_build_tests "Build tests for this project."
+       ${corgi_standalone_mode})
 
 # Compile the game with the debug flag
 set(corgi_DEBUG ON)
