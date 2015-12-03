@@ -57,7 +57,7 @@ void AllocAndFree_Constructor_Test() {
   corgi::VectorPool<TestStruct<DataType>> pool;
   for (int i = 0; i < 100; i++) {
     VECTORPOOL_REF ref = pool.GetNewElement(corgi::kAddToFront);
-    EXPECT_EQ(ref->value, 123);
+    EXPECT_EQ(ref->value, static_cast<DataType>(123));
   }
 }
 TEST_ALL_SIZES_F(AllocAndFree_Constructor)
@@ -67,12 +67,12 @@ template<class DataType>
 void AllocAndFree_OneElement_Test() {
   corgi::VectorPool<TestStruct<DataType>> pool;
   VECTORPOOL_REF ref;
-  EXPECT_EQ(pool.active_count(), 0);
+  EXPECT_EQ(pool.active_count(), 0u);
   ref = pool.GetNewElement(corgi::kAddToFront);
   EXPECT_TRUE(ref.IsValid());
-  EXPECT_EQ(pool.active_count(), 1);
+  EXPECT_EQ(pool.active_count(), 1u);
   pool.FreeElement(ref);
-  EXPECT_EQ(pool.active_count(), 0);
+  EXPECT_EQ(pool.active_count(), 0u);
   EXPECT_FALSE(ref.IsValid());
 }
 TEST_ALL_SIZES_F(AllocAndFree_OneElement)
@@ -83,20 +83,20 @@ void AllocAndFree_TwoElementsElement_Test() {
   corgi::VectorPool<TestStruct<DataType>> pool;
   VECTORPOOL_REF ref1;
   VECTORPOOL_REF ref2;
-  EXPECT_EQ(pool.active_count(), 0);
+  EXPECT_EQ(pool.active_count(), 0u);
   ref1 = pool.GetNewElement(corgi::kAddToFront);
   ref2 = pool.GetNewElement(corgi::kAddToFront);
   EXPECT_TRUE(ref1.IsValid());
   EXPECT_TRUE(ref2.IsValid());
-  EXPECT_EQ(pool.active_count(), 2);
+  EXPECT_EQ(pool.active_count(), 2u);
 
   pool.FreeElement(ref1);
   EXPECT_FALSE(ref1.IsValid());
-  EXPECT_EQ(pool.active_count(), 1);
+  EXPECT_EQ(pool.active_count(), 1u);
 
   pool.FreeElement(ref2);
   EXPECT_FALSE(ref2.IsValid());
-  EXPECT_EQ(pool.active_count(), 0);
+  EXPECT_EQ(pool.active_count(), 0u);
 }
 TEST_ALL_SIZES_F(AllocAndFree_TwoElementsElement)
 
@@ -137,17 +137,17 @@ void AllocAndFree_ManyElementsElement_Test() {
 
   // First 50 (numbered 0-49)
   for (int i = 49; i >= 0; i--) {
-    EXPECT_EQ(iter->value, i);
+    EXPECT_EQ(iter->value, static_cast<DataType>(i));
     ++iter;
   }
   // Second 50, numbered 0-49
   for (int i = 1; i < 100; i += 2) {
-    EXPECT_EQ(iter->value, i);
+    EXPECT_EQ(iter->value, static_cast<DataType>(i));
     ++iter;
   }
   // Final 50, numbered 50-99
   for (int i = 50; i < 100; i++) {
-    EXPECT_EQ(iter->value, i);
+    EXPECT_EQ(iter->value, static_cast<DataType>(i));
     ++iter;
   }
   EXPECT_EQ(iter, pool.end());
@@ -169,7 +169,7 @@ void InsertionOrder_AddToBack_Test() {
 
   int i = 0;
   for (auto iter = pool.begin(); iter != pool.end(); ++iter) {
-    EXPECT_EQ(i, iter->value);
+    EXPECT_EQ(i, static_cast<int>(iter->value));
     i++;
   }
 }
@@ -190,7 +190,7 @@ void InsertionOrder_AddToFront_Test() {
 
   int i = 99;
   for (auto iter = pool.begin(); iter != pool.end(); ++iter) {
-    EXPECT_EQ(i, iter->value);
+    EXPECT_EQ(i, static_cast<int>(iter->value));
     i--;
   }
 }
@@ -222,7 +222,7 @@ void Iterator_StepThrough_Test() {
 
   int counter = 0;
   for (auto iter = pool.begin(); iter != pool.end(); ++iter) {
-    EXPECT_EQ(iter->value, counter);
+    EXPECT_EQ(static_cast<int>(iter->value), counter);
     counter++;
   }
   EXPECT_EQ(counter, 100);
@@ -243,7 +243,7 @@ void Iterator_StepBackwards_Test() {
 
   for (auto iter = --pool.end(); iter != pool.begin(); --iter) {
     counter++;
-    EXPECT_EQ(iter->value, 100 - counter);
+    EXPECT_EQ(static_cast<int>(iter->value), 100 - counter);
   }
   // Not 100 here, because we had to advance it once during initialization,
   // to get our iterator off of end().
