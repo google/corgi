@@ -24,16 +24,6 @@ namespace corgi {
 /// @addtogroup corgi_entity
 /// @{
 ///
-/// @def CORGI_MAX_COMPONENT_COUNT
-///
-/// @brief The maximum number of components in the system.
-///
-/// Redefine this to fit however many Components your system needs.
-///
-/// @warning This should be set with care, because it affects the size of each
-/// Entity. Ideally this should be set to something that is as close as
-/// possible to the actual number of Components used by the program.
-#define CORGI_MAX_COMPONENT_COUNT 30
 
 /// @var ComponentId
 ///
@@ -43,13 +33,7 @@ namespace corgi {
 /// uint16_t, or uint32_t. (However, if you need an uint32_t, you are
 /// probably doing something odd.)
 /// @{
-#if kMaxComponentCount <= 0xff
-typedef uint8_t ComponentId;
-#elif kMaxComponentCount <= 0xffff
 typedef uint16_t ComponentId;
-#else
-typedef uint32_t ComponentId;
-#endif
 /// @}
 
 /// @var kInvalidComponent
@@ -57,11 +41,7 @@ typedef uint32_t ComponentId;
 /// @brief A sentinel value to represent an invalid Component.
 ///
 /// @note Component IDs start at 1.
-const ComponentId kInvalidComponent = 0;
-
-/// @cond CORGI_INTERNAL
-static const ComponentId kMaxComponentCount = CORGI_MAX_COMPONENT_COUNT;
-/// @endcond
+const ComponentId kInvalidComponent = static_cast<ComponentId>(-1);
 
 /// @typedef WorldTime
 ///

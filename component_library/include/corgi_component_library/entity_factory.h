@@ -51,7 +51,7 @@ class EntityFactory : public corgi::EntityFactoryInterface {
 
   /// @brief The default constructor for an empty EntityFactory.
   EntityFactory()
-      : max_component_id_(corgi::kInvalidComponent),
+      : max_component_id_(0),
         debug_entity_creation_(false) {}
   virtual ~EntityFactory() {}
 
