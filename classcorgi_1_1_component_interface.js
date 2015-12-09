@@ -10,6 +10,7 @@ var classcorgi_1_1_component_interface =
     [ "ExportRawData", "classcorgi_1_1_component_interface.html#a8ecc28bbd67fc254f72da0683e73007b", null ],
     [ "GetComponentDataAsVoid", "classcorgi_1_1_component_interface.html#a51fe42d8d18c3a4001c8537aea029d37", null ],
     [ "GetComponentDataAsVoid", "classcorgi_1_1_component_interface.html#a3108acd9549d90885dfa4fc12928ad8b", null ],
+    [ "HasDataForEntity", "classcorgi_1_1_component_interface.html#a0af7cb82471ee5a1722842e49feecebb", null ],
     [ "Init", "classcorgi_1_1_component_interface.html#ad040cec46efdc3d158fe01d7c4d71eee", null ],
     [ "InitEntity", "classcorgi_1_1_component_interface.html#ab46d0e97e732f4c8afe8b1f78b2d3436", null ],
     [ "RemoveEntity", "classcorgi_1_1_component_interface.html#ab07e914d8e8bd3ac62f4f2e57e466304", null ],

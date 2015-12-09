@@ -24,6 +24,85 @@
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400italic,500,500italic,700,700italic|Roboto+Mono:400,700" rel="stylesheet">
 <link href="style.css" rel="stylesheet" type="text/css"/>
+<script>
+  /**
+   * Check if the browser rendering this page is being run on an Android device.
+   * It checks if the string 'android' is found in the browser's `userAgent`.
+   * @return {boolean} This returns `true` if the browser's `userAgent` contains
+   * the string 'android' (indicating that the browser is on an Android device).
+   * Otherwise, it returns `false`.
+   */
+  function isAndroidDevice() {
+    if (navigator && navigator.userAgent) {
+      return navigator.userAgent.toLowerCase().indexOf('android') != -1;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Check if an HTML `class` attribute is in the browser-specific format.
+   * @param {string} An HTML `class` attribute in the format 'browser-{device}'.
+   * @return {boolean} Returns `true` if `browserClass` was in the valid format,
+   * prefixed with 'browser-'. Otherwise, it returns false.
+   */
+  function isBrowserSpecificClassName(browserClass) {
+    if (browserClass && browserClass.substring(0, 8) == 'browser-' &&
+        browserClass.length > 8) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Get all the HTML Elements with browser-specific `class` attributes.
+   * @return {array} Returns an array of all the HTML Elements with a `class`
+   * attribute that is prefixed with `browser-`.
+   */
+  function getAllBrowserSpecificElements() {
+    if (document) {
+      var htmlElements = document.getElementsByTagName("*");
+      var browserSpecificElements = [];
+      for (var i = 0; i < htmlElements.length; i++) {
+        if (isBrowserSpecificClassName(htmlElements[i].className)) {
+          browserSpecificElements.push(htmlElements[i]);
+        }
+      }
+      return browserSpecificElements;
+    } else {
+      return null;
+    }
+  }
+  /**
+   * Given a browser-specific HTML `class` attribute, extract the device name.
+   * @param {string} browserClass The string name of an HTML `class` attribute,
+   * in the format `browser-{device}`.
+   * @return {string} Returns a string containing only the device portion of
+   * the class name. If the input was invalid, then it returns `null`.
+   */
+  function extractDeviceFromBrowserClass(browserClass) {
+    if (isBrowserSpecificClassName(browserClass)) {
+      return browserClass.substring(8);
+    }
+    else {
+      return null;
+    }
+  }
+  /**
+   * Hide device specific elements that do not apply to the current device.
+   */
+  function handleDeviceSpecificLoading() {
+    var browserSpecificElements = getAllBrowserSpecificElements();
+    for (var i = 0; i < browserSpecificElements.length; i++) {
+      var device = extractDeviceFromBrowserClass(browserSpecificElements[i].className);
+      if (device && !isAndroidDevice() && device == 'android') {
+        browserSpecificElements[i].innerHTML = '';
+      } else if(device && isAndroidDevice() && device == 'desktop') {
+        browserSpecificElements[i].innerHTML = '';
+      }
+    }
+  }
+  $(document).ready(handleDeviceSpecificLoading);
+</script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -286,19 +365,19 @@ $(document).ready(function(){initNavTree('meta_8h_source.html','');});
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="preprocessor">#endif  // CORGI_COMPONENT_LIBRARY_META_H_</span></div>
 <div class="ttc" id="classcorgi_1_1_component_interface_html_a8fcb3126b70ec692558ecb4ba7e50eb2"><div class="ttname"><a href="classcorgi_1_1_component_interface.html#a8fcb3126b70ec692558ecb4ba7e50eb2">corgi::ComponentInterface::RawDataUniquePtr</a></div><div class="ttdeci">std::unique_ptr&lt; uint8_t, std::function&lt; void(uint8_t *)&gt; &gt; RawDataUniquePtr</div><div class="ttdoc">A pointer type for exported raw data. </div><div class="ttdef"><b>Definition:</b> component_interface.h:63</div></div>
-<div class="ttc" id="classcorgi_1_1_component_html"><div class="ttname"><a href="classcorgi_1_1_component.html">corgi::Component</a></div><div class="ttdoc">A Component is an object that encapsulates all data and logic for Entities of a particular type...</div><div class="ttdef"><b>Definition:</b> component.h:42</div></div>
+<div class="ttc" id="classcorgi_1_1_component_html"><div class="ttname"><a href="classcorgi_1_1_component.html">corgi::Component</a></div><div class="ttdoc">A Component is an object that encapsulates all data and logic for Entities of a particular type...</div><div class="ttdef"><b>Definition:</b> component.h:43</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_meta_component_html_a8d5717f9afe225cbfe5212ea984714c3"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_meta_component.html#a8d5717f9afe225cbfe5212ea984714c3">corgi::component_library::MetaComponent::UpdateAllEntities</a></div><div class="ttdeci">virtual void UpdateAllEntities(corgi::WorldTime)</div><div class="ttdoc">Does nothing. This is only implemented as part of the ComponentInterface. </div><div class="ttdef"><b>Definition:</b> meta.h:121</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_meta_component_html_a8dba48d468c5c6f285e5bb4edbd69612"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_meta_component.html#a8dba48d468c5c6f285e5bb4edbd69612">corgi::component_library::MetaComponent::CleanupEntity</a></div><div class="ttdeci">virtual void CleanupEntity(corgi::EntityRef &amp;entity)</div><div class="ttdoc">Removes the given Entity from the dictionary tracked by this Component. </div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_meta_data_html_a2bed919b686bcd16040575e945750a32"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_meta_data.html#a2bed919b686bcd16040575e945750a32">corgi::component_library::MetaData::entity_id</a></div><div class="ttdeci">std::string entity_id</div><div class="ttdoc">A std::string to uniquely identify this Entity. </div><div class="ttdef"><b>Definition:</b> meta.h:39</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_meta_component_html_a055522494bba651d5fbbad06ac396fca"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_meta_component.html#a055522494bba651d5fbbad06ac396fca">corgi::component_library::MetaComponent::AddFromPrototypeData</a></div><div class="ttdeci">void AddFromPrototypeData(corgi::EntityRef &amp;entity, const corgi::MetaDef *meta_def)</div><div class="ttdoc">Adds the comment from the prototype data to an Entity&#39;s MetaData. </div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_meta_data_html_a06fb73f505f0730fbf61f3d309ba334a"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_meta_data.html#a06fb73f505f0730fbf61f3d309ba334a">corgi::component_library::MetaData::source_file</a></div><div class="ttdeci">std::string source_file</div><div class="ttdoc">If the Entity came from a source file, the std::string name of the file is stored here...</div><div class="ttdef"><b>Definition:</b> meta.h:51</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_meta_component_html_a0414f4bbef8132188363a25c92126894"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_meta_component.html#a0414f4bbef8132188363a25c92126894">corgi::component_library::MetaComponent::GetEntityID</a></div><div class="ttdeci">const std::string &amp; GetEntityID(const corgi::EntityRef &amp;entity)</div><div class="ttdoc">Get the ID for this Entity. </div></div>
-<div class="ttc" id="group__corgi__entity_html_ga754f75a6aad33aa11de5084743ee3f98"><div class="ttname"><a href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98">corgi::WorldTime</a></div><div class="ttdeci">int WorldTime</div><div class="ttdoc">A typedef that represents time in the game. </div><div class="ttdef"><b>Definition:</b> entity_common.h:69</div></div>
+<div class="ttc" id="group__corgi__entity_html_ga754f75a6aad33aa11de5084743ee3f98"><div class="ttname"><a href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98">corgi::WorldTime</a></div><div class="ttdeci">int WorldTime</div><div class="ttdoc">A typedef that represents time in the game. </div><div class="ttdef"><b>Definition:</b> entity_common.h:49</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_meta_component_html_ad361a82e4d8a525cc3d8fdb13a2853f3"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_meta_component.html#ad361a82e4d8a525cc3d8fdb13a2853f3">corgi::component_library::MetaComponent::GetEntityFromDictionary</a></div><div class="ttdeci">corgi::EntityRef GetEntityFromDictionary(const std::string &amp;key)</div><div class="ttdoc">Get an Entity from the dictionary at a given key. </div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_meta_component_html_aef7751d10c22cea11798dccb42955a7e"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_meta_component.html#aef7751d10c22cea11798dccb42955a7e">corgi::component_library::MetaComponent::~MetaComponent</a></div><div class="ttdeci">virtual ~MetaComponent()</div><div class="ttdoc">The destructor for MetaComponent. </div><div class="ttdef"><b>Definition:</b> meta.h:72</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_meta_component_html_a2bba87ac00921d7f043891fb91bb11ae"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_meta_component.html#a2bba87ac00921d7f043891fb91bb11ae">corgi::component_library::MetaComponent::AddWithSourceFile</a></div><div class="ttdeci">void AddWithSourceFile(corgi::EntityRef &amp;entity, const std::string &amp;source_file)</div><div class="ttdoc">Adds a source file name to an Entity&#39;s MetaData. </div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_meta_data_html_adf8acf19b7d6a52526dc397ae6d21430"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_meta_data.html#adf8acf19b7d6a52526dc397ae6d21430">corgi::component_library::MetaData::comment</a></div><div class="ttdeci">std::string comment</div><div class="ttdoc">A human-readable comment to remember what this entity is for. </div><div class="ttdef"><b>Definition:</b> meta.h:56</div></div>
-<div class="ttc" id="classcorgi_1_1_vector_pool_1_1_vector_pool_reference_html"><div class="ttname"><a href="classcorgi_1_1_vector_pool_1_1_vector_pool_reference.html">corgi::VectorPool::VectorPoolReference</a></div><div class="ttdoc">A reference object for pointing into the vector pool. It acts as a pointer for vector pool elements a...</div><div class="ttdef"><b>Definition:</b> vector_pool.h:71</div></div>
+<div class="ttc" id="classcorgi_1_1_vector_pool_1_1_vector_pool_reference_html"><div class="ttname"><a href="classcorgi_1_1_vector_pool_1_1_vector_pool_reference.html">corgi::VectorPool::VectorPoolReference</a></div><div class="ttdoc">A reference object for pointing into the vector pool. It acts as a pointer for vector pool elements a...</div><div class="ttdef"><b>Definition:</b> vector_pool.h:72</div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_meta_data_html_a8924bfef236d6312aebfb3f509eadfe6"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_meta_data.html#a8924bfef236d6312aebfb3f509eadfe6">corgi::component_library::MetaData::components_from_prototype</a></div><div class="ttdeci">std::set&lt; corgi::ComponentId &gt; components_from_prototype</div><div class="ttdoc">Used to keep track of which of this Entity&#39;s Components came from the prototype. </div><div class="ttdef"><b>Definition:</b> meta.h:62</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_meta_component_html_a07c67e8c8a9badf5686f7e607a18e32b"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_meta_component.html#a07c67e8c8a9badf5686f7e607a18e32b">corgi::component_library::MetaComponent::AddFromRawData</a></div><div class="ttdeci">virtual void AddFromRawData(corgi::EntityRef &amp;entity, const void *raw_data)</div><div class="ttdoc">Deserialize a flat binary buffer to create and populate an Entity&#39;s MetaData from raw data...</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_meta_component_html_ada3aceac107068bd97ddb22a008acb7e"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_meta_component.html#ada3aceac107068bd97ddb22a008acb7e">corgi::component_library::MetaComponent::ExportRawData</a></div><div class="ttdeci">virtual RawDataUniquePtr ExportRawData(const corgi::EntityRef &amp;entity) const </div><div class="ttdoc">Serializes a MetaComponent&#39;s data for a given Entity. </div></div>

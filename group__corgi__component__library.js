@@ -3,6 +3,7 @@ var group__corgi__component__library =
     [ "AnimationData", "structcorgi_1_1component__library_1_1_animation_data.html", [
       [ "AnimationData", "structcorgi_1_1component__library_1_1_animation_data.html#a7452e63ab98859ddd85167bbc3b685ea", null ],
       [ "anim_table_object", "structcorgi_1_1component__library_1_1_animation_data.html#a48cf3494eacff29a6be338027b222be9", null ],
+      [ "debug_bone", "structcorgi_1_1component__library_1_1_animation_data.html#a2183c73d6553cdb717bb35a6970501c6", null ],
       [ "debug_state", "structcorgi_1_1component__library_1_1_animation_data.html#acaa40955c4d4e57f8ac8a7cf6d8ce22c", null ],
       [ "last_anim_idx", "structcorgi_1_1component__library_1_1_animation_data.html#ad8d25c8e674860648fff82d38d4de4d8", null ],
       [ "motivator", "structcorgi_1_1component__library_1_1_animation_data.html#a92702e88dc57ba680fa51be87c539b16", null ],
@@ -298,7 +299,6 @@ var group__corgi__component__library =
       [ "WorldTransform", "classcorgi_1_1component__library_1_1_transform_component.html#a2d25cba067c8d50219925760eceb7003", null ]
     ] ],
     [ "CollisionCallback", "group__corgi__component__library.html#gaccc7268ac4d7f9f2b6361f2d549f5818", null ],
-    [ "AnimationDebugState", "group__corgi__component__library.html#ga6b46bb8d496e3efb26f0c329acc97220", null ],
     [ "GetMaxMinPositionsForEntity", "group__corgi__component__library.html#ga224b0e980c978b0a805e5ffce2419fd6", null ],
     [ "kDefaultPhysicsGravity", "group__corgi__component__library.html#gaab9cd5a640fd8ae2606f9f22f7b3aa4c", null ],
     [ "kDefaultPhysicsMaxSteps", "group__corgi__component__library.html#ga92ee3b2e5ef0f674b106b5abb6ca3b7c", null ],

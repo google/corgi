@@ -8,6 +8,7 @@ var group__corgi__entity__manager =
       [ "AllocateNewEntity", "classcorgi_1_1_entity_manager.html#ab375135077d32c1d82ec3a60a9d2c036", null ],
       [ "begin", "classcorgi_1_1_entity_manager.html#a867066490e3621ce92d715832a90d5ee", null ],
       [ "Clear", "classcorgi_1_1_entity_manager.html#ae0a8ad329f5006d6e3c9ae691742a43e", null ],
+      [ "ComponentCount", "classcorgi_1_1_entity_manager.html#a5c22aa89ce30b75b20500c639fb3a958", null ],
       [ "CreateEntityFromData", "classcorgi_1_1_entity_manager.html#a0cbd9ef9441e1e6c38fbcb03bdffc60a", null ],
       [ "DeleteEntity", "classcorgi_1_1_entity_manager.html#a3c5aa7c50e955b1dd92f724f27486a08", null ],
       [ "DeleteEntityImmediately", "classcorgi_1_1_entity_manager.html#a8793d086004de0d7a2eb4dcfdd3ecaf7", null ],

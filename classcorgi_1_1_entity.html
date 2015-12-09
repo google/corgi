@@ -24,6 +24,85 @@
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400italic,500,500italic,700,700italic|Roboto+Mono:400,700" rel="stylesheet">
 <link href="style.css" rel="stylesheet" type="text/css"/>
+<script>
+  /**
+   * Check if the browser rendering this page is being run on an Android device.
+   * It checks if the string 'android' is found in the browser's `userAgent`.
+   * @return {boolean} This returns `true` if the browser's `userAgent` contains
+   * the string 'android' (indicating that the browser is on an Android device).
+   * Otherwise, it returns `false`.
+   */
+  function isAndroidDevice() {
+    if (navigator && navigator.userAgent) {
+      return navigator.userAgent.toLowerCase().indexOf('android') != -1;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Check if an HTML `class` attribute is in the browser-specific format.
+   * @param {string} An HTML `class` attribute in the format 'browser-{device}'.
+   * @return {boolean} Returns `true` if `browserClass` was in the valid format,
+   * prefixed with 'browser-'. Otherwise, it returns false.
+   */
+  function isBrowserSpecificClassName(browserClass) {
+    if (browserClass && browserClass.substring(0, 8) == 'browser-' &&
+        browserClass.length > 8) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Get all the HTML Elements with browser-specific `class` attributes.
+   * @return {array} Returns an array of all the HTML Elements with a `class`
+   * attribute that is prefixed with `browser-`.
+   */
+  function getAllBrowserSpecificElements() {
+    if (document) {
+      var htmlElements = document.getElementsByTagName("*");
+      var browserSpecificElements = [];
+      for (var i = 0; i < htmlElements.length; i++) {
+        if (isBrowserSpecificClassName(htmlElements[i].className)) {
+          browserSpecificElements.push(htmlElements[i]);
+        }
+      }
+      return browserSpecificElements;
+    } else {
+      return null;
+    }
+  }
+  /**
+   * Given a browser-specific HTML `class` attribute, extract the device name.
+   * @param {string} browserClass The string name of an HTML `class` attribute,
+   * in the format `browser-{device}`.
+   * @return {string} Returns a string containing only the device portion of
+   * the class name. If the input was invalid, then it returns `null`.
+   */
+  function extractDeviceFromBrowserClass(browserClass) {
+    if (isBrowserSpecificClassName(browserClass)) {
+      return browserClass.substring(8);
+    }
+    else {
+      return null;
+    }
+  }
+  /**
+   * Hide device specific elements that do not apply to the current device.
+   */
+  function handleDeviceSpecificLoading() {
+    var browserSpecificElements = getAllBrowserSpecificElements();
+    for (var i = 0; i < browserSpecificElements.length; i++) {
+      var device = extractDeviceFromBrowserClass(browserSpecificElements[i].className);
+      if (device && !isAndroidDevice() && device == 'android') {
+        browserSpecificElements[i].innerHTML = '';
+      } else if(device && isAndroidDevice() && device == 'desktop') {
+        browserSpecificElements[i].innerHTML = '';
+      }
+    }
+  }
+  $(document).ready(handleDeviceSpecificLoading);
+</script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -142,89 +221,21 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_entity.html#a387e3f3daab109410bd688825bb00d0d">Entity</a> ()</td></tr>
 <tr class="memdesc:a387e3f3daab109410bd688825bb00d0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for creating an <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a>. <br/></td></tr>
 <tr class="separator:a387e3f3daab109410bd688825bb00d0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50a0754a5917b8f7a3a9aaf0eff22dde"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_entity.html#a50a0754a5917b8f7a3a9aaf0eff22dde">GetComponentDataIndex</a> (<a class="el" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a> componentId) const </td></tr>
-<tr class="memdesc:a50a0754a5917b8f7a3a9aaf0eff22dde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the index of the data in the corresponding <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> system.  <a href="#a50a0754a5917b8f7a3a9aaf0eff22dde">More...</a><br/></td></tr>
-<tr class="separator:a50a0754a5917b8f7a3a9aaf0eff22dde"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6627685c83eff405e27c0f8d26a5cc60"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_entity.html#a6627685c83eff405e27c0f8d26a5cc60">SetComponentDataIndex</a> (<a class="el" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a> componentId, <a class="el" href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">ComponentIndex</a> value)</td></tr>
-<tr class="memdesc:a6627685c83eff405e27c0f8d26a5cc60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the index for the data associated with this <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> in the given <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a>.  <a href="#a6627685c83eff405e27c0f8d26a5cc60">More...</a><br/></td></tr>
-<tr class="separator:a6627685c83eff405e27c0f8d26a5cc60"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a472b45191d8f7c65b14472721430b2af"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_entity.html#a472b45191d8f7c65b14472721430b2af">IsRegisteredForComponent</a> (<a class="el" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a> componentId) const </td></tr>
-<tr class="memdesc:a472b45191d8f7c65b14472721430b2af"><td class="mdescLeft">&#160;</td><td class="mdescRight">A utility function for checking if this <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> is associated with a given <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a>.  <a href="#a472b45191d8f7c65b14472721430b2af">More...</a><br/></td></tr>
-<tr class="separator:a472b45191d8f7c65b14472721430b2af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a953effc6282d00008993a32e847f47b6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_entity.html#a953effc6282d00008993a32e847f47b6">marked_for_deletion</a> () const </td></tr>
 <tr class="memdesc:a953effc6282d00008993a32e847f47b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">An accessor function to check if this <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> has been marked for deletion.  <a href="#a953effc6282d00008993a32e847f47b6">More...</a><br/></td></tr>
 <tr class="separator:a953effc6282d00008993a32e847f47b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7e79868be43f93c13bbf53a9add6f6a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_entity.html#ad7e79868be43f93c13bbf53a9add6f6a">set_marked_for_deletion</a> (bool <a class="el" href="classcorgi_1_1_entity.html#a953effc6282d00008993a32e847f47b6">marked_for_deletion</a>)</td></tr>
 <tr class="memdesc:ad7e79868be43f93c13bbf53a9add6f6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">A mutator function to set an <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> as marked for deletion.  <a href="#ad7e79868be43f93c13bbf53a9add6f6a">More...</a><br/></td></tr>
 <tr class="separator:ad7e79868be43f93c13bbf53a9add6f6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace9915ba41d5bffe824fa77614800ecd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ace9915ba41d5bffe824fa77614800ecd"></a>
+<a class="el" href="group__corgi__entity.html#gabaad342e5e2a6b0df9fc286c6f0d410b">EntityIdType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_entity.html#ace9915ba41d5bffe824fa77614800ecd">entity_id</a> () const </td></tr>
+<tr class="memdesc:ace9915ba41d5bffe824fa77614800ecd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the unique entity id that represents this entity. Should generally only be used by internal CORGI functions. Users of the library should usually refer to entities as EntityRefs. <br/></td></tr>
+<tr class="separator:ace9915ba41d5bffe824fa77614800ecd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c98a959f217734ec7faeea3f5e77c8b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_entity.html#a5c98a959f217734ec7faeea3f5e77c8b">set_entity_id</a> (<a class="el" href="group__corgi__entity.html#gabaad342e5e2a6b0df9fc286c6f0d410b">EntityIdType</a> <a class="el" href="classcorgi_1_1_entity.html#ace9915ba41d5bffe824fa77614800ecd">entity_id</a>)</td></tr>
+<tr class="memdesc:a5c98a959f217734ec7faeea3f5e77c8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets an entity's unique ID.  <a href="#a5c98a959f217734ec7faeea3f5e77c8b">More...</a><br/></td></tr>
+<tr class="separator:a5c98a959f217734ec7faeea3f5e77c8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a50a0754a5917b8f7a3a9aaf0eff22dde"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int corgi::Entity::GetComponentDataIndex </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a>&#160;</td>
-          <td class="paramname"><em>componentId</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Gets the index of the data in the corresponding <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> system. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">componentId</td><td>The ID of the <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> whose data index will be returned.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Returns an int index of the data in the corresponding <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> system. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a472b45191d8f7c65b14472721430b2af"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool corgi::Entity::IsRegisteredForComponent </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a>&#160;</td>
-          <td class="paramname"><em>componentId</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>A utility function for checking if this <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> is associated with a given <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a>. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">componentId</td><td>The ID of the <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> to check whether or not it is associated with this <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a>.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Returns a bool of whether or not this <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> is associated with the given <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a>. </dd></dl>
-
-</div>
-</div>
 <a class="anchor" id="a953effc6282d00008993a32e847f47b6"></a>
 <div class="memitem">
 <div class="memproto">
@@ -248,6 +259,33 @@ Public Member Functions</h2></td></tr>
 
 <p>An accessor function to check if this <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> has been marked for deletion. </p>
 <dl class="section return"><dt>Returns</dt><dd>Returns a bool indicating whether or not this <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> is marked for deletion. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a5c98a959f217734ec7faeea3f5e77c8b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void corgi::Entity::set_entity_id </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__corgi__entity.html#gabaad342e5e2a6b0df9fc286c6f0d410b">EntityIdType</a>&#160;</td>
+          <td class="paramname"><em>entity_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets an entity's unique ID. </p>
+<p>Normally only used internally by the entitymanager for bookkeeping. </p>
 
 </div>
 </div>
@@ -277,49 +315,6 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">marked_for_deletion</td><td>A bool corresponding to whether the <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> should be marked for deletion or not. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="a6627685c83eff405e27c0f8d26a5cc60"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void corgi::Entity::SetComponentDataIndex </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a>&#160;</td>
-          <td class="paramname"><em>componentId</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">ComponentIndex</a>&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Sets the index for the data associated with this <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> in the given <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a>. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">componentId</td><td>The ID of the <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> whose data index will be set. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>The ComponentIndex value to set for the given <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a>. </td></tr>
   </table>
   </dd>
 </dl>

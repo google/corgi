@@ -24,6 +24,85 @@
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400italic,500,500italic,700,700italic|Roboto+Mono:400,700" rel="stylesheet">
 <link href="style.css" rel="stylesheet" type="text/css"/>
+<script>
+  /**
+   * Check if the browser rendering this page is being run on an Android device.
+   * It checks if the string 'android' is found in the browser's `userAgent`.
+   * @return {boolean} This returns `true` if the browser's `userAgent` contains
+   * the string 'android' (indicating that the browser is on an Android device).
+   * Otherwise, it returns `false`.
+   */
+  function isAndroidDevice() {
+    if (navigator && navigator.userAgent) {
+      return navigator.userAgent.toLowerCase().indexOf('android') != -1;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Check if an HTML `class` attribute is in the browser-specific format.
+   * @param {string} An HTML `class` attribute in the format 'browser-{device}'.
+   * @return {boolean} Returns `true` if `browserClass` was in the valid format,
+   * prefixed with 'browser-'. Otherwise, it returns false.
+   */
+  function isBrowserSpecificClassName(browserClass) {
+    if (browserClass && browserClass.substring(0, 8) == 'browser-' &&
+        browserClass.length > 8) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Get all the HTML Elements with browser-specific `class` attributes.
+   * @return {array} Returns an array of all the HTML Elements with a `class`
+   * attribute that is prefixed with `browser-`.
+   */
+  function getAllBrowserSpecificElements() {
+    if (document) {
+      var htmlElements = document.getElementsByTagName("*");
+      var browserSpecificElements = [];
+      for (var i = 0; i < htmlElements.length; i++) {
+        if (isBrowserSpecificClassName(htmlElements[i].className)) {
+          browserSpecificElements.push(htmlElements[i]);
+        }
+      }
+      return browserSpecificElements;
+    } else {
+      return null;
+    }
+  }
+  /**
+   * Given a browser-specific HTML `class` attribute, extract the device name.
+   * @param {string} browserClass The string name of an HTML `class` attribute,
+   * in the format `browser-{device}`.
+   * @return {string} Returns a string containing only the device portion of
+   * the class name. If the input was invalid, then it returns `null`.
+   */
+  function extractDeviceFromBrowserClass(browserClass) {
+    if (isBrowserSpecificClassName(browserClass)) {
+      return browserClass.substring(8);
+    }
+    else {
+      return null;
+    }
+  }
+  /**
+   * Hide device specific elements that do not apply to the current device.
+   */
+  function handleDeviceSpecificLoading() {
+    var browserSpecificElements = getAllBrowserSpecificElements();
+    for (var i = 0; i < browserSpecificElements.length; i++) {
+      var device = extractDeviceFromBrowserClass(browserSpecificElements[i].className);
+      if (device && !isAndroidDevice() && device == 'android') {
+        browserSpecificElements[i].innerHTML = '';
+      } else if(device && isAndroidDevice() && device == 'desktop') {
+        browserSpecificElements[i].innerHTML = '';
+      }
+    }
+  }
+  $(document).ready(handleDeviceSpecificLoading);
+</script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -138,32 +217,35 @@ $(document).ready(function(){initNavTree('classcorgi_1_1_component.html','');});
   <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#aae4ac1f63deaf94da5afe0ddd2acf429">ClearComponentData</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a8d90bdceeb90f0c618b475e7facc0758">Component</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a92b32eded7ed99d56497990307b28ec1">component_data_</a></td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">protected</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a4f3e530aec2b7015820a72af6382d59d">Data</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#af29a889e5a089684bfcf87cafd0af90a">Data</a>(const EntityRef &amp;entity) const </td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a44a7996f5dbd99c7356ebbe1270f3d42">end</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a6aa029818941faa5872eded17ffdc0e4">entity_manager_</a></td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">protected</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a4b295352b577878531a7ab263e3b8979">EntityIterator</a> typedef</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a21c02ff7e10c29cad2bba7bfbcfbf5a2">ExportRawData</a>(const EntityRef &amp;) const </td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a0d4d2b94255e782230d0557170ef0f31">GetComponent</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#af5a2763b566c92e2d36d922ec907d684">GetComponentData</a>(size_t data_index)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a57773237830c0d6f9110accbe2a3cb11">GetComponentData</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a1981706d2009cc35500b11aeedc93d26">GetComponentData</a>(size_t data_index) const </td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a20a157107e5830500efa6379ab972e36">GetComponentData</a>(const EntityRef &amp;entity) const </td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a7455ca1144bfa57fc795802bbff05054">GetComponentDataAsVoid</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a25338292ce8943649cb68e27026fccb5">GetComponentDataAsVoid</a>(const EntityRef &amp;entity) const </td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a946a6926b51ab6f320bdea5f0051c718">GetComponentDataIndex</a>(const EntityRef &amp;entity) const </td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">protected</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a7b5928cb180ac85775111b29d51bf307">GetComponentId</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">static</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a516e76f9e30dd23aa55774c17d522b69">component_index_lookup_</a></td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">protected</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a4f3e530aec2b7015820a72af6382d59d">Data</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#af29a889e5a089684bfcf87cafd0af90a">Data</a>(const EntityRef &amp;entity) const </td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a44a7996f5dbd99c7356ebbe1270f3d42">end</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a6aa029818941faa5872eded17ffdc0e4">entity_manager_</a></td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">protected</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a4b295352b577878531a7ab263e3b8979">EntityIterator</a> typedef</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a21c02ff7e10c29cad2bba7bfbcfbf5a2">ExportRawData</a>(const EntityRef &amp;) const </td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a0d4d2b94255e782230d0557170ef0f31">GetComponent</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#af5a2763b566c92e2d36d922ec907d684">GetComponentData</a>(size_t data_index)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a57773237830c0d6f9110accbe2a3cb11">GetComponentData</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a1981706d2009cc35500b11aeedc93d26">GetComponentData</a>(size_t data_index) const </td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a20a157107e5830500efa6379ab972e36">GetComponentData</a>(const EntityRef &amp;entity) const </td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a7455ca1144bfa57fc795802bbff05054">GetComponentDataAsVoid</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a25338292ce8943649cb68e27026fccb5">GetComponentDataAsVoid</a>(const EntityRef &amp;entity) const </td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a946a6926b51ab6f320bdea5f0051c718">GetComponentDataIndex</a>(const EntityRef &amp;entity) const </td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">protected</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a7b5928cb180ac85775111b29d51bf307">GetComponentId</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">static</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a4476fab9a4e20ac96f4bb05aefe4bce9">HasDataForEntity</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
   <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#ab913bac6696fd50d8f08c7830f62be31">Init</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#ac7955abe834f61266b7639ca28cc8996">InitEntity</a>(EntityRef &amp;)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html#a8fcb3126b70ec692558ecb4ba7e50eb2">RawDataUniquePtr</a> typedef</td><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html">corgi::ComponentInterface</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a5c8410ec4738b7229d560d624c66ab40">RemoveEntity</a>(EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#ad35d12da1efb42041220f46b12ccca78">RemoveEntity</a>(EntityIterator iter)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#abf562b3b9853c97247c998a56d492a22">SetComponentIdOnDataType</a>(ComponentId id)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a324d8f89011d71d7d33a33f366d1e0b9">SetEntityManager</a>(EntityManager *entity_manager)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a7043047f9722b31f4e6ff8d83d87f609">UpdateAllEntities</a>(WorldTime)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a9659cf029432457a2257efae104e64d9">value_type</a> typedef</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a1e0e26b99352a7b514ff5fafea3886e8">~Component</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html#ab6e2c5714dce7500019a94eecbfb6ba6">~ComponentInterface</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html">corgi::ComponentInterface</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a1f52951228c53248c8cddb0bb30bfefc">IsRegisteredWithComponent</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html#a8fcb3126b70ec692558ecb4ba7e50eb2">RawDataUniquePtr</a> typedef</td><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html">corgi::ComponentInterface</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a5c8410ec4738b7229d560d624c66ab40">RemoveEntity</a>(EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#ad35d12da1efb42041220f46b12ccca78">RemoveEntity</a>(EntityIterator iter)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#abf562b3b9853c97247c998a56d492a22">SetComponentIdOnDataType</a>(ComponentId id)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a324d8f89011d71d7d33a33f366d1e0b9">SetEntityManager</a>(EntityManager *entity_manager)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a7043047f9722b31f4e6ff8d83d87f609">UpdateAllEntities</a>(WorldTime)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a9659cf029432457a2257efae104e64d9">value_type</a> typedef</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a1e0e26b99352a7b514ff5fafea3886e8">~Component</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html#ab6e2c5714dce7500019a94eecbfb6ba6">~ComponentInterface</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html">corgi::ComponentInterface</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
 </table></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- Google Analytics -->

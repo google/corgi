@@ -24,6 +24,85 @@
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400italic,500,500italic,700,700italic|Roboto+Mono:400,700" rel="stylesheet">
 <link href="style.css" rel="stylesheet" type="text/css"/>
+<script>
+  /**
+   * Check if the browser rendering this page is being run on an Android device.
+   * It checks if the string 'android' is found in the browser's `userAgent`.
+   * @return {boolean} This returns `true` if the browser's `userAgent` contains
+   * the string 'android' (indicating that the browser is on an Android device).
+   * Otherwise, it returns `false`.
+   */
+  function isAndroidDevice() {
+    if (navigator && navigator.userAgent) {
+      return navigator.userAgent.toLowerCase().indexOf('android') != -1;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Check if an HTML `class` attribute is in the browser-specific format.
+   * @param {string} An HTML `class` attribute in the format 'browser-{device}'.
+   * @return {boolean} Returns `true` if `browserClass` was in the valid format,
+   * prefixed with 'browser-'. Otherwise, it returns false.
+   */
+  function isBrowserSpecificClassName(browserClass) {
+    if (browserClass && browserClass.substring(0, 8) == 'browser-' &&
+        browserClass.length > 8) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Get all the HTML Elements with browser-specific `class` attributes.
+   * @return {array} Returns an array of all the HTML Elements with a `class`
+   * attribute that is prefixed with `browser-`.
+   */
+  function getAllBrowserSpecificElements() {
+    if (document) {
+      var htmlElements = document.getElementsByTagName("*");
+      var browserSpecificElements = [];
+      for (var i = 0; i < htmlElements.length; i++) {
+        if (isBrowserSpecificClassName(htmlElements[i].className)) {
+          browserSpecificElements.push(htmlElements[i]);
+        }
+      }
+      return browserSpecificElements;
+    } else {
+      return null;
+    }
+  }
+  /**
+   * Given a browser-specific HTML `class` attribute, extract the device name.
+   * @param {string} browserClass The string name of an HTML `class` attribute,
+   * in the format `browser-{device}`.
+   * @return {string} Returns a string containing only the device portion of
+   * the class name. If the input was invalid, then it returns `null`.
+   */
+  function extractDeviceFromBrowserClass(browserClass) {
+    if (isBrowserSpecificClassName(browserClass)) {
+      return browserClass.substring(8);
+    }
+    else {
+      return null;
+    }
+  }
+  /**
+   * Hide device specific elements that do not apply to the current device.
+   */
+  function handleDeviceSpecificLoading() {
+    var browserSpecificElements = getAllBrowserSpecificElements();
+    for (var i = 0; i < browserSpecificElements.length; i++) {
+      var device = extractDeviceFromBrowserClass(browserSpecificElements[i].className);
+      if (device && !isAndroidDevice() && device == 'android') {
+        browserSpecificElements[i].innerHTML = '';
+      } else if(device && isAndroidDevice() && device == 'desktop') {
+        browserSpecificElements[i].innerHTML = '';
+      }
+    }
+  }
+  $(document).ready(handleDeviceSpecificLoading);
+</script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -474,7 +553,7 @@ $(document).ready(function(){initNavTree('rendermesh_8h_source.html','');});
 <div class="ttc" id="classcorgi_1_1component__library_1_1_render_mesh_component_html_af6e35196a7de106bf9fd998b5d0ae5b7"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_render_mesh_component.html#af6e35196a7de106bf9fd998b5d0ae5b7">corgi::component_library::RenderMeshComponent::kDefaultCullDist</a></div><div class="ttdeci">static const int kDefaultCullDist</div><div class="ttdoc">The default distance to start culling. </div><div class="ttdef"><b>Definition:</b> rendermesh.h:185</div></div>
 <div class="ttc" id="camera__interface_8h_html"><div class="ttname"><a href="camera__interface_8h.html">camera_interface.h</a></div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_render_mesh_component_html_a2239fed1f2e3882434d49b07cb9ad1b4"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_render_mesh_component.html#a2239fed1f2e3882434d49b07cb9ad1b4">corgi::component_library::RenderMeshComponent::~RenderMeshComponent</a></div><div class="ttdeci">virtual ~RenderMeshComponent()</div><div class="ttdoc">Destructor for RenderMeshComponent. </div><div class="ttdef"><b>Definition:</b> rendermesh.h:193</div></div>
-<div class="ttc" id="classcorgi_1_1_component_html"><div class="ttname"><a href="classcorgi_1_1_component.html">corgi::Component</a></div><div class="ttdoc">A Component is an object that encapsulates all data and logic for Entities of a particular type...</div><div class="ttdef"><b>Definition:</b> component.h:42</div></div>
+<div class="ttc" id="classcorgi_1_1_component_html"><div class="ttname"><a href="classcorgi_1_1_component.html">corgi::Component</a></div><div class="ttdoc">A Component is an object that encapsulates all data and logic for Entities of a particular type...</div><div class="ttdef"><b>Definition:</b> component.h:43</div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_render_mesh_data_html"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_render_mesh_data.html">corgi::component_library::RenderMeshData</a></div><div class="ttdoc">The per-Entity mesh and shader data. </div><div class="ttdef"><b>Definition:</b> rendermesh.h:40</div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_renderlist_entry_html_ab7f200fb0b005e601eecf5893836f310"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_renderlist_entry.html#ab7f200fb0b005e601eecf5893836f310">corgi::component_library::RenderlistEntry::RenderlistEntry</a></div><div class="ttdeci">RenderlistEntry(EntityRef entity_, RenderMeshData *data_)</div><div class="ttdoc">Constructor for RenderlistEntry. </div><div class="ttdef"><b>Definition:</b> rendermesh.h:147</div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_renderlist_entry_html_ab8feecef91ebd3ff779598f094354258"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_renderlist_entry.html#ab8feecef91ebd3ff779598f094354258">corgi::component_library::RenderlistEntry::operator&lt;</a></div><div class="ttdeci">bool operator&lt;(const RenderlistEntry &amp;other) const </div><div class="ttdoc">The greater than operator for RenderlistEntry. </div><div class="ttdef"><b>Definition:</b> rendermesh.h:164</div></div>
@@ -483,7 +562,7 @@ $(document).ready(function(){initNavTree('rendermesh_8h_source.html','');});
 <div class="ttc" id="structcorgi_1_1component__library_1_1_renderlist_entry_html_a7aa328be8698257401f0730007d9a354"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_renderlist_entry.html#a7aa328be8698257401f0730007d9a354">corgi::component_library::RenderlistEntry::entity</a></div><div class="ttdeci">EntityRef entity</div><div class="ttdoc">The Entity associated with this RenderlistEntry. </div><div class="ttdef"><b>Definition:</b> rendermesh.h:151</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_render_mesh_component_html_a38c1ef58ad2612b6c2f1abbdd1e5264b"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_render_mesh_component.html#a38c1ef58ad2612b6c2f1abbdd1e5264b">corgi::component_library::RenderMeshComponent::ExportRawData</a></div><div class="ttdeci">virtual RawDataUniquePtr ExportRawData(const EntityRef &amp;entity) const </div><div class="ttdoc">Serializes a RenderMeshComponent&#39;s data for a given Entity. </div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_render_mesh_data_html_a8270505e3f302ead5cd211ca6409555b"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_render_mesh_data.html#a8270505e3f302ead5cd211ca6409555b">corgi::component_library::RenderMeshData::shader</a></div><div class="ttdeci">fplbase::Shader * shader</div><div class="ttdoc">The fplbase::Shader for this Entity. </div><div class="ttdef"><b>Definition:</b> rendermesh.h:100</div></div>
-<div class="ttc" id="group__corgi__entity_html_ga754f75a6aad33aa11de5084743ee3f98"><div class="ttname"><a href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98">corgi::WorldTime</a></div><div class="ttdeci">int WorldTime</div><div class="ttdoc">A typedef that represents time in the game. </div><div class="ttdef"><b>Definition:</b> entity_common.h:69</div></div>
+<div class="ttc" id="group__corgi__entity_html_ga754f75a6aad33aa11de5084743ee3f98"><div class="ttname"><a href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98">corgi::WorldTime</a></div><div class="ttdeci">int WorldTime</div><div class="ttdoc">A typedef that represents time in the game. </div><div class="ttdef"><b>Definition:</b> entity_common.h:49</div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_renderlist_entry_html"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_renderlist_entry.html">corgi::component_library::RenderlistEntry</a></div><div class="ttdoc">Struct used for keeping track of and sorting our render lists. </div><div class="ttdef"><b>Definition:</b> rendermesh.h:145</div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_render_mesh_data_html_aa8b9c4ac7b02e18a469a0b380cc84ef1"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_render_mesh_data.html#aa8b9c4ac7b02e18a469a0b380cc84ef1">corgi::component_library::RenderMeshData::RenderMeshData</a></div><div class="ttdeci">RenderMeshData()</div><div class="ttdoc">Default constructor for RenderMeshData. </div><div class="ttdef"><b>Definition:</b> rendermesh.h:43</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_render_mesh_component_html_a9ed2d99958331b6947bd90e3db629092"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_render_mesh_component.html#a9ed2d99958331b6947bd90e3db629092">corgi::component_library::RenderMeshComponent::RenderMeshComponent</a></div><div class="ttdeci">RenderMeshComponent()</div><div class="ttdoc">Default constructor for RenderMeshComponent. </div><div class="ttdef"><b>Definition:</b> rendermesh.h:188</div></div>
@@ -500,7 +579,7 @@ $(document).ready(function(){initNavTree('rendermesh_8h_source.html','');});
 <div class="ttc" id="transform_8h_html"><div class="ttname"><a href="transform_8h.html">transform.h</a></div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_render_mesh_component_html_ab0462ba9516a7327c2f07a8621b39f5c"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_render_mesh_component.html#ab0462ba9516a7327c2f07a8621b39f5c">corgi::component_library::RenderMeshComponent::AddFromRawData</a></div><div class="ttdeci">virtual void AddFromRawData(EntityRef &amp;entity, const void *raw_data)</div><div class="ttdoc">Deserialize a flat binary buffer to create and populate an Entity from raw data. </div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_render_mesh_data_html_abb0a3c57285c43a7468d3901debcb5aa"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_render_mesh_data.html#abb0a3c57285c43a7468d3901debcb5aa">corgi::component_library::RenderMeshData::~RenderMeshData</a></div><div class="ttdeci">~RenderMeshData()</div><div class="ttdoc">Destructor for RenderMeshData. </div><div class="ttdef"><b>Definition:</b> rendermesh.h:58</div></div>
-<div class="ttc" id="classcorgi_1_1_vector_pool_1_1_vector_pool_reference_html"><div class="ttname"><a href="classcorgi_1_1_vector_pool_1_1_vector_pool_reference.html">corgi::VectorPool::VectorPoolReference</a></div><div class="ttdoc">A reference object for pointing into the vector pool. It acts as a pointer for vector pool elements a...</div><div class="ttdef"><b>Definition:</b> vector_pool.h:71</div></div>
+<div class="ttc" id="classcorgi_1_1_vector_pool_1_1_vector_pool_reference_html"><div class="ttname"><a href="classcorgi_1_1_vector_pool_1_1_vector_pool_reference.html">corgi::VectorPool::VectorPoolReference</a></div><div class="ttdoc">A reference object for pointing into the vector pool. It acts as a pointer for vector pool elements a...</div><div class="ttdef"><b>Definition:</b> vector_pool.h:72</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_render_mesh_component_html_afdf61cc8baaa2b705d5e8d00a747b902"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_render_mesh_component.html#afdf61cc8baaa2b705d5e8d00a747b902">corgi::component_library::RenderMeshComponent::RenderPass</a></div><div class="ttdeci">void RenderPass(int pass_id, const CameraInterface &amp;camera, fplbase::Renderer &amp;renderer)</div><div class="ttdoc">Renders all Entities that are marked as being part of a given render pass to the current output buffe...</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_render_mesh_component_html_a392799068569d39bca1c4fa01ce257f7"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_render_mesh_component.html#a392799068569d39bca1c4fa01ce257f7">corgi::component_library::RenderMeshComponent::SetCullDistance</a></div><div class="ttdeci">void SetCullDistance(float distance)</div><div class="ttdoc">Set the culling distance. </div><div class="ttdef"><b>Definition:</b> rendermesh.h:307</div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_render_mesh_data_html_a1937aa7ea3aac24c605fa445c9fc731e"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_render_mesh_data.html#a1937aa7ea3aac24c605fa445c9fc731e">corgi::component_library::RenderMeshData::pass_mask</a></div><div class="ttdeci">unsigned char pass_mask</div><div class="ttdoc">A bit field determining during which render passes to render this Entity. </div><div class="ttdef"><b>Definition:</b> rendermesh.h:121</div></div>

@@ -24,6 +24,85 @@
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400italic,500,500italic,700,700italic|Roboto+Mono:400,700" rel="stylesheet">
 <link href="style.css" rel="stylesheet" type="text/css"/>
+<script>
+  /**
+   * Check if the browser rendering this page is being run on an Android device.
+   * It checks if the string 'android' is found in the browser's `userAgent`.
+   * @return {boolean} This returns `true` if the browser's `userAgent` contains
+   * the string 'android' (indicating that the browser is on an Android device).
+   * Otherwise, it returns `false`.
+   */
+  function isAndroidDevice() {
+    if (navigator && navigator.userAgent) {
+      return navigator.userAgent.toLowerCase().indexOf('android') != -1;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Check if an HTML `class` attribute is in the browser-specific format.
+   * @param {string} An HTML `class` attribute in the format 'browser-{device}'.
+   * @return {boolean} Returns `true` if `browserClass` was in the valid format,
+   * prefixed with 'browser-'. Otherwise, it returns false.
+   */
+  function isBrowserSpecificClassName(browserClass) {
+    if (browserClass && browserClass.substring(0, 8) == 'browser-' &&
+        browserClass.length > 8) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Get all the HTML Elements with browser-specific `class` attributes.
+   * @return {array} Returns an array of all the HTML Elements with a `class`
+   * attribute that is prefixed with `browser-`.
+   */
+  function getAllBrowserSpecificElements() {
+    if (document) {
+      var htmlElements = document.getElementsByTagName("*");
+      var browserSpecificElements = [];
+      for (var i = 0; i < htmlElements.length; i++) {
+        if (isBrowserSpecificClassName(htmlElements[i].className)) {
+          browserSpecificElements.push(htmlElements[i]);
+        }
+      }
+      return browserSpecificElements;
+    } else {
+      return null;
+    }
+  }
+  /**
+   * Given a browser-specific HTML `class` attribute, extract the device name.
+   * @param {string} browserClass The string name of an HTML `class` attribute,
+   * in the format `browser-{device}`.
+   * @return {string} Returns a string containing only the device portion of
+   * the class name. If the input was invalid, then it returns `null`.
+   */
+  function extractDeviceFromBrowserClass(browserClass) {
+    if (isBrowserSpecificClassName(browserClass)) {
+      return browserClass.substring(8);
+    }
+    else {
+      return null;
+    }
+  }
+  /**
+   * Hide device specific elements that do not apply to the current device.
+   */
+  function handleDeviceSpecificLoading() {
+    var browserSpecificElements = getAllBrowserSpecificElements();
+    for (var i = 0; i < browserSpecificElements.length; i++) {
+      var device = extractDeviceFromBrowserClass(browserSpecificElements[i].className);
+      if (device && !isAndroidDevice() && device == 'android') {
+        browserSpecificElements[i].innerHTML = '';
+      } else if(device && isAndroidDevice() && device == 'desktop') {
+        browserSpecificElements[i].innerHTML = '';
+      }
+    }
+  }
+  $(document).ready(handleDeviceSpecificLoading);
+</script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -149,81 +228,80 @@ $(document).ready(function(){initNavTree('entity__common_8h_source.html','');});
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="comment">/// @addtogroup corgi_entity</span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="comment">/// @{</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="comment">///</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment">/// @def CORGI_MAX_COMPONENT_COUNT</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment">///</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="comment">/// @brief The maximum number of components in the system.</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="comment">///</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">/// Redefine this to fit however many Components your system needs.</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment">///</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="comment">/// @warning This should be set with care, because it affects the size of each</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment">/// Entity. Ideally this should be set to something that is as close as</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="comment">/// possible to the actual number of Components used by the program.</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="group__corgi__entity.html#gacee7cfef4d68f97f23d7824306562bac">   36</a></span>&#160;<span class="comment"></span><span class="preprocessor">#define CORGI_MAX_COMPONENT_COUNT 30</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor"></span><span class="comment"></span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment">/// @var ComponentId</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">///</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">/// @brief This represents the ID of a Component.</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">///</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">/// @note Depending on kMaxComponentCount, this value is either an uint8_t,</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">/// uint16_t, or uint32_t. (However, if you need an uint32_t, you are</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">/// probably doing something odd.)</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment">/// @{</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment"></span><span class="preprocessor">#if kMaxComponentCount &lt;= 0xff</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">   47</a></span>&#160;<span class="preprocessor"></span><span class="keyword">typedef</span> uint8_t <a class="code" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a>;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#elif kMaxComponentCount &lt;= 0xffff</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor"></span><span class="keyword">typedef</span> uint16_t <a class="code" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a>;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor"></span><span class="keyword">typedef</span> uint32_t <a class="code" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a>;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor"></span><span class="comment">/// @}</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment"></span><span class="comment"></span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment">/// @var ComponentId</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="comment">///</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="comment">/// @brief This represents the ID of a Component.</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">///</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment">/// @note Depending on kMaxComponentCount, this value is either an uint8_t,</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="comment">/// uint16_t, or uint32_t. (However, if you need an uint32_t, you are</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment">/// probably doing something odd.)</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="comment">/// @{</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">   36</a></span>&#160;<span class="comment"></span><span class="keyword">typedef</span> uint16_t <a class="code" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a>;<span class="comment"></span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="comment">/// @}</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment"></span><span class="comment"></span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">/// @var kInvalidComponent</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">///</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">/// @brief A sentinel value to represent an invalid Component.</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">///</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">/// @note Component IDs start at 1.</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="group__corgi__entity.html#gad457c99f64f7df58fc6d4a8caeda1d59">   44</a></span>&#160;<span class="comment"></span><span class="keyword">const</span> <a class="code" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a> <a class="code" href="group__corgi__entity.html#gad457c99f64f7df58fc6d4a8caeda1d59">kInvalidComponent</a> = <span class="keyword">static_cast&lt;</span><a class="code" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a><span class="keyword">&gt;</span>(-1);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment">/// @typedef WorldTime</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">///</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">/// @brief A typedef that represents time in the game.</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98">   49</a></span>&#160;<span class="comment"></span><span class="keyword">typedef</span> <span class="keywordtype">int</span> <a class="code" href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98">WorldTime</a>;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">/// @cond CORGI_INTERNAL</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment"></span><span class="keyword">const</span> <span class="keywordtype">int</span> kMillisecondsPerSecond = 1000;<span class="comment"></span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment">/// @endcond</span></div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment"></span><span class="comment"></span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">/// @var kInvalidComponent</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">/// @typedef ComponentIndex</span></div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="comment">///</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">/// @brief A sentinel value to represent an invalid Component.</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">///</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">/// @note Component IDs start at 1.</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="group__corgi__entity.html#gad457c99f64f7df58fc6d4a8caeda1d59">   60</a></span>&#160;<span class="comment"></span><span class="keyword">const</span> <a class="code" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a> <a class="code" href="group__corgi__entity.html#gad457c99f64f7df58fc6d4a8caeda1d59">kInvalidComponent</a> = 0;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment">/// @cond CORGI_INTERNAL</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment"></span><span class="keyword">static</span> <span class="keyword">const</span> <a class="code" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a> kMaxComponentCount = <a class="code" href="group__corgi__entity.html#gacee7cfef4d68f97f23d7824306562bac">CORGI_MAX_COMPONENT_COUNT</a>;<span class="comment"></span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">/// @endcond</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment"></span><span class="comment"></span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">/// @typedef WorldTime</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">///</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment">/// @brief A typedef that represents time in the game.</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98">   69</a></span>&#160;<span class="comment"></span><span class="keyword">typedef</span> <span class="keywordtype">int</span> <a class="code" href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98">WorldTime</a>;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment">/// @cond CORGI_INTERNAL</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span><span class="keyword">const</span> <span class="keywordtype">int</span> kMillisecondsPerSecond = 1000;<span class="comment"></span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">/// @endcond</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment"></span><span class="comment"></span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">/// @typedef ComponentIndex</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment">///</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="comment">/// @brief A ComponentIndex is a value used to represent the location of a piece</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="comment">/// of ComponentData, normally inside of a VectorPool.</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno"><a class="line" href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">   79</a></span>&#160;<span class="comment"></span><span class="keyword">typedef</span> uint16_t <a class="code" href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">ComponentIndex</a>;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment">/// @var kUnusedComponentIndex</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">/// @brief A ComponentIndex is a value used to represent the location of a piece</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">/// of ComponentData, normally inside of a VectorPool.</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">   59</a></span>&#160;<span class="comment"></span><span class="keyword">typedef</span> uint16_t <a class="code" href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">ComponentIndex</a>;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="comment">/// @var kUnusedComponentIndex</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment">///</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment">/// @brief A sentinel value to represent an invalid Component.</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">///</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">/// Since all Entities contain an array corresponding to every</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">/// Component in the system, this value is used as a default value</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">/// to indicate that a specific Component is not registered with</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment">/// a given Entity.</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment"></span><span class="keyword">static</span> <span class="keyword">const</span> <a class="code" href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">ComponentIndex</a> kInvalidComponentIndex =</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keyword">static_cast&lt;</span><a class="code" href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">ComponentIndex</a><span class="keyword">&gt;</span>(-1);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment">/// @typedef EntityIdType</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">///</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment">/// @brief A EntityIdType is a value used to uniquely represent an entity</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">/// in various internal structures.  In general, CORGI users should avoid</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment">/// using this directly, and should instead refer to entities via EntityRefs.</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="group__corgi__entity.html#gabaad342e5e2a6b0df9fc286c6f0d410b">   77</a></span>&#160;<span class="comment"></span><span class="keyword">typedef</span> uint16_t <a class="code" href="group__corgi__entity.html#gabaad342e5e2a6b0df9fc286c6f0d410b">EntityIdType</a>;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment">/// @var kInvalidEntityId</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment">///</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment">/// @brief A sentinel value to represent an invalid entity.</span></div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">///</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">/// @brief A sentinel value to represent an invalid Component.</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">///</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment">/// Since all Entities contain an array corresponding to every</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment">/// Component in the system, this value is used as a default value</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="comment">/// to indicate that a specific Component is not registered with</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment">/// a given Entity.</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno"><a class="line" href="group__corgi__entity.html#gaf67861033c9325e649cb38c76b8878ea">   89</a></span>&#160;<span class="comment"></span><span class="keyword">static</span> <span class="keyword">const</span> <a class="code" href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">ComponentIndex</a> <a class="code" href="group__corgi__entity.html#gaf67861033c9325e649cb38c76b8878ea">kUnusedComponentIndex</a> =</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keyword">static_cast&lt;</span><a class="code" href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">ComponentIndex</a><span class="keyword">&gt;</span>(-1);<span class="comment"></span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment">/// @}</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;}  <span class="comment">// corgi</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">#endif  // CORGI_ENTITY_COMMON_H_</span></div>
-<div class="ttc" id="group__corgi__entity_html_gacee7cfef4d68f97f23d7824306562bac"><div class="ttname"><a href="group__corgi__entity.html#gacee7cfef4d68f97f23d7824306562bac">CORGI_MAX_COMPONENT_COUNT</a></div><div class="ttdeci">#define CORGI_MAX_COMPONENT_COUNT</div><div class="ttdoc">The maximum number of components in the system. </div><div class="ttdef"><b>Definition:</b> entity_common.h:36</div></div>
-<div class="ttc" id="group__corgi__entity_html_ga754f75a6aad33aa11de5084743ee3f98"><div class="ttname"><a href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98">corgi::WorldTime</a></div><div class="ttdeci">int WorldTime</div><div class="ttdoc">A typedef that represents time in the game. </div><div class="ttdef"><b>Definition:</b> entity_common.h:69</div></div>
-<div class="ttc" id="group__corgi__entity_html_gad457c99f64f7df58fc6d4a8caeda1d59"><div class="ttname"><a href="group__corgi__entity.html#gad457c99f64f7df58fc6d4a8caeda1d59">corgi::kInvalidComponent</a></div><div class="ttdeci">const ComponentId kInvalidComponent</div><div class="ttdoc">A sentinel value to represent an invalid Component. </div><div class="ttdef"><b>Definition:</b> entity_common.h:60</div></div>
-<div class="ttc" id="group__corgi__entity_html_gaf67861033c9325e649cb38c76b8878ea"><div class="ttname"><a href="group__corgi__entity.html#gaf67861033c9325e649cb38c76b8878ea">corgi::kUnusedComponentIndex</a></div><div class="ttdeci">static const ComponentIndex kUnusedComponentIndex</div><div class="ttdoc">A sentinel value to represent an invalid Component. </div><div class="ttdef"><b>Definition:</b> entity_common.h:89</div></div>
-<div class="ttc" id="group__corgi__entity_html_gaa9b819f754e4f0f1b122e8669fd4121b"><div class="ttname"><a href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">corgi::ComponentIndex</a></div><div class="ttdeci">uint16_t ComponentIndex</div><div class="ttdoc">A ComponentIndex is a value used to represent the location of a piece of ComponentData, normally inside of a VectorPool. </div><div class="ttdef"><b>Definition:</b> entity_common.h:79</div></div>
-<div class="ttc" id="group__corgi__entity_html_ga5f64e19a6613a18291d7e9d44c785293"><div class="ttname"><a href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">corgi::ComponentId</a></div><div class="ttdeci">uint8_t ComponentId</div><div class="ttdoc">This represents the ID of a Component. </div><div class="ttdef"><b>Definition:</b> entity_common.h:47</div></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">/// Entities have a unique ID that is used reference them internally.  This</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">/// value represents an invalid entity.  It is usually either used for</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment">/// uninitialized values, or to indicate a null return value.</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno"><a class="line" href="group__corgi__entity.html#ga8760d0222d31c8de03a4e92858697383">   86</a></span>&#160;<span class="comment"></span><span class="keyword">static</span> <span class="keyword">const</span> <a class="code" href="group__corgi__entity.html#gabaad342e5e2a6b0df9fc286c6f0d410b">EntityIdType</a> <a class="code" href="group__corgi__entity.html#ga8760d0222d31c8de03a4e92858697383">kInvalidEntityId</a> = <span class="keyword">static_cast&lt;</span><a class="code" href="group__corgi__entity.html#gabaad342e5e2a6b0df9fc286c6f0d410b">EntityIdType</a><span class="keyword">&gt;</span>(-1);</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment">/// @}</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;}  <span class="comment">// corgi</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="preprocessor">#endif  // CORGI_ENTITY_COMMON_H_</span></div>
+<div class="ttc" id="group__corgi__entity_html_gabaad342e5e2a6b0df9fc286c6f0d410b"><div class="ttname"><a href="group__corgi__entity.html#gabaad342e5e2a6b0df9fc286c6f0d410b">corgi::EntityIdType</a></div><div class="ttdeci">uint16_t EntityIdType</div><div class="ttdoc">A EntityIdType is a value used to uniquely represent an entity in various internal structures...</div><div class="ttdef"><b>Definition:</b> entity_common.h:77</div></div>
+<div class="ttc" id="group__corgi__entity_html_ga754f75a6aad33aa11de5084743ee3f98"><div class="ttname"><a href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98">corgi::WorldTime</a></div><div class="ttdeci">int WorldTime</div><div class="ttdoc">A typedef that represents time in the game. </div><div class="ttdef"><b>Definition:</b> entity_common.h:49</div></div>
+<div class="ttc" id="group__corgi__entity_html_gad457c99f64f7df58fc6d4a8caeda1d59"><div class="ttname"><a href="group__corgi__entity.html#gad457c99f64f7df58fc6d4a8caeda1d59">corgi::kInvalidComponent</a></div><div class="ttdeci">const ComponentId kInvalidComponent</div><div class="ttdoc">A sentinel value to represent an invalid Component. </div><div class="ttdef"><b>Definition:</b> entity_common.h:44</div></div>
+<div class="ttc" id="group__corgi__entity_html_ga8760d0222d31c8de03a4e92858697383"><div class="ttname"><a href="group__corgi__entity.html#ga8760d0222d31c8de03a4e92858697383">corgi::kInvalidEntityId</a></div><div class="ttdeci">static const EntityIdType kInvalidEntityId</div><div class="ttdoc">A sentinel value to represent an invalid entity. </div><div class="ttdef"><b>Definition:</b> entity_common.h:86</div></div>
+<div class="ttc" id="group__corgi__entity_html_gaa9b819f754e4f0f1b122e8669fd4121b"><div class="ttname"><a href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">corgi::ComponentIndex</a></div><div class="ttdeci">uint16_t ComponentIndex</div><div class="ttdoc">A ComponentIndex is a value used to represent the location of a piece of ComponentData, normally inside of a VectorPool. </div><div class="ttdef"><b>Definition:</b> entity_common.h:59</div></div>
+<div class="ttc" id="group__corgi__entity_html_ga5f64e19a6613a18291d7e9d44c785293"><div class="ttname"><a href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">corgi::ComponentId</a></div><div class="ttdeci">uint16_t ComponentId</div><div class="ttdoc">This represents the ID of a Component. </div><div class="ttdef"><b>Definition:</b> entity_common.h:36</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- Google Analytics -->

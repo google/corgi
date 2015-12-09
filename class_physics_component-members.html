@@ -24,6 +24,85 @@
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400italic,500,500italic,700,700italic|Roboto+Mono:400,700" rel="stylesheet">
 <link href="style.css" rel="stylesheet" type="text/css"/>
+<script>
+  /**
+   * Check if the browser rendering this page is being run on an Android device.
+   * It checks if the string 'android' is found in the browser's `userAgent`.
+   * @return {boolean} This returns `true` if the browser's `userAgent` contains
+   * the string 'android' (indicating that the browser is on an Android device).
+   * Otherwise, it returns `false`.
+   */
+  function isAndroidDevice() {
+    if (navigator && navigator.userAgent) {
+      return navigator.userAgent.toLowerCase().indexOf('android') != -1;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Check if an HTML `class` attribute is in the browser-specific format.
+   * @param {string} An HTML `class` attribute in the format 'browser-{device}'.
+   * @return {boolean} Returns `true` if `browserClass` was in the valid format,
+   * prefixed with 'browser-'. Otherwise, it returns false.
+   */
+  function isBrowserSpecificClassName(browserClass) {
+    if (browserClass && browserClass.substring(0, 8) == 'browser-' &&
+        browserClass.length > 8) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Get all the HTML Elements with browser-specific `class` attributes.
+   * @return {array} Returns an array of all the HTML Elements with a `class`
+   * attribute that is prefixed with `browser-`.
+   */
+  function getAllBrowserSpecificElements() {
+    if (document) {
+      var htmlElements = document.getElementsByTagName("*");
+      var browserSpecificElements = [];
+      for (var i = 0; i < htmlElements.length; i++) {
+        if (isBrowserSpecificClassName(htmlElements[i].className)) {
+          browserSpecificElements.push(htmlElements[i]);
+        }
+      }
+      return browserSpecificElements;
+    } else {
+      return null;
+    }
+  }
+  /**
+   * Given a browser-specific HTML `class` attribute, extract the device name.
+   * @param {string} browserClass The string name of an HTML `class` attribute,
+   * in the format `browser-{device}`.
+   * @return {string} Returns a string containing only the device portion of
+   * the class name. If the input was invalid, then it returns `null`.
+   */
+  function extractDeviceFromBrowserClass(browserClass) {
+    if (isBrowserSpecificClassName(browserClass)) {
+      return browserClass.substring(8);
+    }
+    else {
+      return null;
+    }
+  }
+  /**
+   * Hide device specific elements that do not apply to the current device.
+   */
+  function handleDeviceSpecificLoading() {
+    var browserSpecificElements = getAllBrowserSpecificElements();
+    for (var i = 0; i < browserSpecificElements.length; i++) {
+      var device = extractDeviceFromBrowserClass(browserSpecificElements[i].className);
+      if (device && !isAndroidDevice() && device == 'android') {
+        browserSpecificElements[i].innerHTML = '';
+      } else if(device && isAndroidDevice() && device == 'desktop') {
+        browserSpecificElements[i].innerHTML = '';
+      }
+    }
+  }
+  $(document).ready(handleDeviceSpecificLoading);
+</script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -143,53 +222,56 @@ $(document).ready(function(){initNavTree('class_physics_component.html','');});
   <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#a630d71cb7950dafde0c929b98aabe53d">collision_data</a>()</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a8d90bdceeb90f0c618b475e7facc0758">Component</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a92b32eded7ed99d56497990307b28ec1">component_data_</a></td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">protected</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a4f3e530aec2b7015820a72af6382d59d">Data</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#af29a889e5a089684bfcf87cafd0af90a">Data</a>(const EntityRef &amp;entity) const</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="class_physics_component.html#afc9f6f78832a1e48b3ba860538504c08">DebugDrawObject</a>(fplbase::Renderer *renderer, const mathfu::mat4 &amp;camera_transform, const corgi::EntityRef &amp;entity, const mathfu::vec3 &amp;color)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#a9d62243ae763322e16bd3eef84da9516">DebugDrawWorld</a>(fplbase::Renderer *renderer, const mathfu::mat4 &amp;camera_transform)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="class_physics_component.html#aa96a972b87aaf44e628136db47d09d1c">DisablePhysics</a>(const corgi::EntityRef &amp;entity)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#ac15191eec4864e501870c063183d40ad">EnablePhysics</a>(const corgi::EntityRef &amp;entity)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a44a7996f5dbd99c7356ebbe1270f3d42">end</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a6aa029818941faa5872eded17ffdc0e4">entity_manager_</a></td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">protected</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a4b295352b577878531a7ab263e3b8979">EntityIterator</a> typedef</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#a6b901f2f92f9774c9cbb248d0d835d8f">ExportRawData</a>(const corgi::EntityRef &amp;entity) const </td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="class_physics_component.html#aed90f871649605c7d0709974c0b660b5">FinalizeStaticMesh</a>(const corgi::EntityRef &amp;entity, short collision_type, short collides_with, float mass, float restitution, const std::string &amp;user_tag)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#ab73f24e963bd307e434f8410270a1edd">GenerateRaycastShape</a>(corgi::EntityRef &amp;entity, bool result_exportable)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a0d4d2b94255e782230d0557170ef0f31">GetComponent</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#af5a2763b566c92e2d36d922ec907d684">GetComponentData</a>(size_t data_index)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a57773237830c0d6f9110accbe2a3cb11">GetComponentData</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a1981706d2009cc35500b11aeedc93d26">GetComponentData</a>(size_t data_index) const</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a20a157107e5830500efa6379ab972e36">GetComponentData</a>(const EntityRef &amp;entity) const</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a7455ca1144bfa57fc795802bbff05054">GetComponentDataAsVoid</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a25338292ce8943649cb68e27026fccb5">GetComponentDataAsVoid</a>(const EntityRef &amp;entity) const</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a946a6926b51ab6f320bdea5f0051c718">GetComponentDataIndex</a>(const EntityRef &amp;entity) const</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">protected</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a7b5928cb180ac85775111b29d51bf307">GetComponentId</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">static</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#a9e36906706a9937c8bbe4bcf74bd4e74">gravity</a>() const </td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a516e76f9e30dd23aa55774c17d522b69">component_index_lookup_</a></td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">protected</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a4f3e530aec2b7015820a72af6382d59d">Data</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#af29a889e5a089684bfcf87cafd0af90a">Data</a>(const EntityRef &amp;entity) const</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#afc9f6f78832a1e48b3ba860538504c08">DebugDrawObject</a>(fplbase::Renderer *renderer, const mathfu::mat4 &amp;camera_transform, const corgi::EntityRef &amp;entity, const mathfu::vec3 &amp;color)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="class_physics_component.html#a9d62243ae763322e16bd3eef84da9516">DebugDrawWorld</a>(fplbase::Renderer *renderer, const mathfu::mat4 &amp;camera_transform)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#aa96a972b87aaf44e628136db47d09d1c">DisablePhysics</a>(const corgi::EntityRef &amp;entity)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="class_physics_component.html#ac15191eec4864e501870c063183d40ad">EnablePhysics</a>(const corgi::EntityRef &amp;entity)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a44a7996f5dbd99c7356ebbe1270f3d42">end</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a6aa029818941faa5872eded17ffdc0e4">entity_manager_</a></td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">protected</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a4b295352b577878531a7ab263e3b8979">EntityIterator</a> typedef</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="class_physics_component.html#a6b901f2f92f9774c9cbb248d0d835d8f">ExportRawData</a>(const corgi::EntityRef &amp;entity) const </td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#aed90f871649605c7d0709974c0b660b5">FinalizeStaticMesh</a>(const corgi::EntityRef &amp;entity, short collision_type, short collides_with, float mass, float restitution, const std::string &amp;user_tag)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="class_physics_component.html#ab73f24e963bd307e434f8410270a1edd">GenerateRaycastShape</a>(corgi::EntityRef &amp;entity, bool result_exportable)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a0d4d2b94255e782230d0557170ef0f31">GetComponent</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#af5a2763b566c92e2d36d922ec907d684">GetComponentData</a>(size_t data_index)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a57773237830c0d6f9110accbe2a3cb11">GetComponentData</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a1981706d2009cc35500b11aeedc93d26">GetComponentData</a>(size_t data_index) const</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a20a157107e5830500efa6379ab972e36">GetComponentData</a>(const EntityRef &amp;entity) const</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a7455ca1144bfa57fc795802bbff05054">GetComponentDataAsVoid</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a25338292ce8943649cb68e27026fccb5">GetComponentDataAsVoid</a>(const EntityRef &amp;entity) const</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a946a6926b51ab6f320bdea5f0051c718">GetComponentDataIndex</a>(const EntityRef &amp;entity) const</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">protected</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a7b5928cb180ac85775111b29d51bf307">GetComponentId</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">static</span></td></tr>
+  <tr><td class="entry"><a class="el" href="class_physics_component.html#a9e36906706a9937c8bbe4bcf74bd4e74">gravity</a>() const </td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a4476fab9a4e20ac96f4bb05aefe4bce9">HasDataForEntity</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
   <tr><td class="entry"><a class="el" href="class_physics_component.html#a0ce5174aa2298f4f0c4b98bc85c5712e">Init</a>()</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">virtual</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#a24ecaf091fa2a923e51ce6bb13428b44">InitEntity</a>(corgi::EntityRef &amp;)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">virtual</span></td></tr>
   <tr><td class="entry"><a class="el" href="class_physics_component.html#a936b59d71dbf78c78dccb0389f80005f">InitStaticMesh</a>(corgi::EntityRef &amp;entity)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#a932bee8155bf91f37d77a3ddda3a7d73">max_steps</a>() const </td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="class_physics_component.html#aeb544a2a04cde8f050c6a51ec436ec4e">PhysicsComponent</a>()</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#acb99ab9e6c885f6cd24e1543975f7f55">ProcessBulletTickCallback</a>()</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html#a8fcb3126b70ec692558ecb4ba7e50eb2">RawDataUniquePtr</a> typedef</td><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html">corgi::ComponentInterface</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#aca1b38f42e1849be2584fd4ae620870b">RaycastSingle</a>(mathfu::vec3 &amp;start, mathfu::vec3 &amp;end)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="class_physics_component.html#a5b872f0212f31bb1195cd205553780ea">RaycastSingle</a>(mathfu::vec3 &amp;start, mathfu::vec3 &amp;end, short layer_mask)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#a4244bae0585c144b0963b8f249b5b2e4">RaycastSingle</a>(mathfu::vec3 &amp;start, mathfu::vec3 &amp;end, mathfu::vec3 *hit_point)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="class_physics_component.html#a002d7fc8c594c358b3e92c0d637628c5">RaycastSingle</a>(mathfu::vec3 &amp;start, mathfu::vec3 &amp;end, short layer_mask, mathfu::vec3 *hit_point)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a5c8410ec4738b7229d560d624c66ab40">RemoveEntity</a>(EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#ad35d12da1efb42041220f46b12ccca78">RemoveEntity</a>(EntityIterator iter)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#ad6d73ce89e8e6bec3a1742acb8b660ae">set_collision_callback</a>(CollisionCallback callback, void *user_data)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="class_physics_component.html#aff3245d023f08d6cc3b58ea9e57904b3">set_gravity</a>(float gravity)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#a02d6d4ef7f0a139dfaea7ba2c1026d16">set_max_steps</a>(int max_steps)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#abf562b3b9853c97247c998a56d492a22">SetComponentIdOnDataType</a>(ComponentId id)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a324d8f89011d71d7d33a33f366d1e0b9">SetEntityManager</a>(EntityManager *entity_manager)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="class_physics_component.html#ad5fcfef9f936c8423a89692ca4ec9159">UpdateAllEntities</a>(corgi::WorldTime delta_time)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#afca61f59efe69a989c1427accd80990f">UpdatePhysicsFromTransform</a>(const corgi::EntityRef &amp;entity)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="class_physics_component.html#ad52bd53c81e73e68fa64eece0403a55f">UpdatePhysicsScale</a>(const corgi::EntityRef &amp;entity)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a9659cf029432457a2257efae104e64d9">value_type</a> typedef</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a1e0e26b99352a7b514ff5fafea3886e8">~Component</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html#ab6e2c5714dce7500019a94eecbfb6ba6">~ComponentInterface</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html">corgi::ComponentInterface</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="class_physics_component.html#afadf481ee69c12d205435ede58da6121">~PhysicsComponent</a>()</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a1f52951228c53248c8cddb0bb30bfefc">IsRegisteredWithComponent</a>(const EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="class_physics_component.html#a932bee8155bf91f37d77a3ddda3a7d73">max_steps</a>() const </td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#aeb544a2a04cde8f050c6a51ec436ec4e">PhysicsComponent</a>()</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="class_physics_component.html#acb99ab9e6c885f6cd24e1543975f7f55">ProcessBulletTickCallback</a>()</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html#a8fcb3126b70ec692558ecb4ba7e50eb2">RawDataUniquePtr</a> typedef</td><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html">corgi::ComponentInterface</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="class_physics_component.html#aca1b38f42e1849be2584fd4ae620870b">RaycastSingle</a>(mathfu::vec3 &amp;start, mathfu::vec3 &amp;end)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#a5b872f0212f31bb1195cd205553780ea">RaycastSingle</a>(mathfu::vec3 &amp;start, mathfu::vec3 &amp;end, short layer_mask)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="class_physics_component.html#a4244bae0585c144b0963b8f249b5b2e4">RaycastSingle</a>(mathfu::vec3 &amp;start, mathfu::vec3 &amp;end, mathfu::vec3 *hit_point)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#a002d7fc8c594c358b3e92c0d637628c5">RaycastSingle</a>(mathfu::vec3 &amp;start, mathfu::vec3 &amp;end, short layer_mask, mathfu::vec3 *hit_point)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a5c8410ec4738b7229d560d624c66ab40">RemoveEntity</a>(EntityRef &amp;entity)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#ad35d12da1efb42041220f46b12ccca78">RemoveEntity</a>(EntityIterator iter)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="class_physics_component.html#ad6d73ce89e8e6bec3a1742acb8b660ae">set_collision_callback</a>(CollisionCallback callback, void *user_data)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#aff3245d023f08d6cc3b58ea9e57904b3">set_gravity</a>(float gravity)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="class_physics_component.html#a02d6d4ef7f0a139dfaea7ba2c1026d16">set_max_steps</a>(int max_steps)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#abf562b3b9853c97247c998a56d492a22">SetComponentIdOnDataType</a>(ComponentId id)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a324d8f89011d71d7d33a33f366d1e0b9">SetEntityManager</a>(EntityManager *entity_manager)</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#ad5fcfef9f936c8423a89692ca4ec9159">UpdateAllEntities</a>(corgi::WorldTime delta_time)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="class_physics_component.html#afca61f59efe69a989c1427accd80990f">UpdatePhysicsFromTransform</a>(const corgi::EntityRef &amp;entity)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#ad52bd53c81e73e68fa64eece0403a55f">UpdatePhysicsScale</a>(const corgi::EntityRef &amp;entity)</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a9659cf029432457a2257efae104e64d9">value_type</a> typedef</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classcorgi_1_1_component.html#a1e0e26b99352a7b514ff5fafea3886e8">~Component</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html#ab6e2c5714dce7500019a94eecbfb6ba6">~ComponentInterface</a>()</td><td class="entry"><a class="el" href="classcorgi_1_1_component_interface.html">corgi::ComponentInterface</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_physics_component.html#afadf481ee69c12d205435ede58da6121">~PhysicsComponent</a>()</td><td class="entry"><a class="el" href="class_physics_component.html">PhysicsComponent</a></td><td class="entry"><span class="mlabel">virtual</span></td></tr>
 </table></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- Google Analytics -->

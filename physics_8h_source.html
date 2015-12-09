@@ -24,6 +24,85 @@
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400italic,500,500italic,700,700italic|Roboto+Mono:400,700" rel="stylesheet">
 <link href="style.css" rel="stylesheet" type="text/css"/>
+<script>
+  /**
+   * Check if the browser rendering this page is being run on an Android device.
+   * It checks if the string 'android' is found in the browser's `userAgent`.
+   * @return {boolean} This returns `true` if the browser's `userAgent` contains
+   * the string 'android' (indicating that the browser is on an Android device).
+   * Otherwise, it returns `false`.
+   */
+  function isAndroidDevice() {
+    if (navigator && navigator.userAgent) {
+      return navigator.userAgent.toLowerCase().indexOf('android') != -1;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Check if an HTML `class` attribute is in the browser-specific format.
+   * @param {string} An HTML `class` attribute in the format 'browser-{device}'.
+   * @return {boolean} Returns `true` if `browserClass` was in the valid format,
+   * prefixed with 'browser-'. Otherwise, it returns false.
+   */
+  function isBrowserSpecificClassName(browserClass) {
+    if (browserClass && browserClass.substring(0, 8) == 'browser-' &&
+        browserClass.length > 8) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Get all the HTML Elements with browser-specific `class` attributes.
+   * @return {array} Returns an array of all the HTML Elements with a `class`
+   * attribute that is prefixed with `browser-`.
+   */
+  function getAllBrowserSpecificElements() {
+    if (document) {
+      var htmlElements = document.getElementsByTagName("*");
+      var browserSpecificElements = [];
+      for (var i = 0; i < htmlElements.length; i++) {
+        if (isBrowserSpecificClassName(htmlElements[i].className)) {
+          browserSpecificElements.push(htmlElements[i]);
+        }
+      }
+      return browserSpecificElements;
+    } else {
+      return null;
+    }
+  }
+  /**
+   * Given a browser-specific HTML `class` attribute, extract the device name.
+   * @param {string} browserClass The string name of an HTML `class` attribute,
+   * in the format `browser-{device}`.
+   * @return {string} Returns a string containing only the device portion of
+   * the class name. If the input was invalid, then it returns `null`.
+   */
+  function extractDeviceFromBrowserClass(browserClass) {
+    if (isBrowserSpecificClassName(browserClass)) {
+      return browserClass.substring(8);
+    }
+    else {
+      return null;
+    }
+  }
+  /**
+   * Hide device specific elements that do not apply to the current device.
+   */
+  function handleDeviceSpecificLoading() {
+    var browserSpecificElements = getAllBrowserSpecificElements();
+    for (var i = 0; i < browserSpecificElements.length; i++) {
+      var device = extractDeviceFromBrowserClass(browserSpecificElements[i].className);
+      if (device && !isAndroidDevice() && device == 'android') {
+        browserSpecificElements[i].innerHTML = '';
+      } else if(device && isAndroidDevice() && device == 'desktop') {
+        browserSpecificElements[i].innerHTML = '';
+      }
+    }
+  }
+  $(document).ready(handleDeviceSpecificLoading);
+</script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -668,7 +747,7 @@ $(document).ready(function(){initNavTree('physics_8h_source.html','');});
 <div class="ttc" id="group__corgi__component__library_html_ga92ee3b2e5ef0f674b106b5abb6ca3b7c"><div class="ttname"><a href="group__corgi__component__library.html#ga92ee3b2e5ef0f674b106b5abb6ca3b7c">kDefaultPhysicsMaxSteps</a></div><div class="ttdeci">static const int kDefaultPhysicsMaxSteps</div><div class="ttdoc">The default number of max steps to advance per frame. </div><div class="ttdef"><b>Definition:</b> physics.h:67</div></div>
 <div class="ttc" id="classcorgi_1_1_component_interface_html_a8fcb3126b70ec692558ecb4ba7e50eb2"><div class="ttname"><a href="classcorgi_1_1_component_interface.html#a8fcb3126b70ec692558ecb4ba7e50eb2">corgi::ComponentInterface::RawDataUniquePtr</a></div><div class="ttdeci">std::unique_ptr&lt; uint8_t, std::function&lt; void(uint8_t *)&gt; &gt; RawDataUniquePtr</div><div class="ttdoc">A pointer type for exported raw data. </div><div class="ttdef"><b>Definition:</b> component_interface.h:63</div></div>
 <div class="ttc" id="struct_rigid_body_data_html_a0bc23d0a785c048258c3da0484e3c14c"><div class="ttname"><a href="struct_rigid_body_data.html#a0bc23d0a785c048258c3da0484e3c14c">RigidBodyData::rigid_body</a></div><div class="ttdeci">std::unique_ptr&lt; btRigidBody &gt; rigid_body</div><div class="ttdoc">The btRigidBody of the RigidBodyData. </div><div class="ttdef"><b>Definition:</b> physics.h:155</div></div>
-<div class="ttc" id="classcorgi_1_1_component_html"><div class="ttname"><a href="classcorgi_1_1_component.html">corgi::Component</a></div><div class="ttdoc">A Component is an object that encapsulates all data and logic for Entities of a particular type...</div><div class="ttdef"><b>Definition:</b> component.h:42</div></div>
+<div class="ttc" id="classcorgi_1_1_component_html"><div class="ttname"><a href="classcorgi_1_1_component.html">corgi::Component</a></div><div class="ttdoc">A Component is an object that encapsulates all data and logic for Entities of a particular type...</div><div class="ttdef"><b>Definition:</b> component.h:43</div></div>
 <div class="ttc" id="class_physics_component_html_ad6d73ce89e8e6bec3a1742acb8b660ae"><div class="ttname"><a href="class_physics_component.html#ad6d73ce89e8e6bec3a1742acb8b660ae">PhysicsComponent::set_collision_callback</a></div><div class="ttdeci">void set_collision_callback(CollisionCallback callback, void *user_data)</div><div class="ttdoc">Sets the callback function for collisions. </div><div class="ttdef"><b>Definition:</b> physics.h:505</div></div>
 <div class="ttc" id="struct_collision_data_html_a70dfbbaf4ecf5ea7e1f3170369da29df"><div class="ttname"><a href="struct_collision_data.html#a70dfbbaf4ecf5ea7e1f3170369da29df">CollisionData::this_entity</a></div><div class="ttdeci">corgi::EntityRef this_entity</div><div class="ttdoc">The first Entity involved in the collision. </div><div class="ttdef"><b>Definition:</b> physics.h:76</div></div>
 <div class="ttc" id="class_physics_component_html_a431ebbcdc8bb25f92aa677476b936c5d"><div class="ttname"><a href="class_physics_component.html#a431ebbcdc8bb25f92aa677476b936c5d">PhysicsComponent::bullet_world</a></div><div class="ttdeci">btDiscreteDynamicsWorld * bullet_world()</div><div class="ttdoc">Get the bullet world. </div><div class="ttdef"><b>Definition:</b> physics.h:471</div></div>
@@ -676,7 +755,7 @@ $(document).ready(function(){initNavTree('physics_8h_source.html','');});
 <div class="ttc" id="group__corgi__component__library_html_gaab9cd5a640fd8ae2606f9f22f7b3aa4c"><div class="ttname"><a href="group__corgi__component__library.html#gaab9cd5a640fd8ae2606f9f22f7b3aa4c">kDefaultPhysicsGravity</a></div><div class="ttdeci">static const float kDefaultPhysicsGravity</div><div class="ttdoc">The constant for gravity. </div><div class="ttdef"><b>Definition:</b> physics.h:62</div></div>
 <div class="ttc" id="class_physics_component_html_a932bee8155bf91f37d77a3ddda3a7d73"><div class="ttname"><a href="class_physics_component.html#a932bee8155bf91f37d77a3ddda3a7d73">PhysicsComponent::max_steps</a></div><div class="ttdeci">int max_steps() const </div><div class="ttdoc">Get the max steps. </div><div class="ttdef"><b>Definition:</b> physics.h:491</div></div>
 <div class="ttc" id="struct_collision_data_html"><div class="ttname"><a href="struct_collision_data.html">CollisionData</a></div><div class="ttdoc">Data describing which Entities were involed in a collision and where. </div><div class="ttdef"><b>Definition:</b> physics.h:72</div></div>
-<div class="ttc" id="group__corgi__entity_html_ga754f75a6aad33aa11de5084743ee3f98"><div class="ttname"><a href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98">corgi::WorldTime</a></div><div class="ttdeci">int WorldTime</div><div class="ttdoc">A typedef that represents time in the game. </div><div class="ttdef"><b>Definition:</b> entity_common.h:69</div></div>
+<div class="ttc" id="group__corgi__entity_html_ga754f75a6aad33aa11de5084743ee3f98"><div class="ttname"><a href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98">corgi::WorldTime</a></div><div class="ttdeci">int WorldTime</div><div class="ttdoc">A typedef that represents time in the game. </div><div class="ttdef"><b>Definition:</b> entity_common.h:49</div></div>
 <div class="ttc" id="struct_rigid_body_data_html_a352332db220c9a5c88bdc3e9ba410912"><div class="ttname"><a href="struct_rigid_body_data.html#a352332db220c9a5c88bdc3e9ba410912">RigidBodyData::motion_state</a></div><div class="ttdeci">std::unique_ptr&lt; btMotionState &gt; motion_state</div><div class="ttdoc">The btMotionState of the RigidBodyData. </div><div class="ttdef"><b>Definition:</b> physics.h:150</div></div>
 <div class="ttc" id="struct_collision_data_html_a06672eca8b61e307846b4f496b55c3fe"><div class="ttname"><a href="struct_collision_data.html#a06672eca8b61e307846b4f496b55c3fe">CollisionData::this_tag</a></div><div class="ttdeci">std::string this_tag</div><div class="ttdoc">A std::string tag to identify the first Entity involved in the collision. </div><div class="ttdef"><b>Definition:</b> physics.h:87</div></div>
 <div class="ttc" id="struct_rigid_body_data_html_a25031d86cca347eba5fd20de296c5cb9"><div class="ttname"><a href="struct_rigid_body_data.html#a25031d86cca347eba5fd20de296c5cb9">RigidBodyData::offset</a></div><div class="ttdeci">mathfu::vec3 offset</div><div class="ttdoc">The position offset from the origin of the TransformComponent to the center. </div><div class="ttdef"><b>Definition:</b> physics.h:125</div></div>
@@ -690,7 +769,7 @@ $(document).ready(function(){initNavTree('physics_8h_source.html','');});
 <div class="ttc" id="struct_collision_data_html_ae3e79f39d1c9e304fd70ff4669e89792"><div class="ttname"><a href="struct_collision_data.html#ae3e79f39d1c9e304fd70ff4669e89792">CollisionData::this_position</a></div><div class="ttdeci">mathfu::vec3 this_position</div><div class="ttdoc">The position of the first Entity involved in the collision. </div><div class="ttdef"><b>Definition:</b> physics.h:81</div></div>
 <div class="ttc" id="struct_collision_data_html_a19a5dc4147a78bcc9c0414fccf5e805e"><div class="ttname"><a href="struct_collision_data.html#a19a5dc4147a78bcc9c0414fccf5e805e">CollisionData::other_entity</a></div><div class="ttdeci">corgi::EntityRef other_entity</div><div class="ttdoc">The second Entity involved in the collision. </div><div class="ttdef"><b>Definition:</b> physics.h:92</div></div>
 <div class="ttc" id="struct_rigid_body_data_html_a0755de7082aa5340863f0319e254da17"><div class="ttname"><a href="struct_rigid_body_data.html#a0755de7082aa5340863f0319e254da17">RigidBodyData::collides_with</a></div><div class="ttdeci">short collides_with</div><div class="ttdoc">A bit field determining what types of objects it can collide into. </div><div class="ttdef"><b>Definition:</b> physics.h:135</div></div>
-<div class="ttc" id="classcorgi_1_1_vector_pool_1_1_vector_pool_reference_html"><div class="ttname"><a href="classcorgi_1_1_vector_pool_1_1_vector_pool_reference.html">corgi::VectorPool::VectorPoolReference</a></div><div class="ttdoc">A reference object for pointing into the vector pool. It acts as a pointer for vector pool elements a...</div><div class="ttdef"><b>Definition:</b> vector_pool.h:71</div></div>
+<div class="ttc" id="classcorgi_1_1_vector_pool_1_1_vector_pool_reference_html"><div class="ttname"><a href="classcorgi_1_1_vector_pool_1_1_vector_pool_reference.html">corgi::VectorPool::VectorPoolReference</a></div><div class="ttdoc">A reference object for pointing into the vector pool. It acts as a pointer for vector pool elements a...</div><div class="ttdef"><b>Definition:</b> vector_pool.h:72</div></div>
 <div class="ttc" id="struct_physics_data_html_af24f9d386b25bc34e673a898791dc1f9"><div class="ttname"><a href="struct_physics_data.html#af24f9d386b25bc34e673a898791dc1f9">PhysicsData::enabled</a></div><div class="ttdeci">bool enabled() const </div><div class="ttdoc">Check if this physics is enabled for this Entity. </div><div class="ttdef"><b>Definition:</b> physics.h:242</div></div>
 <div class="ttc" id="struct_rigid_body_data_html_ab96f0c4bfa93077da908957b717500ec"><div class="ttname"><a href="struct_rigid_body_data.html#ab96f0c4bfa93077da908957b717500ec">RigidBodyData::shape</a></div><div class="ttdeci">std::unique_ptr&lt; btCollisionShape &gt; shape</div><div class="ttdoc">The btCollisionShape of the RigidBodyData. </div><div class="ttdef"><b>Definition:</b> physics.h:145</div></div>
 <div class="ttc" id="class_physics_component_html"><div class="ttname"><a href="class_physics_component.html">PhysicsComponent</a></div><div class="ttdoc">The Component that manages the physics for every Entity that registers with it. </div><div class="ttdef"><b>Definition:</b> physics.h:265</div></div>

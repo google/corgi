@@ -24,6 +24,85 @@
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400italic,500,500italic,700,700italic|Roboto+Mono:400,700" rel="stylesheet">
 <link href="style.css" rel="stylesheet" type="text/css"/>
+<script>
+  /**
+   * Check if the browser rendering this page is being run on an Android device.
+   * It checks if the string 'android' is found in the browser's `userAgent`.
+   * @return {boolean} This returns `true` if the browser's `userAgent` contains
+   * the string 'android' (indicating that the browser is on an Android device).
+   * Otherwise, it returns `false`.
+   */
+  function isAndroidDevice() {
+    if (navigator && navigator.userAgent) {
+      return navigator.userAgent.toLowerCase().indexOf('android') != -1;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Check if an HTML `class` attribute is in the browser-specific format.
+   * @param {string} An HTML `class` attribute in the format 'browser-{device}'.
+   * @return {boolean} Returns `true` if `browserClass` was in the valid format,
+   * prefixed with 'browser-'. Otherwise, it returns false.
+   */
+  function isBrowserSpecificClassName(browserClass) {
+    if (browserClass && browserClass.substring(0, 8) == 'browser-' &&
+        browserClass.length > 8) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Get all the HTML Elements with browser-specific `class` attributes.
+   * @return {array} Returns an array of all the HTML Elements with a `class`
+   * attribute that is prefixed with `browser-`.
+   */
+  function getAllBrowserSpecificElements() {
+    if (document) {
+      var htmlElements = document.getElementsByTagName("*");
+      var browserSpecificElements = [];
+      for (var i = 0; i < htmlElements.length; i++) {
+        if (isBrowserSpecificClassName(htmlElements[i].className)) {
+          browserSpecificElements.push(htmlElements[i]);
+        }
+      }
+      return browserSpecificElements;
+    } else {
+      return null;
+    }
+  }
+  /**
+   * Given a browser-specific HTML `class` attribute, extract the device name.
+   * @param {string} browserClass The string name of an HTML `class` attribute,
+   * in the format `browser-{device}`.
+   * @return {string} Returns a string containing only the device portion of
+   * the class name. If the input was invalid, then it returns `null`.
+   */
+  function extractDeviceFromBrowserClass(browserClass) {
+    if (isBrowserSpecificClassName(browserClass)) {
+      return browserClass.substring(8);
+    }
+    else {
+      return null;
+    }
+  }
+  /**
+   * Hide device specific elements that do not apply to the current device.
+   */
+  function handleDeviceSpecificLoading() {
+    var browserSpecificElements = getAllBrowserSpecificElements();
+    for (var i = 0; i < browserSpecificElements.length; i++) {
+      var device = extractDeviceFromBrowserClass(browserSpecificElements[i].className);
+      if (device && !isAndroidDevice() && device == 'android') {
+        browserSpecificElements[i].innerHTML = '';
+      } else if(device && isAndroidDevice() && device == 'desktop') {
+        browserSpecificElements[i].innerHTML = '';
+      }
+    }
+  }
+  $(document).ready(handleDeviceSpecificLoading);
+</script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -351,20 +430,20 @@ $(document).ready(function(){initNavTree('graph_8h_source.html','');});
 <div class="ttc" id="classcorgi_1_1component__library_1_1_graph_component_html_a5850d0c347b8cb47e8632d0ef8004290"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_graph_component.html#a5850d0c347b8cb47e8632d0ef8004290">corgi::component_library::GraphComponent::EntityPostLoadFixup</a></div><div class="ttdeci">void EntityPostLoadFixup(corgi::EntityRef &amp;entity)</div><div class="ttdoc">Fixes up a given Entity. </div></div>
 <div class="ttc" id="classcorgi_1_1_component_interface_html_a8fcb3126b70ec692558ecb4ba7e50eb2"><div class="ttname"><a href="classcorgi_1_1_component_interface.html#a8fcb3126b70ec692558ecb4ba7e50eb2">corgi::ComponentInterface::RawDataUniquePtr</a></div><div class="ttdeci">std::unique_ptr&lt; uint8_t, std::function&lt; void(uint8_t *)&gt; &gt; RawDataUniquePtr</div><div class="ttdoc">A pointer type for exported raw data. </div><div class="ttdef"><b>Definition:</b> component_interface.h:63</div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_graph_data_html_a97c3d862bb0e7f8df8984e49c198efa6"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_graph_data.html#a97c3d862bb0e7f8df8984e49c198efa6">corgi::component_library::GraphData::operator=</a></div><div class="ttdeci">GraphData &amp; operator=(GraphData &amp;&amp;other)</div><div class="ttdoc">The move assignment operator for GraphData. </div><div class="ttdef"><b>Definition:</b> graph.h:116</div></div>
-<div class="ttc" id="classcorgi_1_1_component_html"><div class="ttname"><a href="classcorgi_1_1_component.html">corgi::Component</a></div><div class="ttdoc">A Component is an object that encapsulates all data and logic for Entities of a particular type...</div><div class="ttdef"><b>Definition:</b> component.h:42</div></div>
+<div class="ttc" id="classcorgi_1_1_component_html"><div class="ttname"><a href="classcorgi_1_1_component.html">corgi::Component</a></div><div class="ttdoc">A Component is an object that encapsulates all data and logic for Entities of a particular type...</div><div class="ttdef"><b>Definition:</b> component.h:43</div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_graph_data_html_a256380419064a649a6dff038ae978fc5"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_graph_data.html#a256380419064a649a6dff038ae978fc5">corgi::component_library::GraphData::GraphData</a></div><div class="ttdeci">GraphData()</div><div class="ttdoc">The default constructor for an empty GraphData. </div><div class="ttdef"><b>Definition:</b> graph.h:102</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_graph_component_html"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_graph_component.html">corgi::component_library::GraphComponent</a></div><div class="ttdoc">Manages the event graphs for any Entity that wishes to utilize the event system. </div><div class="ttdef"><b>Definition:</b> graph.h:135</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_graph_component_html_a91e33c3e47ea29f73f3b8facd64e881d"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_graph_component.html#a91e33c3e47ea29f73f3b8facd64e881d">corgi::component_library::GraphComponent::ExportRawData</a></div><div class="ttdeci">virtual RawDataUniquePtr ExportRawData(const corgi::EntityRef &amp;entity) const </div><div class="ttdoc">Serializes a GraphComponent&#39;s data for a given Entity. </div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_graph_component_html_a8aff61993f35b8503f2bbbacc5b53613"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_graph_component.html#a8aff61993f35b8503f2bbbacc5b53613">corgi::component_library::GraphComponent::advance_frame_broadcaster</a></div><div class="ttdeci">breadboard::NodeEventBroadcaster * advance_frame_broadcaster()</div><div class="ttdef"><b>Definition:</b> graph.h:205</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_graph_component_html_a20a2f71e71e7cfd34e9231e2c1ff89f8"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_graph_component.html#a20a2f71e71e7cfd34e9231e2c1ff89f8">corgi::component_library::GraphComponent::AddFromRawData</a></div><div class="ttdeci">virtual void AddFromRawData(corgi::EntityRef &amp;entity, const void *raw_data)</div><div class="ttdoc">Deserialize a flat binary buffer to create and populate an Entity from raw data. </div></div>
-<div class="ttc" id="group__corgi__entity_html_ga754f75a6aad33aa11de5084743ee3f98"><div class="ttname"><a href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98">corgi::WorldTime</a></div><div class="ttdeci">int WorldTime</div><div class="ttdoc">A typedef that represents time in the game. </div><div class="ttdef"><b>Definition:</b> entity_common.h:69</div></div>
+<div class="ttc" id="group__corgi__entity_html_ga754f75a6aad33aa11de5084743ee3f98"><div class="ttname"><a href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98">corgi::WorldTime</a></div><div class="ttdeci">int WorldTime</div><div class="ttdoc">A typedef that represents time in the game. </div><div class="ttdef"><b>Definition:</b> entity_common.h:49</div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_serializable_graph_state_html_ae2e3751b13ca66bf8851bcbb5cc19bc5"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_serializable_graph_state.html#ae2e3751b13ca66bf8851bcbb5cc19bc5">corgi::component_library::SerializableGraphState::SerializableGraphState</a></div><div class="ttdeci">SerializableGraphState(SerializableGraphState &amp;&amp;other)</div><div class="ttdoc">Move constructor for a SerializableGraphState. </div><div class="ttdef"><b>Definition:</b> graph.h:53</div></div>
-<div class="ttc" id="classcorgi_1_1_component_html_ac7955abe834f61266b7639ca28cc8996"><div class="ttname"><a href="classcorgi_1_1_component.html#ac7955abe834f61266b7639ca28cc8996">corgi::Component&lt; GraphData &gt;::InitEntity</a></div><div class="ttdeci">virtual void InitEntity(EntityRef &amp;)</div><div class="ttdoc">Override this function with code that should be executed when an Entity is added to the Component...</div><div class="ttdef"><b>Definition:</b> component.h:377</div></div>
+<div class="ttc" id="classcorgi_1_1_component_html_ac7955abe834f61266b7639ca28cc8996"><div class="ttname"><a href="classcorgi_1_1_component.html#ac7955abe834f61266b7639ca28cc8996">corgi::Component&lt; GraphData &gt;::InitEntity</a></div><div class="ttdeci">virtual void InitEntity(EntityRef &amp;)</div><div class="ttdoc">Override this function with code that should be executed when an Entity is added to the Component...</div><div class="ttdef"><b>Definition:</b> component.h:407</div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_serializable_graph_state_html"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_serializable_graph_state.html">corgi::component_library::SerializableGraphState</a></div><div class="ttdoc">Contains the graph state information, as well as the filename for serialization. </div><div class="ttdef"><b>Definition:</b> graph.h:39</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_graph_component_html_a61467439e071952c3b2f1a9348f46329"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_graph_component.html#a61467439e071952c3b2f1a9348f46329">corgi::component_library::GraphComponent::graph_entity</a></div><div class="ttdeci">const corgi::EntityRef &amp; graph_entity() const </div><div class="ttdef"><b>Definition:</b> graph.h:201</div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_serializable_graph_state_html_aa8c5ad472dbb2eed135ebf7be7e3fe84"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_serializable_graph_state.html#aa8c5ad472dbb2eed135ebf7be7e3fe84">corgi::component_library::SerializableGraphState::SerializableGraphState</a></div><div class="ttdeci">SerializableGraphState()</div><div class="ttdoc">Default constructor for a SerializableGraphState. </div><div class="ttdef"><b>Definition:</b> graph.h:47</div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_graph_data_html_a4b6bd1ec8930c68464854772b18561cf"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_graph_data.html#a4b6bd1ec8930c68464854772b18561cf">corgi::component_library::GraphData::broadcaster</a></div><div class="ttdeci">breadboard::NodeEventBroadcaster broadcaster</div><div class="ttdoc">A NodeEventBroadcaster that broadcasts events to any registered NodeEventListeners. </div><div class="ttdef"><b>Definition:</b> graph.h:99</div></div>
-<div class="ttc" id="classcorgi_1_1_vector_pool_1_1_vector_pool_reference_html"><div class="ttname"><a href="classcorgi_1_1_vector_pool_1_1_vector_pool_reference.html">corgi::VectorPool::VectorPoolReference</a></div><div class="ttdoc">A reference object for pointing into the vector pool. It acts as a pointer for vector pool elements a...</div><div class="ttdef"><b>Definition:</b> vector_pool.h:71</div></div>
+<div class="ttc" id="classcorgi_1_1_vector_pool_1_1_vector_pool_reference_html"><div class="ttname"><a href="classcorgi_1_1_vector_pool_1_1_vector_pool_reference.html">corgi::VectorPool::VectorPoolReference</a></div><div class="ttdoc">A reference object for pointing into the vector pool. It acts as a pointer for vector pool elements a...</div><div class="ttdef"><b>Definition:</b> vector_pool.h:72</div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_graph_data_html"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_graph_data.html">corgi::component_library::GraphData</a></div><div class="ttdoc">Contains the data for each Entity registered with the GraphComponent. </div><div class="ttdef"><b>Definition:</b> graph.h:89</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_graph_component_html_afa70bebf4db7692a54a8fec1ede1ea12"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_graph_component.html#afa70bebf4db7692a54a8fec1ede1ea12">corgi::component_library::GraphComponent::PostLoadFixup</a></div><div class="ttdeci">void PostLoadFixup()</div><div class="ttdoc">Fixes up all loaded Entities. </div></div>
 <div class="ttc" id="structcorgi_1_1component__library_1_1_serializable_graph_state_html_ad7f3f45b45429565b7ff5654b15fc559"><div class="ttname"><a href="structcorgi_1_1component__library_1_1_serializable_graph_state.html#ad7f3f45b45429565b7ff5654b15fc559">corgi::component_library::SerializableGraphState::operator=</a></div><div class="ttdeci">SerializableGraphState &amp; operator=(SerializableGraphState &amp;&amp;other)</div><div class="ttdoc">Move assignment operator for SerializableGraphState. </div><div class="ttdef"><b>Definition:</b> graph.h:61</div></div>

@@ -7,7 +7,7 @@ var searchData=
   ['initialize',['Initialize',['../classcorgi_1_1component__library_1_1_common_services_component.html#a44391d4228d9643c96c434186337f829',1,'corgi::component_library::CommonServicesComponent']]],
   ['initstaticmesh',['InitStaticMesh',['../class_physics_component.html#a936b59d71dbf78c78dccb0389f80005f',1,'PhysicsComponent']]],
   ['input_5fsystem',['input_system',['../classcorgi_1_1component__library_1_1_common_services_component.html#aeea158f5e600922a7a5b39dab7b65354',1,'corgi::component_library::CommonServicesComponent']]],
-  ['isregisteredforcomponent',['IsRegisteredForComponent',['../classcorgi_1_1_entity.html#a472b45191d8f7c65b14472721430b2af',1,'corgi::Entity']]],
+  ['isregisteredwithcomponent',['IsRegisteredWithComponent',['../classcorgi_1_1_component.html#a1f52951228c53248c8cddb0bb30bfefc',1,'corgi::Component']]],
   ['isstereo',['IsStereo',['../classcorgi_1_1_camera_interface.html#a56baca82c4261cb161d0d3f0a1bd5b2a',1,'corgi::CameraInterface']]],
   ['isvalid',['IsValid',['../classcorgi_1_1_vector_pool_1_1_vector_pool_reference.html#ac0b14a38fcd41e0877142eb04b3aba00',1,'corgi::VectorPool::VectorPoolReference']]],
   ['iterator',['Iterator',['../classcorgi_1_1_vector_pool.html#a6b8fb85ad9e6ab42439da840d4669e2b',1,'corgi::VectorPool']]],

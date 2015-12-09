@@ -24,6 +24,85 @@
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400italic,500,500italic,700,700italic|Roboto+Mono:400,700" rel="stylesheet">
 <link href="style.css" rel="stylesheet" type="text/css"/>
+<script>
+  /**
+   * Check if the browser rendering this page is being run on an Android device.
+   * It checks if the string 'android' is found in the browser's `userAgent`.
+   * @return {boolean} This returns `true` if the browser's `userAgent` contains
+   * the string 'android' (indicating that the browser is on an Android device).
+   * Otherwise, it returns `false`.
+   */
+  function isAndroidDevice() {
+    if (navigator && navigator.userAgent) {
+      return navigator.userAgent.toLowerCase().indexOf('android') != -1;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Check if an HTML `class` attribute is in the browser-specific format.
+   * @param {string} An HTML `class` attribute in the format 'browser-{device}'.
+   * @return {boolean} Returns `true` if `browserClass` was in the valid format,
+   * prefixed with 'browser-'. Otherwise, it returns false.
+   */
+  function isBrowserSpecificClassName(browserClass) {
+    if (browserClass && browserClass.substring(0, 8) == 'browser-' &&
+        browserClass.length > 8) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Get all the HTML Elements with browser-specific `class` attributes.
+   * @return {array} Returns an array of all the HTML Elements with a `class`
+   * attribute that is prefixed with `browser-`.
+   */
+  function getAllBrowserSpecificElements() {
+    if (document) {
+      var htmlElements = document.getElementsByTagName("*");
+      var browserSpecificElements = [];
+      for (var i = 0; i < htmlElements.length; i++) {
+        if (isBrowserSpecificClassName(htmlElements[i].className)) {
+          browserSpecificElements.push(htmlElements[i]);
+        }
+      }
+      return browserSpecificElements;
+    } else {
+      return null;
+    }
+  }
+  /**
+   * Given a browser-specific HTML `class` attribute, extract the device name.
+   * @param {string} browserClass The string name of an HTML `class` attribute,
+   * in the format `browser-{device}`.
+   * @return {string} Returns a string containing only the device portion of
+   * the class name. If the input was invalid, then it returns `null`.
+   */
+  function extractDeviceFromBrowserClass(browserClass) {
+    if (isBrowserSpecificClassName(browserClass)) {
+      return browserClass.substring(8);
+    }
+    else {
+      return null;
+    }
+  }
+  /**
+   * Hide device specific elements that do not apply to the current device.
+   */
+  function handleDeviceSpecificLoading() {
+    var browserSpecificElements = getAllBrowserSpecificElements();
+    for (var i = 0; i < browserSpecificElements.length; i++) {
+      var device = extractDeviceFromBrowserClass(browserSpecificElements[i].className);
+      if (device && !isAndroidDevice() && device == 'android') {
+        browserSpecificElements[i].innerHTML = '';
+      } else if(device && isAndroidDevice() && device == 'desktop') {
+        browserSpecificElements[i].innerHTML = '';
+      }
+    }
+  }
+  $(document).ready(handleDeviceSpecificLoading);
+</script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -176,7 +255,7 @@ $(document).ready(function(){initNavTree('entity__factory_8h_source.html','');})
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment">  /// @brief The default constructor for an empty EntityFactory.</span></div>
 <div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="classcorgi_1_1component__library_1_1_entity_factory.html#a1f1d5956448eae85fcd0e822c5211d80">   53</a></span>&#160;<span class="comment"></span>  <a class="code" href="classcorgi_1_1component__library_1_1_entity_factory.html#a1f1d5956448eae85fcd0e822c5211d80">EntityFactory</a>()</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      : max_component_id_(corgi::<a class="code" href="group__corgi__entity.html#gad457c99f64f7df58fc6d4a8caeda1d59">kInvalidComponent</a>),</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      : max_component_id_(0),</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        debug_entity_creation_(false) {}</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keyword">virtual</span> ~<a class="code" href="classcorgi_1_1component__library_1_1_entity_factory.html">EntityFactory</a>() {}</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment"></span></div>
@@ -546,7 +625,7 @@ $(document).ready(function(){initNavTree('entity__factory_8h_source.html','');})
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_a9b3cfa2f43067e34e8bed94338ddb93b"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#a9b3cfa2f43067e34e8bed94338ddb93b">corgi::component_library::EntityFactory::LoadEntityData</a></div><div class="ttdeci">virtual void LoadEntityData(const void *def, corgi::EntityManager *entity_manager, corgi::EntityRef &amp;entity, bool is_prototype)</div><div class="ttdoc">Creates an Entity from the Entity definition, recursively building up from the prototypes. </div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_aaa82cb5a2f06451bbda5bcef24e246d8"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#aaa82cb5a2f06451bbda5bcef24e246d8">corgi::component_library::EntityFactory::SerializeEntityList</a></div><div class="ttdeci">virtual bool SerializeEntityList(const std::vector&lt; std::vector&lt; uint8_t &gt;&gt; &amp;entity_definitions, std::vector&lt; uint8_t &gt; *entity_list_serialized)</div><div class="ttdoc">After you call SerializeEntity on a few Entities, you may call this method to put them into a proper ...</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_a1f1d5956448eae85fcd0e822c5211d80"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#a1f1d5956448eae85fcd0e822c5211d80">corgi::component_library::EntityFactory::EntityFactory</a></div><div class="ttdeci">EntityFactory()</div><div class="ttdoc">The default constructor for an empty EntityFactory. </div><div class="ttdef"><b>Definition:</b> entity_factory.h:53</div></div>
-<div class="ttc" id="group__corgi__entity_html_gad457c99f64f7df58fc6d4a8caeda1d59"><div class="ttname"><a href="group__corgi__entity.html#gad457c99f64f7df58fc6d4a8caeda1d59">corgi::kInvalidComponent</a></div><div class="ttdeci">const ComponentId kInvalidComponent</div><div class="ttdoc">A sentinel value to represent an invalid Component. </div><div class="ttdef"><b>Definition:</b> entity_common.h:60</div></div>
+<div class="ttc" id="group__corgi__entity_html_gad457c99f64f7df58fc6d4a8caeda1d59"><div class="ttname"><a href="group__corgi__entity.html#gad457c99f64f7df58fc6d4a8caeda1d59">corgi::kInvalidComponent</a></div><div class="ttdeci">const ComponentId kInvalidComponent</div><div class="ttdoc">A sentinel value to represent an invalid Component. </div><div class="ttdef"><b>Definition:</b> entity_common.h:44</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_a74e4ad01d2035d398cd80bca4d327a21"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#a74e4ad01d2035d398cd80bca4d327a21">corgi::component_library::EntityFactory::ComponentIdToDataType</a></div><div class="ttdeci">unsigned int ComponentIdToDataType(corgi::ComponentId component_id)</div><div class="ttdoc">Get the data type specifier for a Component, given a Component ID. </div><div class="ttdef"><b>Definition:</b> entity_factory.h:175</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_abfb65b8df5be2c8f4b586066c8a02dae"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#abfb65b8df5be2c8f4b586066c8a02dae">corgi::component_library::EntityFactory::SetFlatbufferSchema</a></div><div class="ttdeci">void SetFlatbufferSchema(const char *binary_schema_filename)</div><div class="ttdoc">This factory and its subclasses need to know how to parse the Entity FlatBuffers using reflection...</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_a8eb49d643a1a8da3787e1b512ab21c9e"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#a8eb49d643a1a8da3787e1b512ab21c9e">corgi::component_library::EntityFactory::ReadEntityList</a></div><div class="ttdeci">virtual bool ReadEntityList(const void *entity_list, std::vector&lt; const void * &gt; *entity_defs)=0</div><div class="ttdoc">Handles reading an Entity list and extracting the individual Entity data definitions. </div></div>
@@ -555,8 +634,8 @@ $(document).ready(function(){initNavTree('entity__factory_8h_source.html','');})
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_a2068cf3610895fffb4c234aa5c245533"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#a2068cf3610895fffb4c234aa5c245533">corgi::component_library::EntityFactory::OverrideCachedFile</a></div><div class="ttdeci">void OverrideCachedFile(const char *filename, std::unique_ptr&lt; std::string &gt; new_data)</div><div class="ttdoc">Override a cached file with data from memory that will persist until exit. </div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_a19be0f80a4ca02d5443a102b213000f1"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#a19be0f80a4ca02d5443a102b213000f1">corgi::component_library::EntityFactory::CreatePrototypeRequest</a></div><div class="ttdeci">virtual bool CreatePrototypeRequest(const char *prototype_name, std::vector&lt; uint8_t &gt; *request)=0</div><div class="ttdoc">Creates an Entity list that contains a single Entity definition, which contains a single Component de...</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_af0307ee56d4353425400c9f6cf42a866"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#af0307ee56d4353425400c9f6cf42a866">corgi::component_library::EntityFactory::LoadEntitiesFromFile</a></div><div class="ttdeci">virtual int LoadEntitiesFromFile(const char *filename, corgi::EntityManager *entity_manager)</div><div class="ttdoc">Load Entities from a given Entity list file. </div></div>
-<div class="ttc" id="classcorgi_1_1_vector_pool_1_1_vector_pool_reference_html"><div class="ttname"><a href="classcorgi_1_1_vector_pool_1_1_vector_pool_reference.html">corgi::VectorPool::VectorPoolReference</a></div><div class="ttdoc">A reference object for pointing into the vector pool. It acts as a pointer for vector pool elements a...</div><div class="ttdef"><b>Definition:</b> vector_pool.h:71</div></div>
-<div class="ttc" id="classcorgi_1_1_entity_factory_interface_html"><div class="ttname"><a href="classcorgi_1_1_entity_factory_interface.html">corgi::EntityFactoryInterface</a></div><div class="ttdoc">An interface for an Entity factory, which creates Entities for a given EntityManager. </div><div class="ttdef"><b>Definition:</b> entity_manager.h:403</div></div>
+<div class="ttc" id="classcorgi_1_1_vector_pool_1_1_vector_pool_reference_html"><div class="ttname"><a href="classcorgi_1_1_vector_pool_1_1_vector_pool_reference.html">corgi::VectorPool::VectorPoolReference</a></div><div class="ttdoc">A reference object for pointing into the vector pool. It acts as a pointer for vector pool elements a...</div><div class="ttdef"><b>Definition:</b> vector_pool.h:72</div></div>
+<div class="ttc" id="classcorgi_1_1_entity_factory_interface_html"><div class="ttname"><a href="classcorgi_1_1_entity_factory_interface.html">corgi::EntityFactoryInterface</a></div><div class="ttdoc">An interface for an Entity factory, which creates Entities for a given EntityManager. </div><div class="ttdef"><b>Definition:</b> entity_manager.h:408</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html">corgi::component_library::EntityFactory</a></div><div class="ttdoc">An EntityFactory builds Entities based on prototypes, using FlatBuffers to specify the raw data for E...</div><div class="ttdef"><b>Definition:</b> entity_factory.h:37</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_acd2110e3b0d9a87a5acb27486972e42f"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#acd2110e3b0d9a87a5acb27486972e42f">corgi::component_library::EntityFactory::kDataTypeNone</a></div><div class="ttdeci">static const unsigned int kDataTypeNone</div><div class="ttdoc">This is equivalent to the *_NONE value of the FlatBuffer union enum. </div><div class="ttdef"><b>Definition:</b> entity_factory.h:43</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_a27a703aa6334a613857bdd9868a5ff39"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#a27a703aa6334a613857bdd9868a5ff39">corgi::component_library::EntityFactory::LoadEntityListFromMemory</a></div><div class="ttdeci">int LoadEntityListFromMemory(const void *raw_entity_list, corgi::EntityManager *entity_manager, std::vector&lt; corgi::EntityRef &gt; *entities_loaded)</div><div class="ttdoc">Loads a list of Entities from an in-memory buffer. </div></div>
@@ -564,7 +643,7 @@ $(document).ready(function(){initNavTree('entity__factory_8h_source.html','');})
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_aa93c7ea5247943de9eaeb1f257695038"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#aa93c7ea5247943de9eaeb1f257695038">corgi::component_library::EntityFactory::ReadEntityDefinition</a></div><div class="ttdeci">virtual bool ReadEntityDefinition(const void *entity_definition, std::vector&lt; const void * &gt; *component_defs)=0</div><div class="ttdoc">Handles reading an Entity definition and extracting the individual Component data definitions...</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_a7731c0b541623e004e9b74036a929ecc"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#a7731c0b541623e004e9b74036a929ecc">corgi::component_library::EntityFactory::max_component_id</a></div><div class="ttdeci">corgi::ComponentId max_component_id()</div><div class="ttdoc">Get the maximum component ID. </div><div class="ttdef"><b>Definition:</b> entity_factory.h:230</div></div>
 <div class="ttc" id="entity__manager_8h_html"><div class="ttname"><a href="entity__manager_8h.html">entity_manager.h</a></div></div>
-<div class="ttc" id="group__corgi__entity_html_ga5f64e19a6613a18291d7e9d44c785293"><div class="ttname"><a href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">corgi::ComponentId</a></div><div class="ttdeci">uint8_t ComponentId</div><div class="ttdoc">This represents the ID of a Component. </div><div class="ttdef"><b>Definition:</b> entity_common.h:47</div></div>
+<div class="ttc" id="group__corgi__entity_html_ga5f64e19a6613a18291d7e9d44c785293"><div class="ttname"><a href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">corgi::ComponentId</a></div><div class="ttdeci">uint16_t ComponentId</div><div class="ttdoc">This represents the ID of a Component. </div><div class="ttdef"><b>Definition:</b> entity_common.h:36</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- Google Analytics -->

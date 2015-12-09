@@ -24,6 +24,85 @@
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400italic,500,500italic,700,700italic|Roboto+Mono:400,700" rel="stylesheet">
 <link href="style.css" rel="stylesheet" type="text/css"/>
+<script>
+  /**
+   * Check if the browser rendering this page is being run on an Android device.
+   * It checks if the string 'android' is found in the browser's `userAgent`.
+   * @return {boolean} This returns `true` if the browser's `userAgent` contains
+   * the string 'android' (indicating that the browser is on an Android device).
+   * Otherwise, it returns `false`.
+   */
+  function isAndroidDevice() {
+    if (navigator && navigator.userAgent) {
+      return navigator.userAgent.toLowerCase().indexOf('android') != -1;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Check if an HTML `class` attribute is in the browser-specific format.
+   * @param {string} An HTML `class` attribute in the format 'browser-{device}'.
+   * @return {boolean} Returns `true` if `browserClass` was in the valid format,
+   * prefixed with 'browser-'. Otherwise, it returns false.
+   */
+  function isBrowserSpecificClassName(browserClass) {
+    if (browserClass && browserClass.substring(0, 8) == 'browser-' &&
+        browserClass.length > 8) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Get all the HTML Elements with browser-specific `class` attributes.
+   * @return {array} Returns an array of all the HTML Elements with a `class`
+   * attribute that is prefixed with `browser-`.
+   */
+  function getAllBrowserSpecificElements() {
+    if (document) {
+      var htmlElements = document.getElementsByTagName("*");
+      var browserSpecificElements = [];
+      for (var i = 0; i < htmlElements.length; i++) {
+        if (isBrowserSpecificClassName(htmlElements[i].className)) {
+          browserSpecificElements.push(htmlElements[i]);
+        }
+      }
+      return browserSpecificElements;
+    } else {
+      return null;
+    }
+  }
+  /**
+   * Given a browser-specific HTML `class` attribute, extract the device name.
+   * @param {string} browserClass The string name of an HTML `class` attribute,
+   * in the format `browser-{device}`.
+   * @return {string} Returns a string containing only the device portion of
+   * the class name. If the input was invalid, then it returns `null`.
+   */
+  function extractDeviceFromBrowserClass(browserClass) {
+    if (isBrowserSpecificClassName(browserClass)) {
+      return browserClass.substring(8);
+    }
+    else {
+      return null;
+    }
+  }
+  /**
+   * Hide device specific elements that do not apply to the current device.
+   */
+  function handleDeviceSpecificLoading() {
+    var browserSpecificElements = getAllBrowserSpecificElements();
+    for (var i = 0; i < browserSpecificElements.length; i++) {
+      var device = extractDeviceFromBrowserClass(browserSpecificElements[i].className);
+      if (device && !isAndroidDevice() && device == 'android') {
+        browserSpecificElements[i].innerHTML = '';
+      } else if(device && isAndroidDevice() && device == 'desktop') {
+        browserSpecificElements[i].innerHTML = '';
+      }
+    }
+  }
+  $(document).ready(handleDeviceSpecificLoading);
+</script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -157,81 +236,52 @@ $(document).ready(function(){initNavTree('entity_8h_source.html','');});
 <div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="classcorgi_1_1_entity.html">   32</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="classcorgi_1_1_entity.html">Entity</a> {</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; <span class="keyword">public</span>:<span class="comment"></span></div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment">  /// @brief Constructor for creating an Entity.</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="classcorgi_1_1_entity.html#a387e3f3daab109410bd688825bb00d0d">   35</a></span>&#160;<span class="comment"></span>  <a class="code" href="classcorgi_1_1_entity.html#a387e3f3daab109410bd688825bb00d0d">Entity</a>() : marked_for_deletion_(false) {</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; kMaxComponentCount; i++) {</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      componentDataIndex_[i] = <a class="code" href="group__corgi__entity.html#gaf67861033c9325e649cb38c76b8878ea">kUnusedComponentIndex</a>;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    }</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  }</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">  /// @brief Gets the index of the data in the corresponding Component</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">  /// system.</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">  ///</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">  /// @param[in] componentId The ID of the Component whose data</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment">  /// index will be returned.</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment">  ///</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">  /// @return Returns an int index of the data in the corresponding</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">  /// Component system.</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="classcorgi_1_1_entity.html#a50a0754a5917b8f7a3a9aaf0eff22dde">   49</a></span>&#160;<span class="comment"></span>  <span class="keywordtype">int</span> <a class="code" href="classcorgi_1_1_entity.html#a50a0754a5917b8f7a3a9aaf0eff22dde">GetComponentDataIndex</a>(<a class="code" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a> componentId)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordflow">return</span> componentDataIndex_[componentId];</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  }</div>
+<div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="classcorgi_1_1_entity.html#a387e3f3daab109410bd688825bb00d0d">   35</a></span>&#160;<span class="comment"></span>  <a class="code" href="classcorgi_1_1_entity.html#a387e3f3daab109410bd688825bb00d0d">Entity</a>() : entity_id_(<a class="code" href="group__corgi__entity.html#ga8760d0222d31c8de03a4e92858697383">kInvalidEntityId</a>), marked_for_deletion_(false) {}</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="comment">  /// @brief An accessor function to check if this Entity has been</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment">  /// marked for deletion.</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">  ///</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">  /// @return Returns a bool indicating whether or not this Entity</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">  /// is marked for deletion.</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="classcorgi_1_1_entity.html#a953effc6282d00008993a32e847f47b6">   42</a></span>&#160;<span class="comment"></span>  <span class="keywordtype">bool</span> <a class="code" href="classcorgi_1_1_entity.html#a953effc6282d00008993a32e847f47b6">marked_for_deletion</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> marked_for_deletion_; }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">  /// @brief A mutator function to set an Entity as marked for deletion.</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment">  ///</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment">  /// @param[in] marked_for_deletion A bool corresponding to whether the Entity</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">  /// should be marked for deletion or not.</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="classcorgi_1_1_entity.html#ad7e79868be43f93c13bbf53a9add6f6a">   48</a></span>&#160;<span class="comment"></span>  <span class="keywordtype">void</span> <a class="code" href="classcorgi_1_1_entity.html#ad7e79868be43f93c13bbf53a9add6f6a">set_marked_for_deletion</a>(<span class="keywordtype">bool</span> <a class="code" href="classcorgi_1_1_entity.html#a953effc6282d00008993a32e847f47b6">marked_for_deletion</a>) {</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    marked_for_deletion_ = <a class="code" href="classcorgi_1_1_entity.html#a953effc6282d00008993a32e847f47b6">marked_for_deletion</a>;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  }</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment">  /// @brief Sets the index for the data associated with this Entity in the</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment">  /// given Component.</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">  ///</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="comment">  /// @param[in] componentId The ID of the Component whose data index will</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">  /// be set.</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">  /// @param[in] value The ComponentIndex value to set for the given Component.</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="classcorgi_1_1_entity.html#a6627685c83eff405e27c0f8d26a5cc60">   59</a></span>&#160;<span class="comment"></span>  <span class="keywordtype">void</span> <a class="code" href="classcorgi_1_1_entity.html#a6627685c83eff405e27c0f8d26a5cc60">SetComponentDataIndex</a>(<a class="code" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a> componentId, <a class="code" href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">ComponentIndex</a> value) {</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    componentDataIndex_[componentId] = value;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  }</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment">  /// @brief A utility function for checking if this Entity is associated</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">  /// with a given Component.</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">  ///</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">  /// @param[in] componentId The ID of the Component to check whether or not</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">  /// it is associated with this Entity.</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment">  ///</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">  /// @return Returns a bool of whether or not this Entity is associated</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment">  /// with the given Component.</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="classcorgi_1_1_entity.html#a472b45191d8f7c65b14472721430b2af">   71</a></span>&#160;<span class="comment"></span>  <span class="keywordtype">bool</span> <a class="code" href="classcorgi_1_1_entity.html#a472b45191d8f7c65b14472721430b2af">IsRegisteredForComponent</a>(<a class="code" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a> componentId)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordflow">return</span> componentDataIndex_[componentId] != <a class="code" href="group__corgi__entity.html#gaf67861033c9325e649cb38c76b8878ea">kUnusedComponentIndex</a>;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  }</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">  /// @brief An accessor function to check if this Entity has been</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment">  /// marked for deletion.</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="comment">  ///</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="comment">  /// @return Returns a bool indicating whether or not this Entity</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment">  /// is marked for deletion.</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno"><a class="line" href="classcorgi_1_1_entity.html#a953effc6282d00008993a32e847f47b6">   80</a></span>&#160;<span class="comment"></span>  <span class="keywordtype">bool</span> <a class="code" href="classcorgi_1_1_entity.html#a953effc6282d00008993a32e847f47b6">marked_for_deletion</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> marked_for_deletion_; }</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">  /// @brief A mutator function to set an Entity as marked for deletion.</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">  ///</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">  /// @param[in] marked_for_deletion A bool corresponding to whether the Entity</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment">  /// should be marked for deletion or not.</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno"><a class="line" href="classcorgi_1_1_entity.html#ad7e79868be43f93c13bbf53a9add6f6a">   86</a></span>&#160;<span class="comment"></span>  <span class="keywordtype">void</span> <a class="code" href="classcorgi_1_1_entity.html#ad7e79868be43f93c13bbf53a9add6f6a">set_marked_for_deletion</a>(<span class="keywordtype">bool</span> <a class="code" href="classcorgi_1_1_entity.html#a953effc6282d00008993a32e847f47b6">marked_for_deletion</a>) {</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    marked_for_deletion_ = <a class="code" href="classcorgi_1_1_entity.html#a953effc6282d00008993a32e847f47b6">marked_for_deletion</a>;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  }</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <a class="code" href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">ComponentIndex</a> componentDataIndex_[kMaxComponentCount];</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="keywordtype">bool</span> marked_for_deletion_;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;};<span class="comment"></span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment">/// @}</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;}  <span class="comment">// corgi</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="preprocessor">#endif  // CORGI_ENTITY_H_</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment">  /// @brief Returns the unique entity id that represents this entity.  Should</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment">  /// generally only be used by internal CORGI functions.  Users of the library</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">  /// should usually refer to entities as EntityRefs.</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="classcorgi_1_1_entity.html#ace9915ba41d5bffe824fa77614800ecd">   56</a></span>&#160;<span class="comment"></span>  <a class="code" href="group__corgi__entity.html#gabaad342e5e2a6b0df9fc286c6f0d410b">EntityIdType</a> <a class="code" href="classcorgi_1_1_entity.html#ace9915ba41d5bffe824fa77614800ecd">entity_id</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> entity_id_; }</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">  /// @brief Sets an entity&#39;s unique ID.</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">  ///</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment">  /// Normally only used internally by the entitymanager for bookkeeping.</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno"><a class="line" href="classcorgi_1_1_entity.html#a5c98a959f217734ec7faeea3f5e77c8b">   61</a></span>&#160;<span class="comment"></span>  <span class="keywordtype">void</span> <a class="code" href="classcorgi_1_1_entity.html#a5c98a959f217734ec7faeea3f5e77c8b">set_entity_id</a>(<a class="code" href="group__corgi__entity.html#gabaad342e5e2a6b0df9fc286c6f0d410b">EntityIdType</a> <a class="code" href="classcorgi_1_1_entity.html#ace9915ba41d5bffe824fa77614800ecd">entity_id</a>) { entity_id_ = <a class="code" href="classcorgi_1_1_entity.html#ace9915ba41d5bffe824fa77614800ecd">entity_id</a>; }</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <a class="code" href="group__corgi__entity.html#gabaad342e5e2a6b0df9fc286c6f0d410b">EntityIdType</a> entity_id_;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <span class="keywordtype">bool</span> marked_for_deletion_;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;};<span class="comment"></span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">/// @}</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;}  <span class="comment">// corgi</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">#endif  // CORGI_ENTITY_H_</span></div>
+<div class="ttc" id="classcorgi_1_1_entity_html_a5c98a959f217734ec7faeea3f5e77c8b"><div class="ttname"><a href="classcorgi_1_1_entity.html#a5c98a959f217734ec7faeea3f5e77c8b">corgi::Entity::set_entity_id</a></div><div class="ttdeci">void set_entity_id(EntityIdType entity_id)</div><div class="ttdoc">Sets an entity&#39;s unique ID. </div><div class="ttdef"><b>Definition:</b> entity.h:61</div></div>
 <div class="ttc" id="entity__common_8h_html"><div class="ttname"><a href="entity__common_8h.html">entity_common.h</a></div></div>
-<div class="ttc" id="group__corgi__entity_html_gaf67861033c9325e649cb38c76b8878ea"><div class="ttname"><a href="group__corgi__entity.html#gaf67861033c9325e649cb38c76b8878ea">corgi::kUnusedComponentIndex</a></div><div class="ttdeci">static const ComponentIndex kUnusedComponentIndex</div><div class="ttdoc">A sentinel value to represent an invalid Component. </div><div class="ttdef"><b>Definition:</b> entity_common.h:89</div></div>
+<div class="ttc" id="group__corgi__entity_html_gabaad342e5e2a6b0df9fc286c6f0d410b"><div class="ttname"><a href="group__corgi__entity.html#gabaad342e5e2a6b0df9fc286c6f0d410b">corgi::EntityIdType</a></div><div class="ttdeci">uint16_t EntityIdType</div><div class="ttdoc">A EntityIdType is a value used to uniquely represent an entity in various internal structures...</div><div class="ttdef"><b>Definition:</b> entity_common.h:77</div></div>
+<div class="ttc" id="classcorgi_1_1_entity_html_ace9915ba41d5bffe824fa77614800ecd"><div class="ttname"><a href="classcorgi_1_1_entity.html#ace9915ba41d5bffe824fa77614800ecd">corgi::Entity::entity_id</a></div><div class="ttdeci">EntityIdType entity_id() const </div><div class="ttdoc">Returns the unique entity id that represents this entity. Should generally only be used by internal C...</div><div class="ttdef"><b>Definition:</b> entity.h:56</div></div>
 <div class="ttc" id="classcorgi_1_1_entity_html"><div class="ttname"><a href="classcorgi_1_1_entity.html">corgi::Entity</a></div><div class="ttdoc">The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...</div><div class="ttdef"><b>Definition:</b> entity.h:32</div></div>
-<div class="ttc" id="classcorgi_1_1_entity_html_a50a0754a5917b8f7a3a9aaf0eff22dde"><div class="ttname"><a href="classcorgi_1_1_entity.html#a50a0754a5917b8f7a3a9aaf0eff22dde">corgi::Entity::GetComponentDataIndex</a></div><div class="ttdeci">int GetComponentDataIndex(ComponentId componentId) const </div><div class="ttdoc">Gets the index of the data in the corresponding Component system. </div><div class="ttdef"><b>Definition:</b> entity.h:49</div></div>
+<div class="ttc" id="group__corgi__entity_html_ga8760d0222d31c8de03a4e92858697383"><div class="ttname"><a href="group__corgi__entity.html#ga8760d0222d31c8de03a4e92858697383">corgi::kInvalidEntityId</a></div><div class="ttdeci">static const EntityIdType kInvalidEntityId</div><div class="ttdoc">A sentinel value to represent an invalid entity. </div><div class="ttdef"><b>Definition:</b> entity_common.h:86</div></div>
 <div class="ttc" id="classcorgi_1_1_entity_html_a387e3f3daab109410bd688825bb00d0d"><div class="ttname"><a href="classcorgi_1_1_entity.html#a387e3f3daab109410bd688825bb00d0d">corgi::Entity::Entity</a></div><div class="ttdeci">Entity()</div><div class="ttdoc">Constructor for creating an Entity. </div><div class="ttdef"><b>Definition:</b> entity.h:35</div></div>
-<div class="ttc" id="group__corgi__entity_html_gaa9b819f754e4f0f1b122e8669fd4121b"><div class="ttname"><a href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">corgi::ComponentIndex</a></div><div class="ttdeci">uint16_t ComponentIndex</div><div class="ttdoc">A ComponentIndex is a value used to represent the location of a piece of ComponentData, normally inside of a VectorPool. </div><div class="ttdef"><b>Definition:</b> entity_common.h:79</div></div>
-<div class="ttc" id="classcorgi_1_1_entity_html_a953effc6282d00008993a32e847f47b6"><div class="ttname"><a href="classcorgi_1_1_entity.html#a953effc6282d00008993a32e847f47b6">corgi::Entity::marked_for_deletion</a></div><div class="ttdeci">bool marked_for_deletion() const </div><div class="ttdoc">An accessor function to check if this Entity has been marked for deletion. </div><div class="ttdef"><b>Definition:</b> entity.h:80</div></div>
-<div class="ttc" id="classcorgi_1_1_entity_html_a472b45191d8f7c65b14472721430b2af"><div class="ttname"><a href="classcorgi_1_1_entity.html#a472b45191d8f7c65b14472721430b2af">corgi::Entity::IsRegisteredForComponent</a></div><div class="ttdeci">bool IsRegisteredForComponent(ComponentId componentId) const </div><div class="ttdoc">A utility function for checking if this Entity is associated with a given Component. </div><div class="ttdef"><b>Definition:</b> entity.h:71</div></div>
-<div class="ttc" id="classcorgi_1_1_entity_html_ad7e79868be43f93c13bbf53a9add6f6a"><div class="ttname"><a href="classcorgi_1_1_entity.html#ad7e79868be43f93c13bbf53a9add6f6a">corgi::Entity::set_marked_for_deletion</a></div><div class="ttdeci">void set_marked_for_deletion(bool marked_for_deletion)</div><div class="ttdoc">A mutator function to set an Entity as marked for deletion. </div><div class="ttdef"><b>Definition:</b> entity.h:86</div></div>
-<div class="ttc" id="classcorgi_1_1_entity_html_a6627685c83eff405e27c0f8d26a5cc60"><div class="ttname"><a href="classcorgi_1_1_entity.html#a6627685c83eff405e27c0f8d26a5cc60">corgi::Entity::SetComponentDataIndex</a></div><div class="ttdeci">void SetComponentDataIndex(ComponentId componentId, ComponentIndex value)</div><div class="ttdoc">Sets the index for the data associated with this Entity in the given Component. </div><div class="ttdef"><b>Definition:</b> entity.h:59</div></div>
-<div class="ttc" id="group__corgi__entity_html_ga5f64e19a6613a18291d7e9d44c785293"><div class="ttname"><a href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">corgi::ComponentId</a></div><div class="ttdeci">uint8_t ComponentId</div><div class="ttdoc">This represents the ID of a Component. </div><div class="ttdef"><b>Definition:</b> entity_common.h:47</div></div>
+<div class="ttc" id="classcorgi_1_1_entity_html_a953effc6282d00008993a32e847f47b6"><div class="ttname"><a href="classcorgi_1_1_entity.html#a953effc6282d00008993a32e847f47b6">corgi::Entity::marked_for_deletion</a></div><div class="ttdeci">bool marked_for_deletion() const </div><div class="ttdoc">An accessor function to check if this Entity has been marked for deletion. </div><div class="ttdef"><b>Definition:</b> entity.h:42</div></div>
+<div class="ttc" id="classcorgi_1_1_entity_html_ad7e79868be43f93c13bbf53a9add6f6a"><div class="ttname"><a href="classcorgi_1_1_entity.html#ad7e79868be43f93c13bbf53a9add6f6a">corgi::Entity::set_marked_for_deletion</a></div><div class="ttdeci">void set_marked_for_deletion(bool marked_for_deletion)</div><div class="ttdoc">A mutator function to set an Entity as marked for deletion. </div><div class="ttdef"><b>Definition:</b> entity.h:48</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- Google Analytics -->

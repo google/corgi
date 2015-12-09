@@ -11,6 +11,7 @@ var searchData=
   ['collision_5fdata',['collision_data',['../class_physics_component.html#a630d71cb7950dafde0c929b98aabe53d',1,'PhysicsComponent']]],
   ['commonservicescomponent',['CommonServicesComponent',['../classcorgi_1_1component__library_1_1_common_services_component.html#af15b7e8fe6f1e7f7815a5b641a181422',1,'corgi::component_library::CommonServicesComponent']]],
   ['component',['Component',['../classcorgi_1_1_component.html#a8d90bdceeb90f0c618b475e7facc0758',1,'corgi::Component']]],
+  ['componentcount',['ComponentCount',['../classcorgi_1_1_entity_manager.html#a5c22aa89ce30b75b20500c639fb3a958',1,'corgi::EntityManager']]],
   ['componentdata',['ComponentData',['../structcorgi_1_1_component_1_1_component_data.html#a59bb4cc9f9d73ced0640df615f172b24',1,'corgi::Component::ComponentData::ComponentData()'],['../structcorgi_1_1_component_1_1_component_data.html#aaa43f1bf57f9fa89101dae3ee1e8a3ea',1,'corgi::Component::ComponentData::ComponentData(ComponentData &amp;&amp;src)']]],
   ['componentidtodatatype',['ComponentIdToDataType',['../classcorgi_1_1component__library_1_1_entity_factory.html#a74e4ad01d2035d398cd80bca4d327a21',1,'corgi::component_library::EntityFactory']]],
   ['componentidtotablename',['ComponentIdToTableName',['../classcorgi_1_1component__library_1_1_entity_factory.html#a69e688e4ee008923db2ebc6f3aa0d770',1,'corgi::component_library::EntityFactory']]],

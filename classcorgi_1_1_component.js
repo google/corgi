@@ -25,13 +25,16 @@ var classcorgi_1_1_component =
     [ "GetComponentDataAsVoid", "classcorgi_1_1_component.html#a25338292ce8943649cb68e27026fccb5", null ],
     [ "GetComponentDataIndex", "classcorgi_1_1_component.html#a946a6926b51ab6f320bdea5f0051c718", null ],
     [ "GetComponentId", "classcorgi_1_1_component.html#a7b5928cb180ac85775111b29d51bf307", null ],
+    [ "HasDataForEntity", "classcorgi_1_1_component.html#a4476fab9a4e20ac96f4bb05aefe4bce9", null ],
     [ "Init", "classcorgi_1_1_component.html#ab913bac6696fd50d8f08c7830f62be31", null ],
     [ "InitEntity", "classcorgi_1_1_component.html#ac7955abe834f61266b7639ca28cc8996", null ],
+    [ "IsRegisteredWithComponent", "classcorgi_1_1_component.html#a1f52951228c53248c8cddb0bb30bfefc", null ],
     [ "RemoveEntity", "classcorgi_1_1_component.html#a5c8410ec4738b7229d560d624c66ab40", null ],
     [ "RemoveEntity", "classcorgi_1_1_component.html#ad35d12da1efb42041220f46b12ccca78", null ],
     [ "SetComponentIdOnDataType", "classcorgi_1_1_component.html#abf562b3b9853c97247c998a56d492a22", null ],
     [ "SetEntityManager", "classcorgi_1_1_component.html#a324d8f89011d71d7d33a33f366d1e0b9", null ],
     [ "UpdateAllEntities", "classcorgi_1_1_component.html#a7043047f9722b31f4e6ff8d83d87f609", null ],
     [ "component_data_", "classcorgi_1_1_component.html#a92b32eded7ed99d56497990307b28ec1", null ],
+    [ "component_index_lookup_", "classcorgi_1_1_component.html#a516e76f9e30dd23aa55774c17d522b69", null ],
     [ "entity_manager_", "classcorgi_1_1_component.html#a6aa029818941faa5872eded17ffdc0e4", null ]
 ];

@@ -24,6 +24,85 @@
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400italic,500,500italic,700,700italic|Roboto+Mono:400,700" rel="stylesheet">
 <link href="style.css" rel="stylesheet" type="text/css"/>
+<script>
+  /**
+   * Check if the browser rendering this page is being run on an Android device.
+   * It checks if the string 'android' is found in the browser's `userAgent`.
+   * @return {boolean} This returns `true` if the browser's `userAgent` contains
+   * the string 'android' (indicating that the browser is on an Android device).
+   * Otherwise, it returns `false`.
+   */
+  function isAndroidDevice() {
+    if (navigator && navigator.userAgent) {
+      return navigator.userAgent.toLowerCase().indexOf('android') != -1;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Check if an HTML `class` attribute is in the browser-specific format.
+   * @param {string} An HTML `class` attribute in the format 'browser-{device}'.
+   * @return {boolean} Returns `true` if `browserClass` was in the valid format,
+   * prefixed with 'browser-'. Otherwise, it returns false.
+   */
+  function isBrowserSpecificClassName(browserClass) {
+    if (browserClass && browserClass.substring(0, 8) == 'browser-' &&
+        browserClass.length > 8) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Get all the HTML Elements with browser-specific `class` attributes.
+   * @return {array} Returns an array of all the HTML Elements with a `class`
+   * attribute that is prefixed with `browser-`.
+   */
+  function getAllBrowserSpecificElements() {
+    if (document) {
+      var htmlElements = document.getElementsByTagName("*");
+      var browserSpecificElements = [];
+      for (var i = 0; i < htmlElements.length; i++) {
+        if (isBrowserSpecificClassName(htmlElements[i].className)) {
+          browserSpecificElements.push(htmlElements[i]);
+        }
+      }
+      return browserSpecificElements;
+    } else {
+      return null;
+    }
+  }
+  /**
+   * Given a browser-specific HTML `class` attribute, extract the device name.
+   * @param {string} browserClass The string name of an HTML `class` attribute,
+   * in the format `browser-{device}`.
+   * @return {string} Returns a string containing only the device portion of
+   * the class name. If the input was invalid, then it returns `null`.
+   */
+  function extractDeviceFromBrowserClass(browserClass) {
+    if (isBrowserSpecificClassName(browserClass)) {
+      return browserClass.substring(8);
+    }
+    else {
+      return null;
+    }
+  }
+  /**
+   * Hide device specific elements that do not apply to the current device.
+   */
+  function handleDeviceSpecificLoading() {
+    var browserSpecificElements = getAllBrowserSpecificElements();
+    for (var i = 0; i < browserSpecificElements.length; i++) {
+      var device = extractDeviceFromBrowserClass(browserSpecificElements[i].className);
+      if (device && !isAndroidDevice() && device == 'android') {
+        browserSpecificElements[i].innerHTML = '';
+      } else if(device && isAndroidDevice() && device == 'desktop') {
+        browserSpecificElements[i].innerHTML = '';
+      }
+    }
+  }
+  $(document).ready(handleDeviceSpecificLoading);
+</script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -187,6 +266,9 @@ const CorgiVersion *&#160;</td><td class="memItemRight" valign="bottom"><a class
 <tr class="memitem:a432dc7648c99c57d5c9db1ff6ddc289f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcorgi_1_1_component_interface.html">ComponentInterface</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_entity_manager.html#a432dc7648c99c57d5c9db1ff6ddc289f">GetComponent</a> (<a class="el" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a> id) const </td></tr>
 <tr class="memdesc:a432dc7648c99c57d5c9db1ff6ddc289f"><td class="mdescLeft">&#160;</td><td class="mdescRight">A helper function for getting a particular <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a>, given a component ID.  <a href="#a432dc7648c99c57d5c9db1ff6ddc289f">More...</a><br/></td></tr>
 <tr class="separator:a432dc7648c99c57d5c9db1ff6ddc289f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c22aa89ce30b75b20500c639fb3a958"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_entity_manager.html#a5c22aa89ce30b75b20500c639fb3a958">ComponentCount</a> () const </td></tr>
+<tr class="memdesc:a5c22aa89ce30b75b20500c639fb3a958"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of components that have been registered with the entity manager.  <a href="#a5c22aa89ce30b75b20500c639fb3a958">More...</a><br/></td></tr>
+<tr class="separator:a5c22aa89ce30b75b20500c639fb3a958"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc6b4ae4ee504bb1bb02d666568188aa"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:acc6b4ae4ee504bb1bb02d666568188aa"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">ComponentId</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_entity_manager.html#acc6b4ae4ee504bb1bb02d666568188aa">GetComponentId</a> ()</td></tr>
 <tr class="memdesc:acc6b4ae4ee504bb1bb02d666568188aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">A helper function to get the component ID for a given <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a>.  <a href="#acc6b4ae4ee504bb1bb02d666568188aa">More...</a><br/></td></tr>
@@ -351,6 +433,32 @@ template&lt;typename T &gt; </div>
 
 <p>Returns an iterator to the beginning of the active Entities. This is suitable for iterating over every active <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a>. </p>
 <dl class="section return"><dt>Returns</dt><dd>Returns a std::iterator to the first active <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a>. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a5c22aa89ce30b75b20500c639fb3a958"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t corgi::EntityManager::ComponentCount </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the number of components that have been registered with the entity manager. </p>
+<dl class="section return"><dt>Returns</dt><dd>The total number of components that are currently registered with the entity manager. </dd></dl>
 
 </div>
 </div>

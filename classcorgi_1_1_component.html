@@ -24,6 +24,85 @@
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400italic,500,500italic,700,700italic|Roboto+Mono:400,700" rel="stylesheet">
 <link href="style.css" rel="stylesheet" type="text/css"/>
+<script>
+  /**
+   * Check if the browser rendering this page is being run on an Android device.
+   * It checks if the string 'android' is found in the browser's `userAgent`.
+   * @return {boolean} This returns `true` if the browser's `userAgent` contains
+   * the string 'android' (indicating that the browser is on an Android device).
+   * Otherwise, it returns `false`.
+   */
+  function isAndroidDevice() {
+    if (navigator && navigator.userAgent) {
+      return navigator.userAgent.toLowerCase().indexOf('android') != -1;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Check if an HTML `class` attribute is in the browser-specific format.
+   * @param {string} An HTML `class` attribute in the format 'browser-{device}'.
+   * @return {boolean} Returns `true` if `browserClass` was in the valid format,
+   * prefixed with 'browser-'. Otherwise, it returns false.
+   */
+  function isBrowserSpecificClassName(browserClass) {
+    if (browserClass && browserClass.substring(0, 8) == 'browser-' &&
+        browserClass.length > 8) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  /**
+   * Get all the HTML Elements with browser-specific `class` attributes.
+   * @return {array} Returns an array of all the HTML Elements with a `class`
+   * attribute that is prefixed with `browser-`.
+   */
+  function getAllBrowserSpecificElements() {
+    if (document) {
+      var htmlElements = document.getElementsByTagName("*");
+      var browserSpecificElements = [];
+      for (var i = 0; i < htmlElements.length; i++) {
+        if (isBrowserSpecificClassName(htmlElements[i].className)) {
+          browserSpecificElements.push(htmlElements[i]);
+        }
+      }
+      return browserSpecificElements;
+    } else {
+      return null;
+    }
+  }
+  /**
+   * Given a browser-specific HTML `class` attribute, extract the device name.
+   * @param {string} browserClass The string name of an HTML `class` attribute,
+   * in the format `browser-{device}`.
+   * @return {string} Returns a string containing only the device portion of
+   * the class name. If the input was invalid, then it returns `null`.
+   */
+  function extractDeviceFromBrowserClass(browserClass) {
+    if (isBrowserSpecificClassName(browserClass)) {
+      return browserClass.substring(8);
+    }
+    else {
+      return null;
+    }
+  }
+  /**
+   * Hide device specific elements that do not apply to the current device.
+   */
+  function handleDeviceSpecificLoading() {
+    var browserSpecificElements = getAllBrowserSpecificElements();
+    for (var i = 0; i < browserSpecificElements.length; i++) {
+      var device = extractDeviceFromBrowserClass(browserSpecificElements[i].className);
+      if (device && !isAndroidDevice() && device == 'android') {
+        browserSpecificElements[i].innerHTML = '';
+      } else if(device && isAndroidDevice() && device == 'desktop') {
+        browserSpecificElements[i].innerHTML = '';
+      }
+    }
+  }
+  $(document).ready(handleDeviceSpecificLoading);
+</script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -219,6 +298,10 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_component.html#a7043047f9722b31f4e6ff8d83d87f609">UpdateAllEntities</a> (<a class="el" href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98">WorldTime</a>)</td></tr>
 <tr class="memdesc:a7043047f9722b31f4e6ff8d83d87f609"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates all Entities. This is normally called, once per frame, by the <a class="el" href="classcorgi_1_1_entity_manager.html" title="The EntityManager is the code that manages all Entities and Components in the game. Normally the game will instantiate EntityManager, and then use it to create and control all of its Entities. ">EntityManager</a>. <br/></td></tr>
 <tr class="separator:a7043047f9722b31f4e6ff8d83d87f609"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4476fab9a4e20ac96f4bb05aefe4bce9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4476fab9a4e20ac96f4bb05aefe4bce9"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_component.html#a4476fab9a4e20ac96f4bb05aefe4bce9">HasDataForEntity</a> (const <a class="el" href="group__corgi__entity__manager.html#ga208e9c16b6ba76e51b76906a08c0a8d6">EntityRef</a> &amp;entity)</td></tr>
+<tr class="memdesc:a4476fab9a4e20ac96f4bb05aefe4bce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if this component contains any data associated with the supplied entity. <br/></td></tr>
+<tr class="separator:a4476fab9a4e20ac96f4bb05aefe4bce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7455ca1144bfa57fc795802bbff05054"><td class="memItemLeft" align="right" valign="top">virtual void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_component.html#a7455ca1144bfa57fc795802bbff05054">GetComponentDataAsVoid</a> (const <a class="el" href="group__corgi__entity__manager.html#ga208e9c16b6ba76e51b76906a08c0a8d6">EntityRef</a> &amp;entity)</td></tr>
 <tr class="memdesc:a7455ca1144bfa57fc795802bbff05054"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the data for a given <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> as a void pointer.  <a href="#a7455ca1144bfa57fc795802bbff05054">More...</a><br/></td></tr>
 <tr class="separator:a7455ca1144bfa57fc795802bbff05054"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -245,6 +328,10 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memitem:a4f3e530aec2b7015820a72af6382d59d"><td class="memTemplItemLeft" align="right" valign="top">ComponentDataType *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_component.html#a4f3e530aec2b7015820a72af6382d59d">Data</a> (const <a class="el" href="group__corgi__entity__manager.html#ga208e9c16b6ba76e51b76906a08c0a8d6">EntityRef</a> &amp;entity)</td></tr>
 <tr class="memdesc:a4f3e530aec2b7015820a72af6382d59d"><td class="mdescLeft">&#160;</td><td class="mdescRight">A utility function for retrieving the <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> data for an <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> from a specific <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a>.  <a href="#a4f3e530aec2b7015820a72af6382d59d">More...</a><br/></td></tr>
 <tr class="separator:a4f3e530aec2b7015820a72af6382d59d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f52951228c53248c8cddb0bb30bfefc"><td class="memTemplParams" colspan="2">template&lt;typename ComponentDataType &gt; </td></tr>
+<tr class="memitem:a1f52951228c53248c8cddb0bb30bfefc"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_component.html#a1f52951228c53248c8cddb0bb30bfefc">IsRegisteredWithComponent</a> (const <a class="el" href="group__corgi__entity__manager.html#ga208e9c16b6ba76e51b76906a08c0a8d6">EntityRef</a> &amp;entity)</td></tr>
+<tr class="memdesc:a1f52951228c53248c8cddb0bb30bfefc"><td class="mdescLeft">&#160;</td><td class="mdescRight">A utility function for checking if an entity is registered with a particular component.  <a href="#a1f52951228c53248c8cddb0bb30bfefc">More...</a><br/></td></tr>
+<tr class="separator:a1f52951228c53248c8cddb0bb30bfefc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af29a889e5a089684bfcf87cafd0af90a"><td class="memTemplParams" colspan="2">template&lt;typename ComponentDataType &gt; </td></tr>
 <tr class="memitem:af29a889e5a089684bfcf87cafd0af90a"><td class="memTemplItemLeft" align="right" valign="top">ComponentDataType *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_component.html#af29a889e5a089684bfcf87cafd0af90a">Data</a> (const <a class="el" href="group__corgi__entity__manager.html#ga208e9c16b6ba76e51b76906a08c0a8d6">EntityRef</a> &amp;entity) const </td></tr>
 <tr class="memdesc:af29a889e5a089684bfcf87cafd0af90a"><td class="mdescLeft">&#160;</td><td class="mdescRight">A utility function for retrieving the <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> data for an <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> from a specific <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a>.  <a href="#af29a889e5a089684bfcf87cafd0af90a">More...</a><br/></td></tr>
@@ -309,6 +396,11 @@ Protected Attributes</h2></td></tr>
 <a class="el" href="classcorgi_1_1_entity_manager.html">EntityManager</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_component.html#a6aa029818941faa5872eded17ffdc0e4">entity_manager_</a></td></tr>
 <tr class="memdesc:a6aa029818941faa5872eded17ffdc0e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to the <a class="el" href="classcorgi_1_1_entity_manager.html" title="The EntityManager is the code that manages all Entities and Components in the game. Normally the game will instantiate EntityManager, and then use it to create and control all of its Entities. ">EntityManager</a> for this <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a>. This is the main point of contact for Components that need to talk to other things. <br/></td></tr>
 <tr class="separator:a6aa029818941faa5872eded17ffdc0e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a516e76f9e30dd23aa55774c17d522b69"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a516e76f9e30dd23aa55774c17d522b69"></a>
+std::unordered_map<br class="typebreak"/>
+&lt; <a class="el" href="group__corgi__entity.html#gabaad342e5e2a6b0df9fc286c6f0d410b">EntityIdType</a>, <a class="el" href="group__corgi__entity.html#gaa9b819f754e4f0f1b122e8669fd4121b">ComponentIndex</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1_component.html#a516e76f9e30dd23aa55774c17d522b69">component_index_lookup_</a></td></tr>
+<tr class="memdesc:a516e76f9e30dd23aa55774c17d522b69"><td class="mdescLeft">&#160;</td><td class="mdescRight">A map, for translating unique entity IDs into vectorpool indexes. <br/></td></tr>
+<tr class="separator:a516e76f9e30dd23aa55774c17d522b69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a0a2c220c266e80ab59489acdf906887f"></a>
@@ -896,7 +988,7 @@ template&lt;typename T&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Returns a size_t corresponding to the index of the <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> data. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns a size_t corresponding to the index of the <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> data, or kInvalidComponentIndex if no data could be found. </dd></dl>
 
 </div>
 </div>
@@ -925,6 +1017,49 @@ template&lt;typename T&gt; </div>
 
 <p>Get the ID for this <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a>. </p>
 <dl class="section return"><dt>Returns</dt><dd>Returns the <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> ID for this <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a>. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a1f52951228c53248c8cddb0bb30bfefc"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<div class="memtemplate">
+template&lt;typename ComponentDataType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classcorgi_1_1_component.html">corgi::Component</a>&lt; T &gt;::IsRegisteredWithComponent </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__corgi__entity__manager.html#ga208e9c16b6ba76e51b76906a08c0a8d6">EntityRef</a> &amp;&#160;</td>
+          <td class="paramname"><em>entity</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A utility function for checking if an entity is registered with a particular component. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">ComponentDataType</td><td>The data type of the <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> to be checked for registration.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">entity</td><td>An EntityRef reference to the <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> whose <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> data is checked.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns true if the entity has been registered with the <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a>, false otherwise. </dd></dl>
 
 </div>
 </div>
