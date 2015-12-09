@@ -23,19 +23,14 @@ namespace corgi {
 // the constant won't be stripped out by the compiler.
 EntityManager::EntityManager()
     : entity_factory_(nullptr),
-      max_component_id_(kInvalidComponent),
-      version_(&Version()) {
-  for (int i = 0; i < kMaxComponentCount; i++) {
-    components_[i] = nullptr;
-  }
-}
+      version_(&Version()) {}
 
 // Allocates a new entity and returns it
 EntityRef EntityManager::AllocateNewEntity() {
   EntityRef result = EntityRef(entities_.GetNewElement(kAddToBack));
   // Indexes are guaranteed to be unique and stable in vector pools.
   // May need to revisit this if we implement defragging though.
-  result->set_entity_id(result.index());
+  result->set_entity_id(static_cast<EntityIdType>(result.index()));
   return result;
 }
 
@@ -68,7 +63,7 @@ void EntityManager::DeleteMarkedEntities() {
 }
 
 void EntityManager::RemoveAllComponents(EntityRef entity) {
-  for (ComponentId i = 0; i < kMaxComponentCount; i++) {
+  for (ComponentId i = 0; i < components_.size(); i++) {
     if (components_[i] != nullptr && components_[i]->HasDataForEntity(entity)) {
       components_[i]->RemoveEntity(entity);
     }
@@ -84,10 +79,9 @@ void EntityManager::AddEntityToComponent(EntityRef entity,
 
 void EntityManager::RegisterComponentHelper(ComponentInterface* new_component,
                                             ComponentId id) {
-  assert(id < kMaxComponentCount);
   // Make sure this ID isn't already associated with a component.
-  assert(components_[id] == nullptr);
-  components_[id] = new_component;
+  components_.push_back(new_component);
+  assert(new_component == components_[id]);
   new_component->SetEntityManager(this);
   new_component->SetComponentIdOnDataType(id);
   new_component->Init();
@@ -109,20 +103,20 @@ const void* EntityManager::GetComponentDataAsVoid(
 
 void EntityManager::UpdateComponents(WorldTime delta_time) {
   // Update all the registered components.
-  for (size_t i = 0; i < kMaxComponentCount; i++) {
+  for (size_t i = 0; i < components_.size(); i++) {
     if (components_[i]) components_[i]->UpdateAllEntities(delta_time);
   }
   DeleteMarkedEntities();
 }
 
 void EntityManager::Clear() {
-  for (size_t i = 0; i < kMaxComponentCount; i++) {
+  for (size_t i = 0; i < components_.size(); i++) {
     if (components_[i]) {
       components_[i]->ClearComponentData();
       components_[i]->Cleanup();
     }
-    components_[i] = nullptr;
   }
+  components_.clear();
   entities_.Clear();
 }
 

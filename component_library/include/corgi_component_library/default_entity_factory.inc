@@ -99,7 +99,8 @@ bool DefaultEntityFactory::ReadEntityList(
   entity_defs->clear();
   entity_defs->reserve(list->entity_list()->size());
   for (size_t i = 0; i < list->entity_list()->size(); i++) {
-    entity_defs->push_back(list->entity_list()->Get(i));
+    flatbuffers::uoffset_t index = static_cast<flatbuffers::uoffset_t>(i);
+    entity_defs->push_back(list->entity_list()->Get(index));
   }
   return true;
 }
@@ -110,13 +111,15 @@ bool DefaultEntityFactory::ReadEntityDefinition(
   component_defs->clear();
   component_defs->resize(max_component_id() + 1, nullptr);
   for (size_t i = 0; i < def->component_list()->size(); i++) {
-    const ComponentDefInstance* component_def = def->component_list()->Get(i);
+    flatbuffers::uoffset_t index = static_cast<flatbuffers::uoffset_t>(i);
+    const ComponentDefInstance* component_def =
+        def->component_list()->Get(index);
     corgi::ComponentId component_id =
         DataTypeToComponentId(component_def->data_type());
     if (component_id == corgi::kInvalidComponent) {
       fplbase::LogError(
-        "ReadEntityDefinition: Error, unknown component data type %d\n",
-        component_def->data_type());
+          "ReadEntityDefinition: Error, unknown component data type %d\n",
+          component_def->data_type());
       return false;
     }
     (*component_defs)[component_id] = component_def->data();
@@ -161,7 +164,7 @@ bool DefaultEntityFactory::CreateEntityDefinition(
   // to the correct value.
   if (flatbuffer_binary_schema_data() == "") {
     fplbase::LogError(
-      "CreateEntityDefinition: No schema loaded, can't CopyTable");
+        "CreateEntityDefinition: No schema loaded, can't CopyTable");
     return false;
   }
   auto schema = reflection::GetSchema(flatbuffer_binary_schema_data().c_str());
@@ -216,7 +219,7 @@ bool DefaultEntityFactory::CreateEntityList(
   auto schema = reflection::GetSchema(flatbuffer_binary_schema_data().c_str());
   if (schema == nullptr) {
     fplbase::LogError(
-      "CreateEntityList: GetSchema() failed, is it a binary schema?");
+        "CreateEntityList: GetSchema() failed, is it a binary schema?");
     return false;
   }
   auto table_def = schema->objects()->LookupByKey("EntityDef");

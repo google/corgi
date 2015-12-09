@@ -197,7 +197,7 @@ void EntityFactory::LoadEntityData(const void* def,
                 ComponentIdToTableName(static_cast<corgi::ComponentId>(i)),
                 is_prototype ? "prototype" : "entity");
       }
-      overridden_components.insert(i);
+      overridden_components.insert(static_cast<corgi::ComponentId>(i));
       if (is_prototype && i == meta_id) {
         // MetaDef from prototypes gets loaded special.
         meta_component->AddFromPrototypeData(
@@ -221,8 +221,7 @@ void EntityFactory::LoadEntityData(const void* def,
       // If we don't already have a MetaComponent, we should get one added.
       corgi::ComponentInterface* component_ptr =
           entity_manager->GetComponent(component_id);
-      if (component_ptr != nullptr &&
-          component_ptr->HasDataForEntity(entity) &&
+      if (component_ptr != nullptr && component_ptr->HasDataForEntity(entity) &&
           overridden_components.find(component_id) ==
               overridden_components.end()) {
         meta_data->components_from_prototype.insert(component_id);

@@ -194,7 +194,8 @@ void TransformComponent::AddFromRawData(corgi::EntityRef& entity,
 
   if (transform_def->child_ids() != nullptr) {
     for (size_t i = 0; i < transform_def->child_ids()->size(); i++) {
-      auto child_id = transform_def->child_ids()->Get(i);
+      auto child_id = transform_def->child_ids()->Get(
+          static_cast<flatbuffers::uoffset_t>(i));
       // We don't actually add the children until the first update,
       // to give the other entities in our list time to be loaded.
       if (transform_data->child_ids.find(child_id->c_str()) ==
@@ -281,7 +282,8 @@ corgi::EntityRef TransformComponent::ChildWithComponents(
     // If this entity has the components we're looking for, return it.
     bool has_components = true;
     for (size_t i = 0; i < num_ids; ++i) {
-      has_components = has_components &&
+      has_components =
+          has_components &&
           entity_manager_->GetComponent(ids[i])->HasDataForEntity(e);
     }
     if (has_components) return e;

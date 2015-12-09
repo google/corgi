@@ -139,7 +139,8 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
     // TODO: anim_data will set uniforms for an array of matricies. Each
     //       matrix represents one bone position.
     const bool has_anim = anim_data != nullptr && anim_data->motivator.Valid();
-    const int num_mesh_bones = rendermesh_data->mesh->num_bones();
+    const int num_mesh_bones =
+        static_cast<int>(rendermesh_data->mesh->num_bones());
     const int num_anim_bones =
         has_anim ? anim_data->motivator.DefiningAnim()->NumBones() : 0;
     const bool has_one_bone_anim =
@@ -258,7 +259,8 @@ void RenderMeshComponent::AddFromRawData(corgi::EntityRef& entity,
   rendermesh_data->pass_mask = 0;
   if (rendermesh_def->render_pass() != nullptr) {
     for (size_t i = 0; i < rendermesh_def->render_pass()->size(); i++) {
-      int render_pass = rendermesh_def->render_pass()->Get(i);
+      flatbuffers::uoffset_t index = static_cast<flatbuffers::uoffset_t>(i);
+      int render_pass = rendermesh_def->render_pass()->Get(index);
       assert(render_pass < RenderPass_Count);
       rendermesh_data->pass_mask |= 1 << render_pass;
     }
@@ -269,7 +271,8 @@ void RenderMeshComponent::AddFromRawData(corgi::EntityRef& entity,
 
   if (rendermesh_def->culling() != nullptr) {
     for (size_t i = 0; i < rendermesh_def->culling()->size(); i++) {
-      int culling_test = rendermesh_def->culling()->Get(i);
+      flatbuffers::uoffset_t index = static_cast<flatbuffers::uoffset_t>(i);
+      int culling_test = rendermesh_def->culling()->Get(index);
       assert(culling_test < CullingTest_Count);
       rendermesh_data->culling_mask |= 1 << culling_test;
     }

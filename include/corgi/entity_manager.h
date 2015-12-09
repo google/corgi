@@ -112,7 +112,7 @@ class EntityManager {
     ComponentId id =
         static_cast<ComponentId>(ComponentIdLookup<T>::component_id);
     assert(id != kInvalidComponent);
-    assert(id < kMaxComponentCount);
+    assert(id < components_.size());
     return static_cast<T*>(components_[id]);
   }
 
@@ -129,7 +129,7 @@ class EntityManager {
     ComponentId id =
         static_cast<ComponentId>(ComponentIdLookup<T>::component_id);
     assert(id != kInvalidComponent);
-    assert(id < kMaxComponentCount);
+    assert(id < components_.size());
     return static_cast<const T*>(components_[id]);
   }
 
@@ -148,7 +148,7 @@ class EntityManager {
     ComponentId id =
         static_cast<ComponentId>(ComponentIdLookup<T>::component_id);
     assert(id != kInvalidComponent);
-    assert(id < kMaxComponentCount);
+    assert(id < components_.size());
     AddEntityToComponent(entity, id);
   }
 
@@ -162,7 +162,7 @@ class EntityManager {
   /// @return Returns a pointer to the Component at the given id, which
   /// inherits from the ComponentInterface.
   inline ComponentInterface* GetComponent(ComponentId id) {
-    assert(id < kMaxComponentCount);
+    assert(id < components_.size());
     return components_[id];
   }
 
@@ -176,9 +176,16 @@ class EntityManager {
   /// @return Returns a const pointer to the Component at the given id,
   /// which inherits from the ComponentInterface.
   inline const ComponentInterface* GetComponent(ComponentId id) const {
-    assert(id < kMaxComponentCount);
+    assert(id < components_.size());
     return components_[id];
   }
+
+  /// @brief Returns the number of components that have been registered
+  /// with the entity manager.
+  ///
+  /// @return The total number of components that are currently registered
+  /// with the entity manager.
+  inline size_t ComponentCount() const { return components_.size(); }
 
   /// @brief A helper function to get the component ID for a given Component.
   ///
@@ -230,7 +237,7 @@ class EntityManager {
   ComponentId RegisterComponent(T* new_component) {
     static_assert(std::is_base_of<ComponentInterface, T>::value,
                   "'new_component' must inherit from ComponentInterface");
-    ComponentId component_id = ++max_component_id_;
+    ComponentId component_id = static_cast<ComponentId>(components_.size());
     ComponentIdLookup<T>::component_id = component_id;
     RegisterComponentHelper(new_component, component_id);
     return component_id;
@@ -371,7 +378,7 @@ class EntityManager {
   ///
   /// @brief All the Components that are tracked by the system, and are
   /// ready to have Entities added to them.
-  ComponentInterface* components_[kMaxComponentCount];
+  std::vector<ComponentInterface*> components_;
 
   /// @var entities_to_delete_
   ///
@@ -389,8 +396,6 @@ class EntityManager {
   ///
   /// @note Provided by the calling program.
   EntityFactoryInterface* entity_factory_;
-
-  ComponentId max_component_id_;
 
   // Current version of the Corgi Entity Library.
   const CorgiVersion* version_;

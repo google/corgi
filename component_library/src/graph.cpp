@@ -52,7 +52,8 @@ void GraphComponent::AddFromRawData(corgi::EntityRef& entity,
   graph_data->graphs.clear();
   if (filename_list) {
     for (size_t i = 0; i < filename_list->size(); ++i) {
-      auto filename = filename_list->Get(i);
+      auto filename =
+          filename_list->Get(static_cast<flatbuffers::uoffset_t>(i));
       graph_data->graphs.push_back(SerializableGraphState());
       graph_data->graphs.back().graph_state.reset(new breadboard::GraphState);
       graph_data->graphs.back().filename = filename->c_str();
