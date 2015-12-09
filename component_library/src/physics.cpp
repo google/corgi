@@ -551,7 +551,6 @@ void PhysicsComponent::ProcessBulletTickCallback() {
         std::string tag_a;
         std::string tag_b;
         auto physics_a = Data<PhysicsData>(entity_a);
-        auto graph_a = Data<GraphData>(entity_a);
         for (int i = 0; i < physics_a->body_count_; i++) {
           if (physics_a->rigid_bodies_[i].rigid_body.get() == body_a) {
             tag_a = physics_a->rigid_bodies_[i].user_tag;
@@ -559,7 +558,6 @@ void PhysicsComponent::ProcessBulletTickCallback() {
           }
         }
         auto physics_b = Data<PhysicsData>(entity_b);
-        auto graph_b = Data<GraphData>(entity_b);
         for (int i = 0; i < physics_b->body_count_; i++) {
           if (physics_b->rigid_bodies_[i].rigid_body.get() == body_b) {
             tag_b = physics_b->rigid_bodies_[i].user_tag;
@@ -567,12 +565,17 @@ void PhysicsComponent::ProcessBulletTickCallback() {
           }
         }
 
-        // Broadcast that a collision event has occured, and then execute all
-        // collision graphs on both entities involved in the collision.
-        ExecuteGraphs(&collision_data_, graph_a, entity_a, position_a, tag_a,
-                      entity_b, position_b, tag_b);
-        ExecuteGraphs(&collision_data_, graph_b, entity_b, position_b, tag_b,
-                      entity_a, position_a, tag_a);
+        // Check if GraphComponent exists before trying to read its data.
+        if (GraphComponent::GetComponentId() != kInvalidComponent) {
+          auto graph_a = Data<GraphData>(entity_a);
+          auto graph_b = Data<GraphData>(entity_b);
+          // Broadcast that a collision event has occured, and then execute all
+          // collision graphs on both entities involved in the collision.
+          ExecuteGraphs(&collision_data_, graph_a, entity_a, position_a, tag_a,
+                        entity_b, position_b, tag_b);
+          ExecuteGraphs(&collision_data_, graph_b, entity_b, position_b, tag_b,
+                        entity_a, position_a, tag_a);
+        }
 
         // If a collision callback has been registered, call that as well.
         if (collision_callback_) {
