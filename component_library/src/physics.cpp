@@ -296,7 +296,7 @@ void PhysicsComponent::AddFromRawData(corgi::EntityRef& entity,
           mass, rb_data->motion_state.get(), rb_data->shape.get(), inertia);
       rigid_body_builder.m_restitution = shape_def->restitution();
       rb_data->rigid_body.reset(new btRigidBody(rigid_body_builder));
-      rb_data->rigid_body->setUserIndex(entity.index());
+      rb_data->rigid_body->setUserIndex(static_cast<int>(entity.index()));
       rb_data->rigid_body->setUserPointer(entity.container());
 
       // Only the first shape can be non-kinematic.
@@ -772,7 +772,7 @@ void PhysicsComponent::FinalizeStaticMesh(const corgi::EntityRef& entity,
       mass, rb_data->motion_state.get(), rb_data->shape.get(), inertia);
   rigid_body_builder.m_restitution = restitution;
   rb_data->rigid_body.reset(new btRigidBody(rigid_body_builder));
-  rb_data->rigid_body->setUserIndex(entity.index());
+  rb_data->rigid_body->setUserIndex(static_cast<int>(entity.index()));
   rb_data->rigid_body->setUserPointer(entity.container());
   rb_data->rigid_body->setCollisionFlags(
       rb_data->rigid_body->getCollisionFlags() |
@@ -869,7 +869,7 @@ void PhysicsComponent::GenerateRaycastShape(corgi::EntityRef& entity,
   btRigidBody::btRigidBodyConstructionInfo rigid_body_builder(
       0, rb_data->motion_state.get(), rb_data->shape.get(), btVector3());
   rb_data->rigid_body.reset(new btRigidBody(rigid_body_builder));
-  rb_data->rigid_body->setUserIndex(entity.index());
+  rb_data->rigid_body->setUserIndex(static_cast<int>(entity.index()));
   rb_data->rigid_body->setUserPointer(entity.container());
   rb_data->rigid_body->setCollisionFlags(
       rb_data->rigid_body->getCollisionFlags() |

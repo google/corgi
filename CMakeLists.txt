@@ -167,7 +167,7 @@ if (corgi_build_component_library)
     set(BUILD_BULLET3 OFF CACHE BOOL "")
     set(BUILD_EXTRAS OFF CACHE BOOL "")
     set(BUILD_UNIT_TESTS OFF CACHE BOOL "")
-    set(USE_MSVC_RUNTIME_LIBRARY_DLL ON)
+    set(USE_MSVC_RUNTIME_LIBRARY_DLL ON CACHE BOOL "")
     add_subdirectory("${dependencies_bulletphysics_distr_dir}"
                      ${tmp_dir}/bulletphysics)
     restore_compiler_flags()

@@ -185,9 +185,7 @@ class EntityManager {
   ///
   /// @return The total number of components that are currently registered
   /// with the entity manager.
-  inline int ComponentCount() const {
-    return components_.size();
-  }
+  inline size_t ComponentCount() const { return components_.size(); }
 
   /// @brief A helper function to get the component ID for a given Component.
   ///
@@ -239,7 +237,7 @@ class EntityManager {
   ComponentId RegisterComponent(T* new_component) {
     static_assert(std::is_base_of<ComponentInterface, T>::value,
                   "'new_component' must inherit from ComponentInterface");
-    ComponentId component_id = components_.size();
+    ComponentId component_id = static_cast<ComponentId>(components_.size());
     ComponentIdLookup<T>::component_id = component_id;
     RegisterComponentHelper(new_component, component_id);
     return component_id;

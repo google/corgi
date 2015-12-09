@@ -157,7 +157,7 @@ static const size_t kMaximumGeneratedEntityIDStringLength = 33;
 void MetaComponent::GenerateRandomEntityID(std::string* output) {
   int num_digits = 16;
   const char digits[] = "0123456789abcdef";
-  int digit_choices = strlen(digits);
+  int digit_choices = static_cast<int>(strlen(digits));
   const char separator = '-';
   const int separator_every = 5;
 
