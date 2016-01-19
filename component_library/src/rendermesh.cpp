@@ -34,6 +34,9 @@ namespace component_library {
 // registration points technically fall outside our frustrum.
 static const float kFrustrumOffset = 10.0f;
 
+// Default index when determining which shader to use in a render pass.
+static const int kDefaultShaderIndex = 0;
+
 void RenderMeshComponent::Init() {
   asset_manager_ =
       entity_manager_->GetComponent<CommonServicesComponent>()->asset_manager();
@@ -118,13 +121,13 @@ void RenderMeshComponent::RenderAllEntities(fplbase::Renderer& renderer,
 // Render a pass.
 void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
                                      fplbase::Renderer& renderer) {
-  RenderPass(pass_id, camera, renderer, nullptr);
+  RenderPass(pass_id, camera, renderer, kDefaultShaderIndex);
 }
 
 // Render a single render-pass, by ID.
 void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
                                      fplbase::Renderer& renderer,
-                                     const fplbase::Shader* shader_override) {
+                                     size_t shader_index) {
   mat4 camera_vp = camera.GetTransformMatrix();
 
   for (size_t i = 0; i < pass_render_list_[pass_id].size(); i++) {
@@ -135,6 +138,11 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
     TransformData* transform_data = Data<TransformData>(entity);
 
     AnimationData* anim_data = Data<AnimationData>(entity);
+
+    // Only allow rendering with shader override if the index is valid.
+    if (rendermesh_data->shaders.size() <= shader_index) {
+      continue;
+    }
 
     // TODO: anim_data will set uniforms for an array of matricies. Each
     //       matrix represents one bone position.
@@ -177,20 +185,12 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
       renderer.set_camera_pos(world_matrix_inverse * camera.position());
       renderer.set_model_view_projection(mvp);
 
-      if (!shader_override && rendermesh_data->shader) {
-        rendermesh_data->shader->Set(renderer);
-      } else {
-        shader_override->Set(renderer);
-      }
+      rendermesh_data->shaders[shader_index]->Set(renderer);
 
       rendermesh_data->mesh->Render(renderer);
     } else {
-      const fplbase::Shader* shader = nullptr;
-      if (!shader_override && rendermesh_data->shader) {
-        shader = rendermesh_data->shader;
-      } else {
-        shader = shader_override;
-      }
+      const fplbase::Shader* shader =
+          rendermesh_data->shaders[shader_index];
       mathfu::vec4i viewport[2] = {camera.viewport(0), camera.viewport(1)};
       mat4 camera_vp_stereo = camera.GetTransformMatrix(1);
       mat4 mvp_matrices[2] = {mvp, camera_vp_stereo * world_transform};
@@ -225,12 +225,30 @@ void RenderMeshComponent::AddFromRawData(corgi::EntityRef& entity,
   // otherwise it can't load up new meshes!
   assert(asset_manager_ != nullptr);
   assert(rendermesh_def->source_file() != nullptr);
-  assert(rendermesh_def->shader() != nullptr);
+  assert(rendermesh_def->shaders()
+         && rendermesh_def->shaders()->Length() > 0);
 
   RenderMeshData* rendermesh_data = AddEntity(entity);
 
   rendermesh_data->mesh_filename = rendermesh_def->source_file()->c_str();
-  rendermesh_data->shader_filename = rendermesh_def->shader()->c_str();
+
+  auto shader_filenames = rendermesh_def->shaders();
+
+  rendermesh_data->shader_filenames.clear();
+  for (size_t i = 0; i < shader_filenames->size(); i++) {
+    auto filename =
+        shader_filenames->Get(static_cast<flatbuffers::uoffset_t>(i));
+    rendermesh_data->shader_filenames.push_back(filename->c_str());
+  }
+
+  rendermesh_data->shaders.clear();
+  for (size_t i = 0; i < shader_filenames->size(); i++) {
+    auto filename =
+        shader_filenames->Get(static_cast<flatbuffers::uoffset_t>(i));
+    rendermesh_data->shaders.push_back(
+        asset_manager_->LoadShader(filename->c_str()));
+    assert(rendermesh_data->shaders[i] != nullptr);
+  }
 
   rendermesh_data->mesh =
       asset_manager_->LoadMesh(rendermesh_def->source_file()->c_str());
@@ -248,10 +266,6 @@ void RenderMeshComponent::AddFromRawData(corgi::EntityRef& entity,
       rendermesh_data->shader_transforms[i] = mathfu::kAffineIdentity;
     }
   }
-
-  rendermesh_data->shader =
-      asset_manager_->LoadShader(rendermesh_def->shader()->c_str());
-  assert(rendermesh_data->shader != nullptr);
 
   rendermesh_data->visible = rendermesh_def->visible();
   rendermesh_data->default_pose = rendermesh_def->default_pose();
@@ -287,7 +301,8 @@ corgi::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
   const RenderMeshData* data = GetComponentData(entity);
   if (data == nullptr) return nullptr;
 
-  if (data->mesh_filename == "" || data->shader_filename == "") {
+  if (data->mesh_filename == "" ||
+      data->shader_filenames.empty()) {
     // If we don't have a mesh filename or a shader, we can't be exported;
     // we were obviously created programatically.
     return nullptr;
@@ -301,9 +316,15 @@ corgi::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
   auto source_file = (defaults || data->mesh_filename != "")
                          ? fbb.CreateString(data->mesh_filename)
                          : 0;
-  auto shader = (defaults || data->shader_filename != "")
-                    ? fbb.CreateString(data->shader_filename)
-                    : 0;
+
+  std::vector<flatbuffers::Offset<flatbuffers::String>> shaders_vector;
+  for (size_t i = 0; i < data->shader_filenames.size(); i++) {
+    shaders_vector.push_back((defaults || data->shader_filenames[i] != "")
+                                ? fbb.CreateString(data->shader_filenames[i])
+                                : 0);
+  }
+  auto shaders = fbb.CreateVector(shaders_vector);
+
   std::vector<unsigned char> render_pass_vec;
   for (int i = 0; i < RenderPass_Count; i++) {
     if (data->pass_mask & (1 << i)) {
@@ -325,8 +346,8 @@ corgi::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
   if (defaults || source_file.o != 0) {
     builder.add_source_file(source_file);
   }
-  if (defaults || shader.o != 0) {
-    builder.add_shader(shader);
+  if (defaults || shaders.o != 0) {
+    builder.add_shaders(shaders);
   }
   if (defaults || render_pass.o != 0) {
     builder.add_render_pass(render_pass);

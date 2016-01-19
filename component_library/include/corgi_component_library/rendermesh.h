@@ -42,10 +42,8 @@ struct RenderMeshData {
   /// @brief Default constructor for RenderMeshData.
   RenderMeshData()
       : mesh(nullptr),
-        shader(nullptr),
         tint(mathfu::kOnes4f),
         mesh_filename(""),
-        shader_filename(""),
         z_depth(0),
         culling_mask(0),
         pass_mask(0),
@@ -77,10 +75,10 @@ struct RenderMeshData {
   /// data from `other`.
   RenderMeshData& operator=(RenderMeshData&& other) {
     mesh = std::move(other.mesh);
-    shader = std::move(other.shader);
+    shaders = std::move(other.shaders);
     tint = std::move(other.tint);
     mesh_filename = std::move(other.mesh_filename);
-    shader_filename = std::move(other.shader_filename);
+    shader_filenames = std::move(other.shader_filenames);
     z_depth = std::move(other.z_depth);
     culling_mask = std::move(other.culling_mask);
     pass_mask = std::move(other.pass_mask);
@@ -96,8 +94,8 @@ struct RenderMeshData {
   /// @brief The fplbase::Mesh for this Entity.
   fplbase::Mesh* mesh;
 
-  /// @brief The fplbase::Shader for this Entity.
-  fplbase::Shader* shader;
+  /// @brief A vector of fplbase::Shader for this Entity.
+  std::vector<fplbase::Shader*> shaders;
 
   /// @brief A mathfu::vec4 specifying the tinting for the Entity in RGBA.
   mathfu::vec4 tint;
@@ -105,8 +103,8 @@ struct RenderMeshData {
   /// @brief A std::string of the filename for the mesh, used for exporting.
   std::string mesh_filename;
 
-  /// @brief A std::string of the filename for the shader, used for exporting.
-  std::string shader_filename;
+  /// @brief A std::string of the filenames for the shaders, used for exporting.
+  std::vector<std::string> shader_filenames;
 
   /// @brief The z distance corresponding to the depth of where the
   /// Entity should be rendered.
@@ -252,11 +250,11 @@ class RenderMeshComponent : public Component<RenderMeshData> {
   /// within the field of view.
   /// @param[out] renderer A reference to the fplbase::Renderer to capture the
   /// output of the render pass.
-  /// @param[in] shader_override A fplbase::Shader to use as the mesh shader
-  /// for this render pass.
+  /// @param[in] shader_index The shader index for the fplbase::Shader to use as
+  /// the mesh shader for this render pass.
   void RenderPass(int pass_id, const CameraInterface& camera,
                   fplbase::Renderer& renderer,
-                  const fplbase::Shader* shader_override);
+                  size_t shader_index);
 
   /// @brief Goes through and renders every Entity that is visible from the
   /// camera, in pass order.

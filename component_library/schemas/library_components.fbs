@@ -55,7 +55,7 @@ enum CullingTest:ubyte {
 
 table RenderMeshDef {
   source_file:string;
-  shader:string;
+  shaders:[string];
   culling:[CullingTest];
   render_pass:[RenderPass];
   visible:bool = true;
