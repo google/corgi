@@ -139,8 +139,9 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
 
     AnimationData* anim_data = Data<AnimationData>(entity);
 
-    // Only allow rendering with shader override if the index is valid.
-    if (rendermesh_data->shaders.size() <= shader_index) {
+    // Only allow shader override to render if the index is valid.
+    if (rendermesh_data->shaders.size() <= shader_index ||
+        rendermesh_data->shaders[shader_index] == nullptr) {
       continue;
     }
 
@@ -245,9 +246,14 @@ void RenderMeshComponent::AddFromRawData(corgi::EntityRef& entity,
   for (size_t i = 0; i < shader_filenames->size(); i++) {
     auto filename =
         shader_filenames->Get(static_cast<flatbuffers::uoffset_t>(i));
-    rendermesh_data->shaders.push_back(
-        asset_manager_->LoadShader(filename->c_str()));
-    assert(rendermesh_data->shaders[i] != nullptr);
+    if (filename->Length() > 0) {
+      rendermesh_data->shaders.push_back(
+          asset_manager_->LoadShader(filename->c_str()));
+      assert(rendermesh_data->shaders[i] != nullptr);
+    } else {
+      // Rendering for this shader should be skipped.
+      rendermesh_data->shaders.push_back(nullptr);
+    }
   }
 
   rendermesh_data->mesh =
