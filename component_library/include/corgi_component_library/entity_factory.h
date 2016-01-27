@@ -369,6 +369,14 @@ class EntityFactory : public corgi::EntityFactoryInterface {
     return flatbuffer_binary_schema_data_;
   }
 
+  /// @brief Get the map with all the current prototypes.
+  ///
+  /// @return Returns a const reference to the std::unordered_map with the
+  /// prototype data
+  const std::unordered_map<std::string, const void*>& prototype_data() const {
+    return prototype_data_;
+  }
+
  private:
   // Storage for the Flatbuffer binary schema.
   std::string flatbuffer_binary_schema_data_;
