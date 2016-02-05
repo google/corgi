@@ -16,6 +16,7 @@
 #include "corgi_component_library/animation.h"
 #include "corgi_component_library/common_services.h"
 #include "corgi_component_library/transform.h"
+#include "fplbase/flatbuffer_utils.h"
 #include "fplbase/mesh.h"
 #include "fplbase/utilities.h"
 #include "library_components_generated.h"
@@ -298,8 +299,10 @@ void RenderMeshComponent::AddFromRawData(corgi::EntityRef& entity,
     }
   }
 
-  // TODO: Load this from a flatbuffer file instead of setting it.
-  rendermesh_data->tint = mathfu::kOnes4f;
+  auto tint = rendermesh_def->tint();
+  rendermesh_data->tint = (tint != nullptr)
+                          ? fplbase::LoadColorRGBA(rendermesh_def->tint())
+                          : mathfu::kOnes4f;
 }
 
 corgi::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
@@ -348,6 +351,8 @@ corgi::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
   auto culling_mask =
       data->culling_mask ? fbb.CreateVector(culling_mask_vec) : 0;
 
+  auto tint = fplbase::Vec4ToColorRGBA(data->tint);
+
   RenderMeshDefBuilder builder(fbb);
   if (defaults || source_file.o != 0) {
     builder.add_source_file(source_file);
@@ -362,6 +367,8 @@ corgi::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
   if (defaults || culling_mask.o != 0) {
     builder.add_culling(culling_mask);
   }
+
+  builder.add_tint(&tint);
 
   fbb.Finish(builder.Finish());
   return fbb.ReleaseBufferPointer();
