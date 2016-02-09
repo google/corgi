@@ -39,44 +39,25 @@ set(corgi_DEBUG ON)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 # Directory which contains the source for 3rd party libraries.
-if(NOT DEFINED third_party_root)
-  get_filename_component(
-    third_party_root "${CMAKE_CURRENT_LIST_DIR}/../../../../external"
-    REALPATH)
-endif()
-
-# Directory which contains source for FPL libraries.
+# Set up directory which contains source for FPL libraries.
+# Configure fpl_root to the right directory
 if(NOT DEFINED fpl_root)
-  get_filename_component(
-      fpl_root "${CMAKE_CURRENT_LIST_DIR}/../../libs" REALPATH)
+  get_filename_component(fpl_root "${CMAKE_CURRENT_LIST_DIR}/../../libs"
+       REALPATH)
+  if(NOT EXISTS "${fpl_root}")
+    set(fpl_root "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
+  endif ()
 endif()
 
-# If the dependencies directory exists, assume this is the root directory for
-# all libraries required by this project.
-if(NOT DEFINED dependencies_root)
-  set(dependencies_root "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
-  if(EXISTS "${dependencies_root}")
-    set(third_party_root "${dependencies_root}")
-    set(fpl_root "${dependencies_root}")
-  endif()
-endif()
+# Configurable locations of other dependencies of this project.
+# Extra MSVC compiler flags:
+#    /wd4244: 'conversion' conversion from 'type1' to 'type2'
+#    /wd4512: 'class' : assignment operator could not be generated
+#    /wd4800: 'type' : forcing value to bool 'true' or 'false'
+include(${fpl_root}/fplutil/buildutil/cmake_common.txt)
+set_common_build_variables("/wd4244 /wd4512 /wd4800")
 
-set(dependencies_gtest_dir "${fpl_root}/googletest"
-    CACHE PATH "Directory containing the GoogleTest library.")
-set(dependencies_flatbuffers_dir "${fpl_root}/flatbuffers"
-    CACHE PATH "Directory containing the Flatbuffers library.")
-set(dependencies_fplutil_dir "${fpl_root}/fplutil"
-    CACHE PATH "Directory containing the fplutil library.")
-set(dependencies_breadboard_dir "${fpl_root}/breadboard"
-    CACHE PATH "Directory containing the breadboard library.")
-set(dependencies_fplbase_dir "${fpl_root}/fplbase"
-    CACHE PATH "Directory containing the FPLBase library.")
-set(dependencies_mathfu_dir "${fpl_root}/mathfu"
-    CACHE PATH "Directory containing the MathFu library.")
-set(dependencies_motive_dir "${fpl_root}/motive"
-    CACHE PATH "Directory containing the motive animation library.")
-set(dependencies_bulletphysics_distr_dir "${third_party_root}/bulletphysics"
-    CACHE PATH "Directory containing the Bullet Physics distribution.")
+
 # NOTE: This is only required as the breadboard module library and CORGI's
 # component library have a circular dependency.
 set(dependencies_corgi_dir "${CMAKE_CURRENT_LIST_DIR}"
@@ -99,30 +80,6 @@ set(corgi_SRCS
 
 # Includes for this project.
 include_directories(src include)
-
-# Detect clang
-if(${CMAKE_CXX_COMPILER_ID} STREQUAL Clang)
-  set(CMAKE_COMPILER_IS_CLANGXX 1)
-endif()
-
-# Compiler flags.
-set(C_FLAGS_WARNINGS "")
-if(MSVC)
-  # C4127: conditional expression is constant
-  # C4577: 'noexcept' used with no exception handling mode specified.
-  set(C_FLAGS_WARNINGS
-      "/W4 /WX /wd4065 /wd4355 /wd4127 /wd4244 /wd4512 /wd4800 /wd4577")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
-  add_definitions(-DNOMINMAX -D_HAS_EXCEPTIONS=0 -D_CRT_SECURE_NO_WARNINGS)
-elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
-       CMAKE_COMPILER_IS_CLANGXX)
-  set(CMAKE_CXX_FLAGS
-      "${CMAKE_CXX_FLAGS} -std=c++0x -Wall -pedantic -Werror -Wextra")
-endif()
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS_WARNINGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${C_FLAGS_WARNINGS}")
-set(CMAKE_CXX_FLAGS_DEFAULT "${CMAKE_CXX_FLAGS}")
-set(CMAKE_C_FLAGS_DEFAULT "${CMAKE_C_FLAGS}")
 
 # Library targets.
 add_library(corgi ${corgi_SRCS})
