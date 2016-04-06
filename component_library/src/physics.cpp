@@ -647,7 +647,10 @@ void PhysicsComponent::UpdatePhysicsObjectsTransform(
 
   PhysicsData* physics_data = Data<PhysicsData>(entity);
   TransformData* transform_data = Data<TransformData>(entity);
-  btQuaternion orientation = ToBtQuaternion(transform_data->orientation);
+  TransformComponent* transform_component = GetComponent<TransformComponent>();
+  mathfu::vec3 world_position = transform_component->WorldPosition(entity);
+  mathfu::quat world_orientation = transform_component->WorldOrientation(entity);
+  btQuaternion orientation = ToBtQuaternion(world_orientation);
 
   for (int i = 0; i < physics_data->body_count_; i++) {
     auto rb_data = &physics_data->rigid_bodies_[i];
@@ -656,8 +659,8 @@ void PhysicsComponent::UpdatePhysicsObjectsTransform(
     }
     vec3 local_offset =
         vec3::HadamardProduct(rb_data->offset, transform_data->scale);
-    vec3 offset = transform_data->orientation.Inverse() * local_offset;
-    btVector3 position = ToBtVector3(transform_data->position + offset);
+    vec3 offset = world_orientation.Inverse() * local_offset;
+    btVector3 position = ToBtVector3(world_position + offset);
     btTransform transform(orientation, position);
     rb_data->rigid_body->setWorldTransform(transform);
     rb_data->motion_state->setWorldTransform(transform);
