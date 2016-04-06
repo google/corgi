@@ -649,7 +649,8 @@ void PhysicsComponent::UpdatePhysicsObjectsTransform(
   TransformData* transform_data = Data<TransformData>(entity);
   TransformComponent* transform_component = GetComponent<TransformComponent>();
   mathfu::vec3 world_position = transform_component->WorldPosition(entity);
-  mathfu::quat world_orientation = transform_component->WorldOrientation(entity);
+  mathfu::quat world_orientation =
+      transform_component->WorldOrientation(entity);
   btQuaternion orientation = ToBtQuaternion(world_orientation);
 
   for (int i = 0; i < physics_data->body_count_; i++) {
