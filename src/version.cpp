@@ -18,7 +18,7 @@ namespace corgi {
 
 #define CORGI_VERSION_MAJOR 1
 #define CORGI_VERSION_MINOR 0
-#define CORGI_VERSION_REVISION 0
+#define CORGI_VERSION_REVISION 1
 
 // Turn X into a string literal.
 #define CORGI_STRING_EXPAND(X) #X
