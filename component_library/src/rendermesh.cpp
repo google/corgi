@@ -174,11 +174,15 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface &camera,
     if (num_mesh_bones > 1) {
       const bool use_default_pose =
           num_anim_bones != num_mesh_bones || rendermesh_data->default_pose;
-      const mathfu::AffineTransform *bone_transforms =
-          use_default_pose ? rendermesh_data->mesh->bone_global_transforms()
-                           : anim_data->motivator.GlobalTransforms();
-      rendermesh_data->mesh->GatherShaderTransforms(
-          bone_transforms, rendermesh_data->shader_transforms);
+      if (use_default_pose) {
+        for (int i = 0; i < rendermesh_data->num_shader_transforms; ++i) {
+          rendermesh_data->shader_transforms[i] = mathfu::kAffineIdentity;
+        }
+      } else {
+        rendermesh_data->mesh->GatherShaderTransforms(
+            anim_data->motivator.GlobalTransforms(),
+            rendermesh_data->shader_transforms);
+      }
       renderer.SetBoneTransforms(rendermesh_data->shader_transforms,
                                  rendermesh_data->num_shader_transforms);
     }
