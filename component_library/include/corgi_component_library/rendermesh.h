@@ -48,6 +48,7 @@ struct RenderMeshData {
         culling_mask(0),
         pass_mask(0),
         visible(true),
+        initialized(false),
         default_pose(false),
         num_shader_transforms(0),
         shader_transforms(nullptr),
@@ -84,6 +85,7 @@ struct RenderMeshData {
     culling_mask = std::move(other.culling_mask);
     pass_mask = std::move(other.pass_mask);
     visible = std::move(other.visible);
+    initialized = std::move(other.initialized);
     default_pose = std::move(other.default_pose);
     num_shader_transforms = other.num_shader_transforms;
     shader_transforms = other.shader_transforms;
@@ -122,6 +124,9 @@ struct RenderMeshData {
 
   /// @brief A bool determining if this Entity should be rendered.
   bool visible;
+
+  /// @brief A bool indicating if this RenderMesh is initialized.
+  bool initialized;
 
   /// @brief A bool determining if the Entity should be rendered in the
   /// default pose.
@@ -325,6 +330,11 @@ class RenderMeshComponent : public Component<RenderMeshData> {
   }
 
  private:
+  // Finalize the initialization of RenderMeshData if it's not completed yet.
+  // This function should be called right after the corresponding mesh is
+  // loaded.
+  void FinalizeRenderMeshDataIfRequired(RenderMeshData* rendermesh_data);
+
   // todo(ccornell) expand this if needed - make an array for multiple lights.
   // Also maybe make this into a full fledged struct to store things like
   // intensity, color, etc.  (Low priority - none of our shaders support

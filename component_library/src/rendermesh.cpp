@@ -58,6 +58,8 @@ void RenderMeshComponent::RenderPrep(const CameraInterface &camera) {
     RenderMeshData *rendermesh_data = GetComponentData(iter->entity);
     TransformData *transform_data = Data<TransformData>(iter->entity);
 
+    FinalizeRenderMeshDataIfRequired(rendermesh_data);
+
     float max_cos = cos(camera.viewport_angle());
     vec3 camera_facing = camera.facing();
     vec3 camera_position = camera.position();
@@ -141,8 +143,10 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface &camera,
 
     AnimationData *anim_data = Data<AnimationData>(entity);
 
-    // Only allow shader override to render if the index is valid.
-    if (rendermesh_data->shaders.size() <= shader_index ||
+    // Only allow shader override to render if the index is valid
+    // and the rendermesh is initialized properly.
+    if (!rendermesh_data->initialized ||
+        rendermesh_data->shaders.size() <= shader_index ||
         rendermesh_data->shaders[shader_index] == nullptr) {
       continue;
     }
@@ -266,23 +270,13 @@ void RenderMeshComponent::AddFromRawData(corgi::EntityRef &entity,
 
   rendermesh_data->debug_name = rendermesh_def->source_file()->c_str();
 
-  rendermesh_data->mesh =
-      asset_manager_->LoadMesh(rendermesh_def->source_file()->c_str());
+  rendermesh_data->mesh = asset_manager_->LoadMesh(
+      rendermesh_def->source_file()->c_str(), true /* async */);
+
   assert(rendermesh_data->mesh != nullptr);
 
   // Allocate the array to hold shader default pose's transforms.
   assert(rendermesh_data->shader_transforms == nullptr);
-  const uint8_t num_shader_transforms =
-      static_cast<uint8_t>(rendermesh_data->mesh->num_shader_bones());
-  rendermesh_data->num_shader_transforms = num_shader_transforms;
-  if (num_shader_transforms > 0) {
-    rendermesh_data->shader_transforms =
-        new mathfu::AffineTransform[num_shader_transforms];
-    for (uint8_t i = 0; i < num_shader_transforms; ++i) {
-      rendermesh_data->shader_transforms[i] = mathfu::kAffineIdentity;
-    }
-  }
-
   rendermesh_data->visible = rendermesh_def->visible();
   rendermesh_data->default_pose = rendermesh_def->default_pose();
 
@@ -380,6 +374,27 @@ corgi::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
 
   fbb.Finish(builder.Finish());
   return fbb.ReleaseBufferPointer();
+}
+
+void RenderMeshComponent::FinalizeRenderMeshDataIfRequired(
+    RenderMeshData *rendermesh_data) {
+  if (rendermesh_data->initialized || rendermesh_data->mesh == nullptr ||
+      rendermesh_data->mesh->num_vertices() == 0) {
+    // If this RenderMeshData is already initialized or the mesh has not been
+    // loaded yet (which is inferred from num_vertices() > 0), just return.
+    return;
+  }
+  const uint8_t num_shader_transforms =
+      static_cast<uint8_t>(rendermesh_data->mesh->num_shader_bones());
+  rendermesh_data->num_shader_transforms = num_shader_transforms;
+  if (num_shader_transforms > 0) {
+    rendermesh_data->shader_transforms =
+        new mathfu::AffineTransform[num_shader_transforms];
+    for (uint8_t i = 0; i < num_shader_transforms; ++i) {
+      rendermesh_data->shader_transforms[i] = mathfu::kAffineIdentity;
+    }
+  }
+  rendermesh_data->initialized = true;
 }
 
 }  // component_library
