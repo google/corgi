@@ -44,7 +44,7 @@ To contribute to this project see [CONTRIBUTING][].
 
    [Android]: http://www.android.com
    [CONTRIBUTING]: http://github.com/google/corgi/blob/master/CONTRIBUTING
-   [CORGI Google Group]: http://group.google.com/group/corgi-lib
+   [CORGI Google Group]: https://groups.google.com/forum/#!forum/corgi-lib
    [CORGI Issues Tracker]: http://github.com/google/corgi/issues
    [entity-component system]: https://en.wikipedia.org/wiki/Entity_component_system
    [landing page]: http://google.github.io/corgi
