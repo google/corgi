@@ -50,7 +50,8 @@ struct RenderMeshData {
         visible(true),
         default_pose(false),
         num_shader_transforms(0),
-        shader_transforms(nullptr) {}
+        shader_transforms(nullptr),
+        debug_name("") {}
 
   /// @brief Destructor for RenderMeshData.
   ~RenderMeshData() {
@@ -88,6 +89,7 @@ struct RenderMeshData {
     shader_transforms = other.shader_transforms;
     other.shader_transforms = nullptr;
     other.num_shader_transforms = 0;
+    debug_name = std::move(other.debug_name);
     return *this;
   }
 
@@ -132,6 +134,9 @@ struct RenderMeshData {
   /// @brief A mathfu::AffineTransform array that contains the shader
   /// transforms.
   mathfu::AffineTransform* shader_transforms;
+
+  /// @brief The debug name of this mesh
+  std::string debug_name;
 
  private:
   // Disallow copies. They're inefficient with the shader_transforms array.

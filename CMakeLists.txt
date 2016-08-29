@@ -57,7 +57,6 @@ endif()
 include(${fpl_root}/fplutil/buildutil/cmake_common.txt)
 set_common_build_variables("/wd4244 /wd4512 /wd4800")
 
-
 # NOTE: This is only required as the breadboard module library and CORGI's
 # component library have a circular dependency.
 set(dependencies_corgi_dir "${CMAKE_CURRENT_LIST_DIR}"
@@ -80,6 +79,10 @@ set(corgi_SRCS
 
 # Includes for this project.
 include_directories(src include)
+
+if(fplbase_debug_markers)
+  add_definitions(-DFPLBASE_ENABLE_DEBUG_MARKERS)
+endif()
 
 # Library targets.
 add_library(corgi ${corgi_SRCS})

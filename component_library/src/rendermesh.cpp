@@ -16,6 +16,7 @@
 #include "corgi_component_library/animation.h"
 #include "corgi_component_library/common_services.h"
 #include "corgi_component_library/transform.h"
+#include "fplbase/debug_markers.h"
 #include "fplbase/flatbuffer_utils.h"
 #include "fplbase/mesh.h"
 #include "fplbase/utilities.h"
@@ -146,6 +147,8 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface &camera,
       continue;
     }
 
+    PushDebugMarker(rendermesh_data->debug_name);
+
     // TODO: anim_data will set uniforms for an array of matricies. Each
     //       matrix represents one bone position.
     const bool has_anim = anim_data != nullptr && anim_data->motivator.Valid();
@@ -204,6 +207,8 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface &camera,
       rendermesh_data->mesh->RenderStereo(renderer, shader, viewport,
                                           mvp_matrices, camera_positions);
     }
+
+    PopDebugMarker(); // rendermesh_data->debug_name
   }
 }
 
@@ -258,6 +263,8 @@ void RenderMeshComponent::AddFromRawData(corgi::EntityRef &entity,
       rendermesh_data->shaders.push_back(nullptr);
     }
   }
+
+  rendermesh_data->debug_name = rendermesh_def->source_file()->c_str();
 
   rendermesh_data->mesh =
       asset_manager_->LoadMesh(rendermesh_def->source_file()->c_str());
