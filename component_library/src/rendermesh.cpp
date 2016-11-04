@@ -151,6 +151,10 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface &camera,
       continue;
     }
 
+    fplbase::Shader *shader = rendermesh_data->shaders[shader_index];
+    // Reload shader if it's dirty.
+    asset_manager_->ReloadShaderWithGlobalDefinesIfDirty(shader);
+
     PushDebugMarker(rendermesh_data->debug_name);
 
     // TODO: anim_data will set uniforms for an array of matricies. Each
@@ -259,8 +263,8 @@ void RenderMeshComponent::AddFromRawData(corgi::EntityRef &entity,
     auto filename =
         shader_filenames->Get(static_cast<flatbuffers::uoffset_t>(i));
     if (filename->Length() > 0) {
-      rendermesh_data->shaders.push_back(
-          asset_manager_->LoadShader(filename->c_str()));
+      rendermesh_data->shaders.push_back(asset_manager_->LoadShader(
+          filename->c_str(), true /* async */, nullptr /* alias */));
       assert(rendermesh_data->shaders[i] != nullptr);
     } else {
       // Rendering for this shader should be skipped.
