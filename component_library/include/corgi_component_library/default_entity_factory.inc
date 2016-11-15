@@ -81,6 +81,11 @@
 #error You must #define FACTORY_TYPE_NAMESPACE to the namespace your generated \
        FlatBuffers types are in before including this file.
 #endif
+// The namespace needs to be prepended to the table when we look it up, so
+// define the full table name.
+#define FPL_STR_EXPAND(tok) #tok
+#define FPL_STR(tok) FPL_STR_EXPAND(tok)
+#define ENTITY_DEF FPL_STR(FACTORY_TYPE_NAMESPACE) ".EntityDef"
 
 #include "corgi_component_library/default_entity_factory.h"
 #include "flatbuffers/reflection.h"
@@ -222,7 +227,7 @@ bool DefaultEntityFactory::CreateEntityList(
         "CreateEntityList: GetSchema() failed, is it a binary schema?");
     return false;
   }
-  auto table_def = schema->objects()->LookupByKey("EntityDef");
+  auto table_def = schema->objects()->LookupByKey(ENTITY_DEF);
   if (table_def == nullptr) {
     fplbase::LogError("CreateEntityList: Can't look up EntityDef");
     return false;
