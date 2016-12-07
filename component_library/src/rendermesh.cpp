@@ -19,6 +19,7 @@
 #include "fplbase/debug_markers.h"
 #include "fplbase/flatbuffer_utils.h"
 #include "fplbase/mesh.h"
+#include "fplbase/render_state.h"
 #include "fplbase/utilities.h"
 #include "library_components_generated.h"
 
@@ -207,7 +208,8 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface &camera,
       rendermesh_data->mesh->Render(renderer);
     } else {
       const fplbase::Shader *shader = rendermesh_data->shaders[shader_index];
-      mathfu::vec4i viewport[2] = {camera.viewport(0), camera.viewport(1)};
+      fplbase::Viewport viewport[2] = {fplbase::Viewport(camera.viewport(0)),
+                                       fplbase::Viewport(camera.viewport(1))};
       mat4 camera_vp_stereo = camera.GetTransformMatrix(1);
       mat4 mvp_matrices[2] = {mvp, camera_vp_stereo * world_transform};
       vec3 camera_positions[2] = {world_matrix_inverse * camera.position(0),
