@@ -117,7 +117,8 @@ RigidBodyData& RigidBodyData::operator=(RigidBodyData&& src) {
 }
 
 // These functions require bullet_physics.h, so define here.
-PhysicsData::PhysicsData() : body_count_(0), enabled_(false) {}
+PhysicsData::PhysicsData()
+    : body_count_(0), enabled_(false), gravity_multiplier_(1.0f) {}
 PhysicsData::~PhysicsData() {}
 PhysicsData::PhysicsData(PhysicsData&& src) { *this = std::move(src); }
 
@@ -326,10 +327,17 @@ void PhysicsComponent::AddFromRawData(corgi::EntityRef& entity,
       bullet_world_->addRigidBody(rb_data->rigid_body.get(),
                                   rb_data->collision_type,
                                   rb_data->collides_with);
+
+      // Give any custom gravity, after adding it to the world.
+      if (physics_def->gravity_multiplier() != 1.0f) {
+        rb_data->rigid_body->setGravity(bullet_world_->getGravity() *
+                                        physics_def->gravity_multiplier());
+      }
     }
   }
 
   physics_data->enabled_ = true;
+  physics_data->gravity_multiplier_ = physics_def->gravity_multiplier();
   UpdatePhysicsFromTransform(entity);
 }
 
@@ -462,6 +470,9 @@ corgi::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
   PhysicsDefBuilder builder(fbb);
   builder.add_kinematic(kinematic);
   builder.add_shapes(shapes);
+  if (data->gravity_multiplier_ != 1.0f) {
+    builder.add_gravity_multiplier(data->gravity_multiplier_);
+  }
 
   fbb.Finish(builder.Finish());
   return fbb.ReleaseBufferPointer();
@@ -887,6 +898,12 @@ void PhysicsComponent::GenerateRaycastShape(corgi::EntityRef& entity,
   bullet_world_->addRigidBody(rb_data->rigid_body.get(),
                               rb_data->collision_type, rb_data->collides_with);
   data->enabled_ = true;
+}
+
+float PhysicsComponent::GravityForEntity(const corgi::EntityRef& entity) const {
+  auto physics_data = Data<PhysicsData>(entity);
+  assert(physics_data);
+  return physics_data->gravity_multiplier_ * gravity();
 }
 
 void PhysicsComponent::DebugDrawWorld(Renderer* renderer,

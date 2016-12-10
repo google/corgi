@@ -69,6 +69,7 @@ table RenderMeshDef {
 table PhysicsDef {
   shapes:[BulletShapeDef];
   kinematic:bool = false;
+  gravity_multiplier:float = 1.0;
 }
 
 // Debug information to log each frame.
