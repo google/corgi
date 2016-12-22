@@ -74,7 +74,7 @@ static void BulletTickCallback(btDynamicsWorld* world, btScalar time_step);
 static const char* kPhysicsShader = "shaders/color";
 
 static inline btVector3 ToBtVector3(const mathfu::vec3& v) {
-  return btVector3(v.x(), v.y(), v.z());
+  return btVector3(v.x, v.y, v.z);
 }
 
 static inline btVector3 ToBtVector3(const fplbase::Vec3& v) {
@@ -92,7 +92,7 @@ static inline mathfu::vec3 BtToMathfuVec3(const btVector3& v) {
 static inline btQuaternion ToBtQuaternion(const mathfu::quat& q) {
   // Bullet assumes a right handed system, while mathfu is left, so the axes
   // need to be negated.
-  return btQuaternion(-q.vector().x(), -q.vector().y(), -q.vector().z(),
+  return btQuaternion(-q.vector().x, -q.vector().y, -q.vector().z,
                       q.scalar());
 }
 
@@ -286,7 +286,7 @@ void PhysicsComponent::AddFromRawData(corgi::EntityRef& entity,
         }
       }
       rb_data->shape->setLocalScaling(
-          btVector3(fabs(scale.x()), fabs(scale.y()), fabs(scale.z())));
+          btVector3(fabs(scale.x), fabs(scale.y), fabs(scale.z)));
       rb_data->motion_state.reset(new btDefaultMotionState());
       btScalar mass = shape_def->mass();
       btVector3 inertia(0.0f, 0.0f, 0.0f);
@@ -451,7 +451,7 @@ corgi::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
       float invMass = body.rigid_body->getInvMass();
       shape_builder.add_mass(invMass ? 1.0f / invMass : 0.0f);
       shape_builder.add_restitution(body.rigid_body->getRestitution());
-      fplbase::Vec3 offset(body.offset.x(), body.offset.y(), body.offset.z());
+      fplbase::Vec3 offset(body.offset.x, body.offset.y, body.offset.z);
       shape_builder.add_offset(&offset);
       shape_builder.add_collision_type(
           static_cast<BulletCollisionType>(body.collision_type));
@@ -689,9 +689,9 @@ void PhysicsComponent::UpdatePhysicsScale(const corgi::EntityRef& entity) {
     auto rb_data = &physics_data->rigid_bodies_[i];
     const btVector3& localScale = rb_data->shape->getLocalScaling();
     // Bullet doesn't handle a negative scale, so prevent any from being set.
-    const btVector3 newScale(fabs(transform_data->scale.x()),
-                             fabs(transform_data->scale.y()),
-                             fabs(transform_data->scale.z()));
+    const btVector3 newScale(fabs(transform_data->scale.x),
+                             fabs(transform_data->scale.y),
+                             fabs(transform_data->scale.z));
     if ((localScale - newScale).length2() > FLT_EPSILON) {
       // If the scale has changed, the rigid body needs to be removed from the
       // world, updated accordingly, and added back in.
@@ -872,9 +872,9 @@ void PhysicsComponent::GenerateRaycastShape(corgi::EntityRef& entity,
   btVector3 bt_extents = ToBtVector3(extents);
   rb_data->offset = (max + min) / 2.0f;
   rb_data->shape.reset(new btBoxShape(bt_extents / 2.0f));
-  rb_data->shape->setLocalScaling(btVector3(fabs(transform_data->scale.x()),
-                                            fabs(transform_data->scale.y()),
-                                            fabs(transform_data->scale.z())));
+  rb_data->shape->setLocalScaling(btVector3(fabs(transform_data->scale.x),
+                                            fabs(transform_data->scale.y),
+                                            fabs(transform_data->scale.z)));
   vec3 local_offset =
       vec3::HadamardProduct(rb_data->offset, transform_data->scale);
   vec3 transformed_offset =

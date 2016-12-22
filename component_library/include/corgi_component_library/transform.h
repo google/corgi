@@ -118,14 +118,14 @@ struct TransformData {
     mathfu::vec4 c3 = mathfu::vec4(0, 0, 0, 1);
 
     // Apply scale:
-    c0 *= scale.x();
-    c1 *= scale.y();
-    c2 *= scale.z();
+    c0 *= scale.x;
+    c1 *= scale.y;
+    c2 *= scale.z;
 
     // Apply translation:
-    c3[0] = position.x();
-    c3[1] = position.y();
-    c3[2] = position.z();
+    c3[0] = position.x;
+    c3[1] = position.y;
+    c3[2] = position.z;
 
     // Compose and return result:
     return mathfu::mat4(c0, c1, c2, c3);

@@ -218,10 +218,9 @@ corgi::ComponentInterface::RawDataUniquePtr TransformComponent::ExportRawData(
   fbb.ForceDefaults(defaults);
 
   mathfu::vec3 euler = data->orientation.ToEulerAngles() / kDegreesToRadians;
-  fplbase::Vec3 position(data->position.x(), data->position.y(),
-                         data->position.z());
-  fplbase::Vec3 scale(data->scale.x(), data->scale.y(), data->scale.z());
-  fplbase::Vec3 orientation(euler.x(), euler.y(), euler.z());
+  fplbase::Vec3 position(data->position.x, data->position.y, data->position.z);
+  fplbase::Vec3 scale(data->scale.x, data->scale.y, data->scale.z);
+  fplbase::Vec3 orientation(euler.x, euler.y, euler.z);
 
   std::vector<flatbuffers::Offset<flatbuffers::String>> child_ids_vector;
   for (auto iter = data->child_ids.begin(); iter != data->child_ids.end();
