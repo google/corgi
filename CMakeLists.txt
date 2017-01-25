@@ -38,29 +38,14 @@ set(corgi_DEBUG ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
-# Directory which contains the source for 3rd party libraries.
-# Set up directory which contains source for FPL libraries.
-# Configure fpl_root to the right directory
-if(NOT DEFINED fpl_root)
-  get_filename_component(fpl_root "${CMAKE_CURRENT_LIST_DIR}/../../libs"
-       REALPATH)
-  if(NOT EXISTS "${fpl_root}")
-    set(fpl_root "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
-  endif ()
-endif()
-
-# Configurable locations of other dependencies of this project.
+# Call fplutil to get locations of dependencies and set common build settings.
 # Extra MSVC compiler flags:
 #    /wd4244: 'conversion' conversion from 'type1' to 'type2'
 #    /wd4512: 'class' : assignment operator could not be generated
 #    /wd4800: 'type' : forcing value to bool 'true' or 'false'
-include(${fpl_root}/fplutil/buildutil/cmake_common.txt)
+include("cmake/find_fplutil.cmake")
+include("${fplutil_dir}/buildutil/cmake_common.txt")
 set_common_build_variables("/wd4244 /wd4512 /wd4800")
-
-# NOTE: This is only required as the breadboard module library and CORGI's
-# component library have a circular dependency.
-set(dependencies_corgi_dir "${CMAKE_CURRENT_LIST_DIR}"
-    CACHE PATH "Directory containing the CORGI library.")
 
 # Temporary files (like object files) created while compiling projects.
 set(tmp_dir ${CMAKE_CURRENT_BINARY_DIR}/obj)
@@ -98,7 +83,7 @@ if (corgi_build_component_library)
   endif()
 
   set(CORGI_COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR
-      ${CMAKE_SOURCE_DIR}/${CMAKE_FILES_DIRECTORY}/include/component_library)
+      ${CMAKE_CURRENT_BINARY_DIR}/include/component_library)
   file(GLOB_RECURSE
        CORGI_COMPONENT_LIBRARY_FLATBUFFERS_SCHEMAS
        ${CORGI_COMPONENT_LIBRARY_DIR}/schemas/*.fbs)
@@ -223,6 +208,7 @@ if(corgi_build_tests)
 
   include_directories(${GUNIT_INCDIR}
                       ${CMAKE_CURRENT_SOURCE_DIR})
+  fpl_absolute_include_dir(${dependencies_gtest_dir})
 
   function(test_executable name libs)
     cxx_executable_with_flags(${name}_test "${cxx_default}"
