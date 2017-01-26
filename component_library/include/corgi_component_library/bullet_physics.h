@@ -20,7 +20,15 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverloaded-virtual"
 #pragma clang diagnostic ignored "-Wignored-qualifiers"
+#pragma clang diagnostic ignored "-Wunused-parameter"
 #endif  // defined(__clang__)
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverloaded-virtual"
+#pragma GCC diagnostic ignored "-Wignored-qualifiers"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif  // defined(__GNUC__)
 
 #if defined(_MSC_VER)
 #pragma warning(push)
@@ -42,6 +50,10 @@
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif  // defined(_MSC_VER)
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif  // defined(__GNUC__)
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
