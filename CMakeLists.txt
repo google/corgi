@@ -198,7 +198,9 @@ option(
 if(corgi_build_tests)
   set(GUNIT_INCDIR "${dependencies_gtest_dir}/include")
   set(GTEST_LIBDIR "${dependencies_gtest_dir}")
+  set_compiler_flags_for_external_libraries()
   add_subdirectory("${dependencies_gtest_dir}" ${tmp_dir}/googletest)
+  restore_compiler_flags()
 
   include(${GTEST_LIBDIR}/cmake/internal_utils.cmake)
   config_compiler_and_linker()
