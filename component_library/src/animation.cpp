@@ -25,16 +25,6 @@ CORGI_DEFINE_COMPONENT(corgi::component_library::AnimationComponent,
 
 BREADBOARD_DEFINE_EVENT(corgi::component_library::kAnimationCompleteEventId)
 
-// TODO(jsanmiya): Move to a central location.
-#if defined(__clang__) && defined(__has_warning)
-#if __has_feature(cxx_attributes) && __has_warning("-Wimplicit-fallthrough")
-#define FPL_FALLTHROUGH_INTENDED [[clang::fallthrough]];  // NOLINT
-#endif
-#endif
-#if !defined(FPL_FALLTHROUGH_INTENDED)
-#define FPL_FALLTHROUGH_INTENDED
-#endif
-
 using corgi::EntityRef;
 using motive::MotiveTime;
 using motive::RigAnim;
