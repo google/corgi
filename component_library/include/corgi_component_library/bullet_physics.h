@@ -45,6 +45,7 @@
 #pragma warning(disable : 4189)  // variable initialized but not referenced
 #pragma warning(disable : 4505)  // function is not referenced
 #pragma warning(disable : 4702)  // unreachable code
+#pragma warning(disable : 4305)  // truncation from 'double' to 'const btScalar'
 #endif                           // defined(_MSC_VER)
 #include "btBulletDynamicsCommon.h"
 #if defined(_MSC_VER)

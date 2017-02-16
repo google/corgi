@@ -187,8 +187,8 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface &camera,
       const bool use_default_pose =
           num_anim_bones != num_mesh_bones || rendermesh_data->default_pose;
       if (use_default_pose) {
-        for (int i = 0; i < rendermesh_data->num_shader_transforms; ++i) {
-          rendermesh_data->shader_transforms[i] = mathfu::kAffineIdentity;
+        for (int j = 0; j < rendermesh_data->num_shader_transforms; ++j) {
+          rendermesh_data->shader_transforms[j] = mathfu::kAffineIdentity;
         }
       } else {
         rendermesh_data->mesh->GatherShaderTransforms(
@@ -203,11 +203,10 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface &camera,
       renderer.set_camera_pos(world_matrix_inverse * camera.position());
       renderer.set_model_view_projection(mvp);
 
-      rendermesh_data->shaders[shader_index]->Set(renderer);
+      shader->Set(renderer);
 
       rendermesh_data->mesh->Render(renderer);
     } else {
-      const fplbase::Shader *shader = rendermesh_data->shaders[shader_index];
       fplbase::Viewport viewport[2] = {fplbase::Viewport(camera.viewport(0)),
                                        fplbase::Viewport(camera.viewport(1))};
       mat4 camera_vp_stereo = camera.GetTransformMatrix(1);

@@ -138,9 +138,12 @@ if (corgi_build_component_library)
       ${CORGI_COMPONENT_LIBRARY_DIR}/include/corgi_component_library)
   set(corgi_component_library_SRCS
       ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/animation.h
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/bullet_physics.h
       ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/camera_interface.h
       ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/common_services.h
       ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/component_utils.h
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/default_entity_factory.h
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/default_entity_factory.inc
       ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/entity_factory.h
       ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/graph.h
       ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/meta.h
@@ -170,6 +173,9 @@ if (corgi_build_component_library)
   include_directories(${dependencies_fplutil_dir}/libfplutil/include)
   include_directories(${dependencies_motive_dir}/include)
   include_directories(${dependencies_mathfu_dir}/include)
+  if(WIN32)
+    include_directories(${dependencies_fplbase_dir}/external/include)
+  endif()
 
   set_compiler_flags_for_external_libraries()
   add_library(corgi_component_library ${corgi_component_library_SRCS})
