@@ -126,13 +126,14 @@ void MetaComponent::AddEntityToDictionary(const std::string& key,
   // Check for duplicate entities so we can warn the user.
   auto i = entity_dictionary_.find(key);
   if (i != entity_dictionary_.end()) {
-    const char* old_id = key.c_str();
+    // For log, in case data->entity_id points at key.
+    const std::string original_key(key);
     MetaData* data = GetComponentData(entity);
     GenerateRandomEntityID(&data->entity_id);
     fplbase::LogError(
         "Duplicate entities with entity ID '%s', randomizing to '%s'. "
         "Check your entity data.",
-        old_id, data->entity_id.c_str());
+        original_key.c_str(), data->entity_id.c_str());
     entity_dictionary_[data->entity_id] = entity;
   } else {
     entity_dictionary_[key] = entity;
