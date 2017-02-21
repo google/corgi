@@ -1,5 +1,5 @@
-CORGI Version 1.0    {#corgi_readme}
-=================
+CORGI Version 1.0.2    {#corgi_readme}
+===================
 
 CORGI is a C++ [entity-component system][] library developed primarily for
 games that focus on simplicity and flexibility.
