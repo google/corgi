@@ -153,8 +153,10 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface &camera,
     }
 
     fplbase::Shader *shader = rendermesh_data->shaders[shader_index];
-    // Reload shader if it's dirty.
-    asset_manager_->ReloadShaderWithGlobalDefinesIfDirty(shader);
+
+    // Reload shader if its global defines have changed, or if for whatever
+    // other reason, it's marked dirty.
+    shader->ReloadIfDirty();
 
     PushDebugMarker(rendermesh_data->debug_name);
 
