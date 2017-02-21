@@ -1,5 +1,5 @@
-CORGI Version 1.0.2    {#corgi_readme}
-===================
+CORGI Version 1.0    {#corgi_readme}
+=================
 
 CORGI is a C++ [entity-component system][] library developed primarily for
 games that focus on simplicity and flexibility.
@@ -29,8 +29,7 @@ Go to our [landing page][] to browse our documentation and see some examples.
    * Discuss CORGI with other developers and users on the
      [CORGI Google Group][].
    * File issues on the [CORGI Issues Tracker][].
-   * Post your questoins to [stackoverflow.com][] with a mention of
-     **fpl corgi**.
+   * Post your questoins to [stackoverflow.com][] with a mention of **corgi**.
 
 **Important**: The CORGI component library uses submodules, so download the
 source using:
@@ -51,5 +50,5 @@ To contribute to this project see [CONTRIBUTING][].
    [landing page]: http://google.github.io/corgi
    [Linux]: http://en.m.wikipedia.org/wiki/Linux
    [OS X]: http://www.apple.com/osx/
-   [stackoverflow.com]: http://stackoverflow.com/search?q=fpl+corgi
+   [stackoverflow.com]: http://www.stackoverflow.com
    [Windows]: http://windows.microsoft.com/
