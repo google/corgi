@@ -62,7 +62,7 @@ Each class is described in the folloiwing sections of the [Programmer's Guide][]
    [Component]: @ref corgi_component
    [Component Library]: @ref corgi_component_library
    [CONTRIBUTING]: @ref contributing
-   [CORGI Google Group]: http://group.google.com/group/corgi-lib
+   [CORGI Google Group]: http://groups.google.com/group/corgi-lib
    [CORGI Issues Tracker]: http://github.com/google/corgi/issues
    [CORGI]: @ref corgi_index
    [Entity]: @ref corgi_entity
