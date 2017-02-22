@@ -29,7 +29,8 @@ Go to our [landing page][] to browse our documentation and see some examples.
    * Discuss CORGI with other developers and users on the
      [CORGI Google Group][].
    * File issues on the [CORGI Issues Tracker][].
-   * Post your questoins to [stackoverflow.com][] with a mention of **corgi**.
+   * Post your questoins to [stackoverflow.com][] with a mention of
+     **fpl corgi**.
 
 **Important**: The CORGI component library uses submodules, so download the
 source using:
@@ -50,5 +51,5 @@ To contribute to this project see [CONTRIBUTING][].
    [landing page]: http://google.github.io/corgi
    [Linux]: http://en.m.wikipedia.org/wiki/Linux
    [OS X]: http://www.apple.com/osx/
-   [stackoverflow.com]: http://www.stackoverflow.com
+   [stackoverflow.com]: http://stackoverflow.com/search?q=fpl+corgi
    [Windows]: http://windows.microsoft.com/
