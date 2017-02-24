@@ -20,5 +20,6 @@ var searchData=
   ['graph_5fentity',['graph_entity',['../classcorgi_1_1component__library_1_1_graph_component.html#a61467439e071952c3b2f1a9348f46329',1,'corgi::component_library::GraphComponent']]],
   ['graph_5ffactory',['graph_factory',['../classcorgi_1_1component__library_1_1_common_services_component.html#a4f879d651da96c94e64b0720bc2949fe',1,'corgi::component_library::CommonServicesComponent']]],
   ['graphdata',['GraphData',['../structcorgi_1_1component__library_1_1_graph_data.html#a256380419064a649a6dff038ae978fc5',1,'corgi::component_library::GraphData::GraphData()'],['../structcorgi_1_1component__library_1_1_graph_data.html#a3279f8f31e7c5af498ea4bea014ea486',1,'corgi::component_library::GraphData::GraphData(GraphData &amp;&amp;other)']]],
-  ['gravity',['gravity',['../class_physics_component.html#a9e36906706a9937c8bbe4bcf74bd4e74',1,'PhysicsComponent']]]
+  ['gravity',['gravity',['../class_physics_component.html#a9e36906706a9937c8bbe4bcf74bd4e74',1,'PhysicsComponent']]],
+  ['gravityforentity',['GravityForEntity',['../class_physics_component.html#a0c8687c70bc1cc71da74729bc7ed1fbf',1,'PhysicsComponent']]]
 ];

@@ -190,7 +190,7 @@ $(document).ready(function(){initNavTree('classcorgi_1_1component__library_1_1_a
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -212,16 +212,8 @@ $(document).ready(function(){initNavTree('classcorgi_1_1component__library_1_1_a
  <a href="classcorgi_1_1component__library_1_1_animation_component.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="animation_8h_source.html">animation.h</a>&gt;</code></p>
-<div class="dynheader">
-Inheritance diagram for corgi::component_library::AnimationComponent:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classcorgi_1_1component__library_1_1_animation_component.png" usemap="#corgi::component_library::AnimationComponent_map" alt=""/>
-  <map id="corgi::component_library::AnimationComponent_map" name="corgi::component_library::AnimationComponent_map">
-<area href="classcorgi_1_1_component.html" alt="corgi::Component&lt; AnimationData &gt;" shape="rect" coords="0,56,276,80"/>
-<area href="classcorgi_1_1_component_interface.html" title="An interface that provides basic Component functionality. All Components will inherit from this class..." alt="corgi::ComponentInterface" shape="rect" coords="0,0,276,24"/>
-</map>
- </div></div>
+
+<p>Inherits <a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; AnimationData &gt;</a>.</p>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> that provides an elegant way to handle <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> animation by interacting with the Motive animation library. </p>
 </div><table class="memberdecls">
@@ -812,7 +804,7 @@ std::unordered_map<br class="typebreak"/>
 <p>Updates all Motivators in the <a class="el" href="structcorgi_1_1component__library_1_1_animation_data.html" title="The Component data structure that corresponds to each Entity that is registered with the AnimationCom...">AnimationData</a>, as well as, any other Motivators that were initialized with <a class="el" href="classcorgi_1_1component__library_1_1_animation_component.html" title="A Component that provides an elegant way to handle Entity animation by interacting with the Motive an...">AnimationComponent</a>'s MotiveEngine. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">delta_time</td><td>An corgi::WorldTime representing the delta time since the last call to UpdateAllEntities. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">delta_time</td><td>An <a class="el" href="group__corgi__entity.html#ga754f75a6aad33aa11de5084743ee3f98" title="A typedef that represents time in the game. ">corgi::WorldTime</a> representing the delta time since the last call to UpdateAllEntities. </td></tr>
   </table>
   </dd>
 </dl>

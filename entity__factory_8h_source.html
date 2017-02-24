@@ -188,7 +188,7 @@ $(document).ready(function(){initNavTree('entity__factory_8h_source.html','');})
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -572,44 +572,52 @@ $(document).ready(function(){initNavTree('entity__factory_8h_source.html','');})
 <div class="line"><a name="l00368"></a><span class="lineno"><a class="line" href="classcorgi_1_1component__library_1_1_entity_factory.html#a43c86577644732188cb1252b1c5858e0">  368</a></span>&#160;<span class="comment"></span>  <span class="keyword">const</span> std::string&amp; <a class="code" href="classcorgi_1_1component__library_1_1_entity_factory.html#a43c86577644732188cb1252b1c5858e0">flatbuffer_binary_schema_data</a>()<span class="keyword"> const </span>{</div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    <span class="keywordflow">return</span> flatbuffer_binary_schema_data_;</div>
 <div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;  }</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160; <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  <span class="comment">// Storage for the Flatbuffer binary schema.</span></div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;  std::string flatbuffer_binary_schema_data_;</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;  <span class="comment">// Storage for entity files.</span></div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;  std::unordered_map&lt;std::string, std::unique_ptr&lt;std::string&gt;&gt; loaded_files_;</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;  <span class="comment">// Storage for old entity files we don&#39;t need any more; these will be cleared</span></div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;  <span class="comment">// out once there are no entities referencing them.</span></div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;  std::vector&lt;std::unique_ptr&lt;std::string&gt;&gt; stale_files_;</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;  <span class="comment">// Index the prototype library&#39;s entity definitions by prototype name.</span></div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  std::unordered_map&lt;std::string, const void*&gt; prototype_data_;</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;  <span class="comment">// Keep a list of previously-built entity definitions that we use to</span></div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;  <span class="comment">// create an entity by prototype name.</span></div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  std::unordered_map&lt;std::string, std::vector&lt;uint8_t&gt;&gt; prototype_requests_;</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;  <span class="comment">// Look up ComponentId from data type, and vice versa.</span></div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;  std::vector&lt;corgi::ComponentId&gt; data_type_to_component_id_;</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  std::vector&lt;unsigned int&gt; component_id_to_data_type_;</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;<span class="comment">  /// @brief Get the map with all the current prototypes.</span></div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;<span class="comment">  ///</span></div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;<span class="comment">  /// @return Returns a const reference to the std::unordered_map with the</span></div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;<span class="comment">  /// prototype data</span></div>
+<div class="line"><a name="l00376"></a><span class="lineno"><a class="line" href="classcorgi_1_1component__library_1_1_entity_factory.html#a8f4c4e14f0360a921c7ecaf9d19b3762">  376</a></span>&#160;<span class="comment"></span>  <span class="keyword">const</span> std::unordered_map&lt;std::string, const void*&gt;&amp; <a class="code" href="classcorgi_1_1component__library_1_1_entity_factory.html#a8f4c4e14f0360a921c7ecaf9d19b3762">prototype_data</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    <span class="keywordflow">return</span> prototype_data_;</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;  }</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160; <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;  <span class="comment">// Storage for the Flatbuffer binary schema.</span></div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;  std::string flatbuffer_binary_schema_data_;</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  <span class="comment">// Storage for entity files.</span></div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;  std::unordered_map&lt;std::string, std::unique_ptr&lt;std::string&gt;&gt; loaded_files_;</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;  <span class="comment">// Storage for old entity files we don&#39;t need any more; these will be cleared</span></div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  <span class="comment">// out once there are no entities referencing them.</span></div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;  std::vector&lt;std::unique_ptr&lt;std::string&gt;&gt; stale_files_;</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;  <span class="comment">// Index the prototype library&#39;s entity definitions by prototype name.</span></div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  std::unordered_map&lt;std::string, const void*&gt; prototype_data_;</div>
 <div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;  <span class="comment">// Look up the table name from the data type.</span></div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  std::vector&lt;std::string&gt; component_id_to_table_name_;</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;  <span class="comment">// The highest component ID we&#39;ve seen registered.</span></div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  <a class="code" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">corgi::ComponentId</a> max_component_id_;</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;  <span class="comment">// Enable debug output for initializing entities.</span></div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;  <span class="keywordtype">bool</span> debug_entity_creation_;</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;};<span class="comment"></span></div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;<span class="comment">/// @}</span></div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;}  <span class="comment">// namespace component_library</span></div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;}  <span class="comment">// namespace corgi</span></div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;  <span class="comment">// Keep a list of previously-built entity definitions that we use to</span></div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  <span class="comment">// create an entity by prototype name.</span></div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  std::unordered_map&lt;std::string, std::vector&lt;uint8_t&gt;&gt; prototype_requests_;</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  <span class="comment">// Look up ComponentId from data type, and vice versa.</span></div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  std::vector&lt;corgi::ComponentId&gt; data_type_to_component_id_;</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;  std::vector&lt;unsigned int&gt; component_id_to_data_type_;</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;  <span class="comment">// Look up the table name from the data type.</span></div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;  std::vector&lt;std::string&gt; component_id_to_table_name_;</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;  <span class="comment">// The highest component ID we&#39;ve seen registered.</span></div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;  <a class="code" href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">corgi::ComponentId</a> max_component_id_;</div>
 <div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;<span class="preprocessor">#endif  // CORGI_COMPONENT_LIBRARY_ENTITY_FACTORY_H_</span></div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;  <span class="comment">// Enable debug output for initializing entities.</span></div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;  <span class="keywordtype">bool</span> debug_entity_creation_;</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;};<span class="comment"></span></div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;<span class="comment">/// @}</span></div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;}  <span class="comment">// namespace component_library</span></div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;}  <span class="comment">// namespace corgi</span></div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;<span class="preprocessor">#endif  // CORGI_COMPONENT_LIBRARY_ENTITY_FACTORY_H_</span></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_a3b34800091488e8298eaa06230fa9377"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#a3b34800091488e8298eaa06230fa9377">corgi::component_library::EntityFactory::WillBeKeptInMemory</a></div><div class="ttdeci">bool WillBeKeptInMemory(const void *pointer)</div><div class="ttdoc">Check if the given pointer points to something that will be kept in memory for the lifetime of the En...</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_ac04cb967825d1aaac09002fe81de4a6a"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#ac04cb967825d1aaac09002fe81de4a6a">corgi::component_library::EntityFactory::CreateEntityList</a></div><div class="ttdeci">virtual bool CreateEntityList(const std::vector&lt; const void * &gt; &amp;entity_defs, std::vector&lt; uint8_t &gt; *entity_list)=0</div><div class="ttdoc">Handles building an Entity list flatbuffer from a collection of individual Entity flatbuffers...</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_a267d2cfde2f603ea1c3f4eade9a1b548"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#a267d2cfde2f603ea1c3f4eade9a1b548">corgi::component_library::EntityFactory::kErrorLoadingEntities</a></div><div class="ttdeci">static const int kErrorLoadingEntities</div><div class="ttdoc">The return value for LoadEntitiesFromFile and LoadEntityListFromMemory if the methods are unable to r...</div><div class="ttdef"><b>Definition:</b> entity_factory.h:50</div></div>
@@ -641,6 +649,7 @@ $(document).ready(function(){initNavTree('entity__factory_8h_source.html','');})
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_a27a703aa6334a613857bdd9868a5ff39"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#a27a703aa6334a613857bdd9868a5ff39">corgi::component_library::EntityFactory::LoadEntityListFromMemory</a></div><div class="ttdeci">int LoadEntityListFromMemory(const void *raw_entity_list, corgi::EntityManager *entity_manager, std::vector&lt; corgi::EntityRef &gt; *entities_loaded)</div><div class="ttdoc">Loads a list of Entities from an in-memory buffer. </div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_a43c86577644732188cb1252b1c5858e0"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#a43c86577644732188cb1252b1c5858e0">corgi::component_library::EntityFactory::flatbuffer_binary_schema_data</a></div><div class="ttdeci">const std::string &amp; flatbuffer_binary_schema_data() const </div><div class="ttdoc">Get the FlatBuffer binary schema that you loaded with SetFlatbufferSchema(). </div><div class="ttdef"><b>Definition:</b> entity_factory.h:368</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_aa93c7ea5247943de9eaeb1f257695038"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#aa93c7ea5247943de9eaeb1f257695038">corgi::component_library::EntityFactory::ReadEntityDefinition</a></div><div class="ttdeci">virtual bool ReadEntityDefinition(const void *entity_definition, std::vector&lt; const void * &gt; *component_defs)=0</div><div class="ttdoc">Handles reading an Entity definition and extracting the individual Component data definitions...</div></div>
+<div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_a8f4c4e14f0360a921c7ecaf9d19b3762"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#a8f4c4e14f0360a921c7ecaf9d19b3762">corgi::component_library::EntityFactory::prototype_data</a></div><div class="ttdeci">const std::unordered_map&lt; std::string, const void * &gt; &amp; prototype_data() const </div><div class="ttdoc">Get the map with all the current prototypes. </div><div class="ttdef"><b>Definition:</b> entity_factory.h:376</div></div>
 <div class="ttc" id="classcorgi_1_1component__library_1_1_entity_factory_html_a7731c0b541623e004e9b74036a929ecc"><div class="ttname"><a href="classcorgi_1_1component__library_1_1_entity_factory.html#a7731c0b541623e004e9b74036a929ecc">corgi::component_library::EntityFactory::max_component_id</a></div><div class="ttdeci">corgi::ComponentId max_component_id()</div><div class="ttdoc">Get the maximum component ID. </div><div class="ttdef"><b>Definition:</b> entity_factory.h:230</div></div>
 <div class="ttc" id="entity__manager_8h_html"><div class="ttname"><a href="entity__manager_8h.html">entity_manager.h</a></div></div>
 <div class="ttc" id="group__corgi__entity_html_ga5f64e19a6613a18291d7e9d44c785293"><div class="ttname"><a href="group__corgi__entity.html#ga5f64e19a6613a18291d7e9d44c785293">corgi::ComponentId</a></div><div class="ttdeci">uint16_t ComponentId</div><div class="ttdoc">This represents the ID of a Component. </div><div class="ttdef"><b>Definition:</b> entity_common.h:36</div></div>

@@ -25,5 +25,6 @@ var searchData=
   ['graphdata',['GraphData',['../structcorgi_1_1component__library_1_1_graph_data.html',1,'corgi::component_library']]],
   ['graphdata',['GraphData',['../structcorgi_1_1component__library_1_1_graph_data.html#a256380419064a649a6dff038ae978fc5',1,'corgi::component_library::GraphData::GraphData()'],['../structcorgi_1_1component__library_1_1_graph_data.html#a3279f8f31e7c5af498ea4bea014ea486',1,'corgi::component_library::GraphData::GraphData(GraphData &amp;&amp;other)']]],
   ['graphs',['graphs',['../structcorgi_1_1component__library_1_1_graph_data.html#af6d6bcff790db65ed75dfa22cbd672ab',1,'corgi::component_library::GraphData']]],
-  ['gravity',['gravity',['../class_physics_component.html#a9e36906706a9937c8bbe4bcf74bd4e74',1,'PhysicsComponent']]]
+  ['gravity',['gravity',['../class_physics_component.html#a9e36906706a9937c8bbe4bcf74bd4e74',1,'PhysicsComponent']]],
+  ['gravityforentity',['GravityForEntity',['../class_physics_component.html#a0c8687c70bc1cc71da74729bc7ed1fbf',1,'PhysicsComponent']]]
 ];

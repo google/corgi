@@ -190,7 +190,7 @@ $(document).ready(function(){initNavTree('classcorgi_1_1_entity_factory_interfac
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -212,16 +212,8 @@ $(document).ready(function(){initNavTree('classcorgi_1_1_entity_factory_interfac
  <a href="classcorgi_1_1_entity_factory_interface.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="entity__manager_8h_source.html">entity_manager.h</a>&gt;</code></p>
-<div class="dynheader">
-Inheritance diagram for corgi::EntityFactoryInterface:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classcorgi_1_1_entity_factory_interface.png" usemap="#corgi::EntityFactoryInterface_map" alt=""/>
-  <map id="corgi::EntityFactoryInterface_map" name="corgi::EntityFactoryInterface_map">
-<area href="classcorgi_1_1component__library_1_1_entity_factory.html" title="An EntityFactory builds Entities based on prototypes, using FlatBuffers to specify the raw data for E..." alt="corgi::component_library::EntityFactory" shape="rect" coords="0,56,273,80"/>
-<area href="classcorgi_1_1component__library_1_1_default_entity_factory.html" title="Implementations of DefaultEntityFactory can be found in default_entity_factory.inc. " alt="corgi::component_library::DefaultEntityFactory" shape="rect" coords="0,112,273,136"/>
-</map>
- </div></div>
+
+<p>Inherited by <a class="el" href="classcorgi_1_1component__library_1_1_entity_factory.html">corgi::component_library::EntityFactory</a>.</p>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An interface for an <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> factory, which creates Entities for a given <a class="el" href="classcorgi_1_1_entity_manager.html" title="The EntityManager is the code that manages all Entities and Components in the game. Normally the game will instantiate EntityManager, and then use it to create and control all of its Entities. ">EntityManager</a>. </p>
 </div><table class="memberdecls">

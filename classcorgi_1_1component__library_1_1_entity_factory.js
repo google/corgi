@@ -18,6 +18,7 @@ var classcorgi_1_1component__library_1_1_entity_factory =
     [ "LoadEntityListFromMemory", "classcorgi_1_1component__library_1_1_entity_factory.html#a27a703aa6334a613857bdd9868a5ff39", null ],
     [ "max_component_id", "classcorgi_1_1component__library_1_1_entity_factory.html#a7731c0b541623e004e9b74036a929ecc", null ],
     [ "OverrideCachedFile", "classcorgi_1_1component__library_1_1_entity_factory.html#a2068cf3610895fffb4c234aa5c245533", null ],
+    [ "prototype_data", "classcorgi_1_1component__library_1_1_entity_factory.html#a8f4c4e14f0360a921c7ecaf9d19b3762", null ],
     [ "ReadEntityDefinition", "classcorgi_1_1component__library_1_1_entity_factory.html#aa93c7ea5247943de9eaeb1f257695038", null ],
     [ "ReadEntityList", "classcorgi_1_1component__library_1_1_entity_factory.html#a8eb49d643a1a8da3787e1b512ab21c9e", null ],
     [ "SerializeEntity", "classcorgi_1_1component__library_1_1_entity_factory.html#a93b760b6a320748b4978a50ac6fb2fbb", null ],

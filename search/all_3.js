@@ -4,6 +4,7 @@ var searchData=
   ['datatypetocomponentid',['DataTypeToComponentId',['../classcorgi_1_1component__library_1_1_entity_factory.html#a232179a2f00f5c447a9d00a66a43eef7',1,'corgi::component_library::EntityFactory']]],
   ['debug_5fbone',['debug_bone',['../structcorgi_1_1component__library_1_1_animation_data.html#a2183c73d6553cdb717bb35a6970501c6',1,'corgi::component_library::AnimationData']]],
   ['debug_5fentity_5fcreation',['debug_entity_creation',['../classcorgi_1_1component__library_1_1_entity_factory.html#a76e9dd340e779b10b842664c40b619d8',1,'corgi::component_library::EntityFactory']]],
+  ['debug_5fname',['debug_name',['../structcorgi_1_1component__library_1_1_render_mesh_data.html#ab07ec0af1e7729e90209926da077e868',1,'corgi::component_library::RenderMeshData']]],
   ['debug_5fstate',['debug_state',['../structcorgi_1_1component__library_1_1_animation_data.html#acaa40955c4d4e57f8ac8a7cf6d8ce22c',1,'corgi::component_library::AnimationData']]],
   ['debugdrawobject',['DebugDrawObject',['../class_physics_component.html#afc9f6f78832a1e48b3ba860538504c08',1,'PhysicsComponent']]],
   ['debugdrawworld',['DebugDrawWorld',['../class_physics_component.html#a9d62243ae763322e16bd3eef84da9516',1,'PhysicsComponent']]],

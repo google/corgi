@@ -1,10 +1,9 @@
 var searchData=
 [
-  ['parent',['parent',['../structcorgi_1_1component__library_1_1_transform_data.html#a5bbeeabd23129b798878584af34cb2a4',1,'corgi::component_library::TransformData']]],
-  ['pass_5fmask',['pass_mask',['../structcorgi_1_1component__library_1_1_render_mesh_data.html#a1937aa7ea3aac24c605fa445c9fc731e',1,'corgi::component_library::RenderMeshData']]],
-  ['pending_5fchild_5fids',['pending_child_ids',['../structcorgi_1_1component__library_1_1_transform_data.html#a12e9914dc630ffdc600d628702240e22',1,'corgi::component_library::TransformData']]],
-  ['position',['position',['../structcorgi_1_1component__library_1_1_transform_data.html#ae0e67a2bcaadc55937ee0916de0a3669',1,'corgi::component_library::TransformData']]],
-  ['prev',['prev',['../structcorgi_1_1_vector_pool_1_1_vector_pool_element.html#ab71a269002ea18cb1517157c643dab80',1,'corgi::VectorPool::VectorPoolElement']]],
-  ['previous_5ftime_5fremaining',['previous_time_remaining',['../structcorgi_1_1component__library_1_1_animation_data.html#ae03434834c5cdbd6bb1624dde5855551',1,'corgi::component_library::AnimationData']]],
-  ['prototype',['prototype',['../structcorgi_1_1component__library_1_1_meta_data.html#a5731e28681eea81f5baecfbfc2910c58',1,'corgi::component_library::MetaData']]]
+  ['offset',['offset',['../struct_rigid_body_data.html#a25031d86cca347eba5fd20de296c5cb9',1,'RigidBodyData']]],
+  ['orientation',['orientation',['../structcorgi_1_1component__library_1_1_transform_data.html#ac641e592f0a754b77e5a893d4cd1b810',1,'corgi::component_library::TransformData']]],
+  ['other_5fentity',['other_entity',['../struct_collision_data.html#a19a5dc4147a78bcc9c0414fccf5e805e',1,'CollisionData']]],
+  ['other_5fposition',['other_position',['../struct_collision_data.html#a7fe5bbcf3f3d09c8789d147b9f9c5b6c',1,'CollisionData']]],
+  ['other_5ftag',['other_tag',['../struct_collision_data.html#aa3ce71200dbff7963a534815d6234b96',1,'CollisionData']]],
+  ['owner',['owner',['../structcorgi_1_1component__library_1_1_transform_data.html#a2e18b41cf28ba2be24529030ee598181',1,'corgi::component_library::TransformData']]]
 ];

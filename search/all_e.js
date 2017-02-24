@@ -11,5 +11,6 @@ var searchData=
   ['prev',['prev',['../structcorgi_1_1_vector_pool_1_1_vector_pool_element.html#ab71a269002ea18cb1517157c643dab80',1,'corgi::VectorPool::VectorPoolElement']]],
   ['previous_5ftime_5fremaining',['previous_time_remaining',['../structcorgi_1_1component__library_1_1_animation_data.html#ae03434834c5cdbd6bb1624dde5855551',1,'corgi::component_library::AnimationData']]],
   ['processbullettickcallback',['ProcessBulletTickCallback',['../class_physics_component.html#acb99ab9e6c885f6cd24e1543975f7f55',1,'PhysicsComponent']]],
-  ['prototype',['prototype',['../structcorgi_1_1component__library_1_1_meta_data.html#a5731e28681eea81f5baecfbfc2910c58',1,'corgi::component_library::MetaData']]]
+  ['prototype',['prototype',['../structcorgi_1_1component__library_1_1_meta_data.html#a5731e28681eea81f5baecfbfc2910c58',1,'corgi::component_library::MetaData']]],
+  ['prototype_5fdata',['prototype_data',['../classcorgi_1_1component__library_1_1_entity_factory.html#a8f4c4e14f0360a921c7ecaf9d19b3762',1,'corgi::component_library::EntityFactory']]]
 ];

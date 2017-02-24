@@ -190,7 +190,7 @@ $(document).ready(function(){initNavTree('class_physics_component.html','');});
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -212,16 +212,8 @@ $(document).ready(function(){initNavTree('class_physics_component.html','');});
  <a href="class_physics_component.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="physics_8h_source.html">physics.h</a>&gt;</code></p>
-<div class="dynheader">
-Inheritance diagram for PhysicsComponent:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="class_physics_component.png" usemap="#PhysicsComponent_map" alt=""/>
-  <map id="PhysicsComponent_map" name="PhysicsComponent_map">
-<area href="classcorgi_1_1_component.html" alt="corgi::Component&lt; PhysicsData &gt;" shape="rect" coords="0,56,204,80"/>
-<area href="classcorgi_1_1_component_interface.html" title="An interface that provides basic Component functionality. All Components will inherit from this class..." alt="corgi::ComponentInterface" shape="rect" coords="0,0,204,24"/>
-</map>
- </div></div>
+
+<p>Inherits <a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a>.</p>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Component that manages the physics for every Entity that registers with it. </p>
 </div><table class="memberdecls">
@@ -301,6 +293,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a002d7fc8c594c358b3e92c0d637628c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__corgi__entity__manager.html#ga208e9c16b6ba76e51b76906a08c0a8d6">corgi::EntityRef</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_physics_component.html#a002d7fc8c594c358b3e92c0d637628c5">RaycastSingle</a> (mathfu::vec3 &amp;start, mathfu::vec3 &amp;<a class="el" href="classcorgi_1_1_component.html#a44a7996f5dbd99c7356ebbe1270f3d42">end</a>, short layer_mask, mathfu::vec3 *hit_point)</td></tr>
 <tr class="memdesc:a002d7fc8c594c358b3e92c0d637628c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a raycast into the world, returning the first Entity hit.  <a href="#a002d7fc8c594c358b3e92c0d637628c5">More...</a><br/></td></tr>
 <tr class="separator:a002d7fc8c594c358b3e92c0d637628c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c8687c70bc1cc71da74729bc7ed1fbf"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_physics_component.html#a0c8687c70bc1cc71da74729bc7ed1fbf">GravityForEntity</a> (const <a class="el" href="group__corgi__entity__manager.html#ga208e9c16b6ba76e51b76906a08c0a8d6">corgi::EntityRef</a> &amp;entity) const </td></tr>
+<tr class="memdesc:a0c8687c70bc1cc71da74729bc7ed1fbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the gravity value of the given Entity.  <a href="#a0c8687c70bc1cc71da74729bc7ed1fbf">More...</a><br/></td></tr>
+<tr class="separator:a0c8687c70bc1cc71da74729bc7ed1fbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d62243ae763322e16bd3eef84da9516"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_physics_component.html#a9d62243ae763322e16bd3eef84da9516">DebugDrawWorld</a> (fplbase::Renderer *renderer, const mathfu::mat4 &amp;camera_transform)</td></tr>
 <tr class="memdesc:a9d62243ae763322e16bd3eef84da9516"><td class="mdescLeft">&#160;</td><td class="mdescRight">Render the entire physics worlds using Bullet's default debugging tools.  <a href="#a9d62243ae763322e16bd3eef84da9516">More...</a><br/></td></tr>
 <tr class="separator:a9d62243ae763322e16bd3eef84da9516"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -948,6 +943,31 @@ std::unordered_map<br class="typebreak"/>
 
 <p>Get the gravity value. </p>
 <dl class="section return"><dt>Returns</dt><dd>Returns the gravity as a float. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a0c8687c70bc1cc71da74729bc7ed1fbf"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float PhysicsComponent::GravityForEntity </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__corgi__entity__manager.html#ga208e9c16b6ba76e51b76906a08c0a8d6">corgi::EntityRef</a> &amp;&#160;</td>
+          <td class="paramname"><em>entity</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the gravity value of the given Entity. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">entity</td><td>The Entity to get the custom gravity for. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The gravity value of the Entity. </dd></dl>
 
 </div>
 </div>

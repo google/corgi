@@ -190,7 +190,7 @@ $(document).ready(function(){initNavTree('classcorgi_1_1_component_interface.htm
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -213,22 +213,8 @@ $(document).ready(function(){initNavTree('classcorgi_1_1_component_interface.htm
  <a href="classcorgi_1_1_component_interface.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="component__interface_8h_source.html">component_interface.h</a>&gt;</code></p>
-<div class="dynheader">
-Inheritance diagram for corgi::ComponentInterface:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classcorgi_1_1_component_interface.png" usemap="#corgi::ComponentInterface_map" alt=""/>
-  <map id="corgi::ComponentInterface_map" name="corgi::ComponentInterface_map">
-<area href="classcorgi_1_1_component.html" alt="corgi::Component&lt; AnimationData &gt;" shape="rect" coords="268,56,526,80"/>
-<area href="classcorgi_1_1_component.html" alt="corgi::Component&lt; CommonServicesData &gt;" shape="rect" coords="268,112,526,136"/>
-<area href="classcorgi_1_1_component.html" alt="corgi::Component&lt; GraphData &gt;" shape="rect" coords="268,168,526,192"/>
-<area href="classcorgi_1_1_component.html" alt="corgi::Component&lt; MetaData &gt;" shape="rect" coords="268,224,526,248"/>
-<area href="classcorgi_1_1_component.html" alt="corgi::Component&lt; PhysicsData &gt;" shape="rect" coords="268,280,526,304"/>
-<area href="classcorgi_1_1_component.html" alt="corgi::Component&lt; RenderMeshData &gt;" shape="rect" coords="268,336,526,360"/>
-<area href="classcorgi_1_1_component.html" alt="corgi::Component&lt; TransformData &gt;" shape="rect" coords="268,392,526,416"/>
-<area href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type..." alt="corgi::Component&lt; T &gt;" shape="rect" coords="268,448,526,472"/>
-</map>
- </div></div>
+
+<p>Inherited by <a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; AnimationData &gt;</a>, <a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; CommonServicesData &gt;</a>, <a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; GraphData &gt;</a>, <a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; MetaData &gt;</a>, <a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; PhysicsData &gt;</a>, <a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; RenderMeshData &gt;</a>, <a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; TransformData &gt;</a>, and <a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; T &gt;</a>.</p>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An interface that provides basic <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> functionality. All Components will inherit from this class. It provides the minimum set of things that are uniform across all Components (without needing to know the specific type of <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> that it is). </p>
 </div><table class="memberdecls">

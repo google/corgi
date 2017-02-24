@@ -17,6 +17,7 @@ var class_physics_component =
     [ "FinalizeStaticMesh", "class_physics_component.html#aed90f871649605c7d0709974c0b660b5", null ],
     [ "GenerateRaycastShape", "class_physics_component.html#ab73f24e963bd307e434f8410270a1edd", null ],
     [ "gravity", "class_physics_component.html#a9e36906706a9937c8bbe4bcf74bd4e74", null ],
+    [ "GravityForEntity", "class_physics_component.html#a0c8687c70bc1cc71da74729bc7ed1fbf", null ],
     [ "Init", "class_physics_component.html#a0ce5174aa2298f4f0c4b98bc85c5712e", null ],
     [ "InitEntity", "class_physics_component.html#a24ecaf091fa2a923e51ce6bb13428b44", null ],
     [ "InitStaticMesh", "class_physics_component.html#a936b59d71dbf78c78dccb0389f80005f", null ],

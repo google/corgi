@@ -190,7 +190,7 @@ $(document).ready(function(){initNavTree('classcorgi_1_1component__library_1_1_r
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -213,16 +213,8 @@ $(document).ready(function(){initNavTree('classcorgi_1_1component__library_1_1_r
  <a href="classcorgi_1_1component__library_1_1_render_mesh_component.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="rendermesh_8h_source.html">rendermesh.h</a>&gt;</code></p>
-<div class="dynheader">
-Inheritance diagram for corgi::component_library::RenderMeshComponent:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classcorgi_1_1component__library_1_1_render_mesh_component.png" usemap="#corgi::component_library::RenderMeshComponent_map" alt=""/>
-  <map id="corgi::component_library::RenderMeshComponent_map" name="corgi::component_library::RenderMeshComponent_map">
-<area href="classcorgi_1_1_component.html" alt="corgi::Component&lt; RenderMeshData &gt;" shape="rect" coords="0,56,293,80"/>
-<area href="classcorgi_1_1_component_interface.html" title="An interface that provides basic Component functionality. All Components will inherit from this class..." alt="corgi::ComponentInterface" shape="rect" coords="0,0,293,24"/>
-</map>
- </div></div>
+
+<p>Inherits <a class="el" href="classcorgi_1_1_component.html">corgi::Component&lt; RenderMeshData &gt;</a>.</p>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a> that handles the rendering of each Entities mesh that is registered with this <a class="el" href="classcorgi_1_1_component.html" title="A Component is an object that encapsulates all data and logic for Entities of a particular type...">Component</a>. </p>
 </div><table class="memberdecls">
@@ -260,9 +252,9 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memitem:afdf61cc8baaa2b705d5e8d00a747b902"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1component__library_1_1_render_mesh_component.html#afdf61cc8baaa2b705d5e8d00a747b902">RenderPass</a> (int pass_id, const <a class="el" href="classcorgi_1_1_camera_interface.html">CameraInterface</a> &amp;camera, fplbase::Renderer &amp;renderer)</td></tr>
 <tr class="memdesc:afdf61cc8baaa2b705d5e8d00a747b902"><td class="mdescLeft">&#160;</td><td class="mdescRight">Renders all Entities that are marked as being part of a given render pass to the current output buffer.  <a href="#afdf61cc8baaa2b705d5e8d00a747b902">More...</a><br/></td></tr>
 <tr class="separator:afdf61cc8baaa2b705d5e8d00a747b902"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c412bf139fc99cfc0f3aebfbcc265dc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1component__library_1_1_render_mesh_component.html#a2c412bf139fc99cfc0f3aebfbcc265dc">RenderPass</a> (int pass_id, const <a class="el" href="classcorgi_1_1_camera_interface.html">CameraInterface</a> &amp;camera, fplbase::Renderer &amp;renderer, const fplbase::Shader *shader_override)</td></tr>
-<tr class="memdesc:a2c412bf139fc99cfc0f3aebfbcc265dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Renders all Entities that are marked as being part of a given render pass to the current output buffer.  <a href="#a2c412bf139fc99cfc0f3aebfbcc265dc">More...</a><br/></td></tr>
-<tr class="separator:a2c412bf139fc99cfc0f3aebfbcc265dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d7d7c6b59a9b29ed9393633b2e9381f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1component__library_1_1_render_mesh_component.html#a7d7d7c6b59a9b29ed9393633b2e9381f">RenderPass</a> (int pass_id, const <a class="el" href="classcorgi_1_1_camera_interface.html">CameraInterface</a> &amp;camera, fplbase::Renderer &amp;renderer, size_t shader_index)</td></tr>
+<tr class="memdesc:a7d7d7c6b59a9b29ed9393633b2e9381f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Renders all Entities that are marked as being part of a given render pass to the current output buffer.  <a href="#a7d7d7c6b59a9b29ed9393633b2e9381f">More...</a><br/></td></tr>
+<tr class="separator:a7d7d7c6b59a9b29ed9393633b2e9381f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a305683615af3096aa32bfded17558082"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcorgi_1_1component__library_1_1_render_mesh_component.html#a305683615af3096aa32bfded17558082">RenderAllEntities</a> (fplbase::Renderer &amp;renderer, const <a class="el" href="classcorgi_1_1_camera_interface.html">CameraInterface</a> &amp;camera)</td></tr>
 <tr class="memdesc:a305683615af3096aa32bfded17558082"><td class="mdescLeft">&#160;</td><td class="mdescRight">Goes through and renders every <a class="el" href="classcorgi_1_1_entity.html" title="The basic Entity class for CORGI. It contains an array of index values, which are used by Components ...">Entity</a> that is visible from the camera, in pass order.  <a href="#a305683615af3096aa32bfded17558082">More...</a><br/></td></tr>
 <tr class="separator:a305683615af3096aa32bfded17558082"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -633,7 +625,7 @@ std::unordered_map<br class="typebreak"/>
 
 </div>
 </div>
-<a class="anchor" id="a2c412bf139fc99cfc0f3aebfbcc265dc"></a>
+<a class="anchor" id="a7d7d7c6b59a9b29ed9393633b2e9381f"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -658,8 +650,8 @@ std::unordered_map<br class="typebreak"/>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const fplbase::Shader *&#160;</td>
-          <td class="paramname"><em>shader_override</em>&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>shader_index</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -675,7 +667,7 @@ std::unordered_map<br class="typebreak"/>
     <tr><td class="paramdir">[in]</td><td class="paramname">pass_id</td><td>An int used to identify and index the desired render pass. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">camera</td><td>A <a class="el" href="classcorgi_1_1_camera_interface.html" title="An interface for 3D cameras, allowing them to have position, facing field of view, etc. Libraries can use this to pass around generic cameras that the game itself can implement the logic for. ">CameraInterface</a> reference to the camera used to render within the field of view. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">renderer</td><td>A reference to the fplbase::Renderer to capture the output of the render pass. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">shader_override</td><td>A fplbase::Shader to use as the mesh shader for this render pass. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">shader_index</td><td>The shader index for the fplbase::Shader to use as the mesh shader for this render pass. </td></tr>
   </table>
   </dd>
 </dl>
