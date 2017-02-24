@@ -55,10 +55,11 @@ enum CullingTest:ubyte {
 
 table RenderMeshDef {
   source_file:string;
-  shader:string;
+  shaders:[string];
   culling:[CullingTest];
   render_pass:[RenderPass];
   visible:bool = true;
+  tint:fplbase.ColorRGBA;
 
   // Ignore animations and pose the mesh as it was exported.
   // Useful for debugging problems with the mesh_pipeline.
@@ -68,6 +69,7 @@ table RenderMeshDef {
 table PhysicsDef {
   shapes:[BulletShapeDef];
   kinematic:bool = false;
+  gravity_multiplier:float = 1.0;
 }
 
 // Debug information to log each frame.

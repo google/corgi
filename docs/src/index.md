@@ -23,7 +23,8 @@ source using:
    * Discuss CORGI with other developers and users on the
      [CORGI Google Group][].
    * File issues on the [CORGI Issues Tracker][].
-   * Post your questoins to [stackoverflow.com][] with a mention of **corgi**.
+   * Post your questoins to [stackoverflow.com][] with a mention of
+     **fpl corgi**.
 
 To contribute to this project see [CONTRIBUTING][].
 
@@ -62,7 +63,7 @@ Each class is described in the folloiwing sections of the [Programmer's Guide][]
    [Component]: @ref corgi_component
    [Component Library]: @ref corgi_component_library
    [CONTRIBUTING]: @ref contributing
-   [CORGI Google Group]: http://group.google.com/group/corgi-lib
+   [CORGI Google Group]: http://groups.google.com/group/corgi-lib
    [CORGI Issues Tracker]: http://github.com/google/corgi/issues
    [CORGI]: @ref corgi_index
    [Entity]: @ref corgi_entity
@@ -73,5 +74,5 @@ Each class is described in the folloiwing sections of the [Programmer's Guide][]
    [OS X]: http://www.apple.com/osx/
    [Programmer's Guide]: usergroup0.html
    [releases page]: http://github.com/google/corgi/releases
-   [stackoverflow.com]: http://www.stackoverflow.com
+   [stackoverflow.com]: http://stackoverflow.com/search?q=fpl+corgi
    [Windows]: http://windows.microsoft.com/

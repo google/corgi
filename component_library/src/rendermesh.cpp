@@ -16,7 +16,10 @@
 #include "corgi_component_library/animation.h"
 #include "corgi_component_library/common_services.h"
 #include "corgi_component_library/transform.h"
+#include "fplbase/debug_markers.h"
+#include "fplbase/flatbuffer_utils.h"
 #include "fplbase/mesh.h"
+#include "fplbase/render_state.h"
 #include "fplbase/utilities.h"
 #include "library_components_generated.h"
 
@@ -34,24 +37,29 @@ namespace component_library {
 // registration points technically fall outside our frustrum.
 static const float kFrustrumOffset = 10.0f;
 
+// Default index when determining which shader to use in a render pass.
+static const int kDefaultShaderIndex = 0;
+
 void RenderMeshComponent::Init() {
   asset_manager_ =
       entity_manager_->GetComponent<CommonServicesComponent>()->asset_manager();
 }
 
 // Rendermesh depends on transform:
-void RenderMeshComponent::InitEntity(EntityRef& entity) {
+void RenderMeshComponent::InitEntity(EntityRef &entity) {
   entity_manager_->AddEntityToComponent<TransformComponent>(entity);
 }
 
-void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
+void RenderMeshComponent::RenderPrep(const CameraInterface &camera) {
   for (int pass = 0; pass < RenderPass_Count; pass++) {
     pass_render_list_[pass].clear();
   }
   for (auto iter = component_data_.begin(); iter != component_data_.end();
        ++iter) {
-    RenderMeshData* rendermesh_data = GetComponentData(iter->entity);
-    TransformData* transform_data = Data<TransformData>(iter->entity);
+    RenderMeshData *rendermesh_data = GetComponentData(iter->entity);
+    TransformData *transform_data = Data<TransformData>(iter->entity);
+
+    FinalizeRenderMeshDataIfRequired(rendermesh_data);
 
     float max_cos = cos(camera.viewport_angle());
     vec3 camera_facing = camera.facing();
@@ -104,10 +112,10 @@ void RenderMeshComponent::RenderPrep(const CameraInterface& camera) {
             std::greater<RenderlistEntry>());
 }
 
-void RenderMeshComponent::RenderAllEntities(fplbase::Renderer& renderer,
-                                            const CameraInterface& camera) {
+void RenderMeshComponent::RenderAllEntities(fplbase::Renderer &renderer,
+                                            const CameraInterface &camera) {
   // Make sure we only draw the front-facing polygons:
-  renderer.SetCulling(fplbase::Renderer::kCullBack);
+  renderer.SetCulling(fplbase::kCullingModeBack);
 
   // Render the actual game:
   for (int pass = 0; pass < RenderPass_Count; pass++) {
@@ -116,25 +124,41 @@ void RenderMeshComponent::RenderAllEntities(fplbase::Renderer& renderer,
 }
 
 // Render a pass.
-void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
-                                     fplbase::Renderer& renderer) {
-  RenderPass(pass_id, camera, renderer, nullptr);
+void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface &camera,
+                                     fplbase::Renderer &renderer) {
+  RenderPass(pass_id, camera, renderer, kDefaultShaderIndex);
 }
 
 // Render a single render-pass, by ID.
-void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
-                                     fplbase::Renderer& renderer,
-                                     const fplbase::Shader* shader_override) {
+void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface &camera,
+                                     fplbase::Renderer &renderer,
+                                     size_t shader_index) {
   mat4 camera_vp = camera.GetTransformMatrix();
 
   for (size_t i = 0; i < pass_render_list_[pass_id].size(); i++) {
-    EntityRef& entity = pass_render_list_[pass_id][i].entity;
+    EntityRef &entity = pass_render_list_[pass_id][i].entity;
 
-    RenderMeshData* rendermesh_data = Data<RenderMeshData>(entity);
+    RenderMeshData *rendermesh_data = Data<RenderMeshData>(entity);
 
-    TransformData* transform_data = Data<TransformData>(entity);
+    TransformData *transform_data = Data<TransformData>(entity);
 
-    AnimationData* anim_data = Data<AnimationData>(entity);
+    AnimationData *anim_data = Data<AnimationData>(entity);
+
+    // Only allow shader override to render if the index is valid
+    // and the rendermesh is initialized properly.
+    if (!rendermesh_data->initialized ||
+        rendermesh_data->shaders.size() <= shader_index ||
+        rendermesh_data->shaders[shader_index] == nullptr) {
+      continue;
+    }
+
+    fplbase::Shader *shader = rendermesh_data->shaders[shader_index];
+
+    // Reload shader if its global defines have changed, or if for whatever
+    // other reason, it's marked dirty.
+    shader->ReloadIfDirty();
+
+    PushDebugMarker(rendermesh_data->debug_name);
 
     // TODO: anim_data will set uniforms for an array of matricies. Each
     //       matrix represents one bone position.
@@ -164,11 +188,15 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
     if (num_mesh_bones > 1) {
       const bool use_default_pose =
           num_anim_bones != num_mesh_bones || rendermesh_data->default_pose;
-      const mathfu::AffineTransform* bone_transforms =
-          use_default_pose ? rendermesh_data->mesh->bone_global_transforms()
-                           : anim_data->motivator.GlobalTransforms();
-      rendermesh_data->mesh->GatherShaderTransforms(
-          bone_transforms, rendermesh_data->shader_transforms);
+      if (use_default_pose) {
+        for (int j = 0; j < rendermesh_data->num_shader_transforms; ++j) {
+          rendermesh_data->shader_transforms[j] = mathfu::kAffineIdentity;
+        }
+      } else {
+        rendermesh_data->mesh->GatherShaderTransforms(
+            anim_data->motivator.GlobalTransforms(),
+            rendermesh_data->shader_transforms);
+      }
       renderer.SetBoneTransforms(rendermesh_data->shader_transforms,
                                  rendermesh_data->num_shader_transforms);
     }
@@ -177,21 +205,12 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
       renderer.set_camera_pos(world_matrix_inverse * camera.position());
       renderer.set_model_view_projection(mvp);
 
-      if (!shader_override && rendermesh_data->shader) {
-        rendermesh_data->shader->Set(renderer);
-      } else {
-        shader_override->Set(renderer);
-      }
+      shader->Set(renderer);
 
       rendermesh_data->mesh->Render(renderer);
     } else {
-      const fplbase::Shader* shader = nullptr;
-      if (!shader_override && rendermesh_data->shader) {
-        shader = rendermesh_data->shader;
-      } else {
-        shader = shader_override;
-      }
-      mathfu::vec4i viewport[2] = {camera.viewport(0), camera.viewport(1)};
+      fplbase::Viewport viewport[2] = {fplbase::Viewport(camera.viewport(0)),
+                                       fplbase::Viewport(camera.viewport(1))};
       mat4 camera_vp_stereo = camera.GetTransformMatrix(1);
       mat4 mvp_matrices[2] = {mvp, camera_vp_stereo * world_transform};
       vec3 camera_positions[2] = {world_matrix_inverse * camera.position(0),
@@ -199,13 +218,15 @@ void RenderMeshComponent::RenderPass(int pass_id, const CameraInterface& camera,
       rendermesh_data->mesh->RenderStereo(renderer, shader, viewport,
                                           mvp_matrices, camera_positions);
     }
+
+    PopDebugMarker(); // rendermesh_data->debug_name
   }
 }
 
-void RenderMeshComponent::SetVisibilityRecursively(const EntityRef& entity,
+void RenderMeshComponent::SetVisibilityRecursively(const EntityRef &entity,
                                                    bool visible) {
-  RenderMeshData* rendermesh_data = Data<RenderMeshData>(entity);
-  TransformData* transform_data = Data<TransformData>(entity);
+  RenderMeshData *rendermesh_data = Data<RenderMeshData>(entity);
+  TransformData *transform_data = Data<TransformData>(entity);
   if (transform_data) {
     if (rendermesh_data) {
       rendermesh_data->visible = visible;
@@ -217,42 +238,52 @@ void RenderMeshComponent::SetVisibilityRecursively(const EntityRef& entity,
   }
 }
 
-void RenderMeshComponent::AddFromRawData(corgi::EntityRef& entity,
-                                         const void* raw_data) {
-  auto rendermesh_def = static_cast<const RenderMeshDef*>(raw_data);
+void RenderMeshComponent::AddFromRawData(corgi::EntityRef &entity,
+                                         const void *raw_data) {
+  auto rendermesh_def = static_cast<const RenderMeshDef *>(raw_data);
 
   // You need to call asset_manager before you can add from raw data,
   // otherwise it can't load up new meshes!
   assert(asset_manager_ != nullptr);
   assert(rendermesh_def->source_file() != nullptr);
-  assert(rendermesh_def->shader() != nullptr);
+  assert(rendermesh_def->shaders() && rendermesh_def->shaders()->Length() > 0);
 
-  RenderMeshData* rendermesh_data = AddEntity(entity);
+  RenderMeshData *rendermesh_data = AddEntity(entity);
 
   rendermesh_data->mesh_filename = rendermesh_def->source_file()->c_str();
-  rendermesh_data->shader_filename = rendermesh_def->shader()->c_str();
 
-  rendermesh_data->mesh =
-      asset_manager_->LoadMesh(rendermesh_def->source_file()->c_str());
+  auto shader_filenames = rendermesh_def->shaders();
+
+  rendermesh_data->shader_filenames.clear();
+  for (size_t i = 0; i < shader_filenames->size(); i++) {
+    auto filename =
+        shader_filenames->Get(static_cast<flatbuffers::uoffset_t>(i));
+    rendermesh_data->shader_filenames.push_back(filename->c_str());
+  }
+
+  rendermesh_data->shaders.clear();
+  for (size_t i = 0; i < shader_filenames->size(); i++) {
+    auto filename =
+        shader_filenames->Get(static_cast<flatbuffers::uoffset_t>(i));
+    if (filename->Length() > 0) {
+      rendermesh_data->shaders.push_back(asset_manager_->LoadShader(
+          filename->c_str(), true /* async */, nullptr /* alias */));
+      assert(rendermesh_data->shaders[i] != nullptr);
+    } else {
+      // Rendering for this shader should be skipped.
+      rendermesh_data->shaders.push_back(nullptr);
+    }
+  }
+
+  rendermesh_data->debug_name = rendermesh_def->source_file()->c_str();
+
+  rendermesh_data->mesh = asset_manager_->LoadMesh(
+      rendermesh_def->source_file()->c_str(), true /* async */);
+
   assert(rendermesh_data->mesh != nullptr);
 
   // Allocate the array to hold shader default pose's transforms.
   assert(rendermesh_data->shader_transforms == nullptr);
-  const uint8_t num_shader_transforms =
-      static_cast<uint8_t>(rendermesh_data->mesh->num_shader_bones());
-  rendermesh_data->num_shader_transforms = num_shader_transforms;
-  if (num_shader_transforms > 0) {
-    rendermesh_data->shader_transforms =
-        new mathfu::AffineTransform[num_shader_transforms];
-    for (uint8_t i = 0; i < num_shader_transforms; ++i) {
-      rendermesh_data->shader_transforms[i] = mathfu::kAffineIdentity;
-    }
-  }
-
-  rendermesh_data->shader =
-      asset_manager_->LoadShader(rendermesh_def->shader()->c_str());
-  assert(rendermesh_data->shader != nullptr);
-
   rendermesh_data->visible = rendermesh_def->visible();
   rendermesh_data->default_pose = rendermesh_def->default_pose();
 
@@ -278,16 +309,18 @@ void RenderMeshComponent::AddFromRawData(corgi::EntityRef& entity,
     }
   }
 
-  // TODO: Load this from a flatbuffer file instead of setting it.
-  rendermesh_data->tint = mathfu::kOnes4f;
+  auto tint = rendermesh_def->tint();
+  rendermesh_data->tint = (tint != nullptr)
+                              ? fplbase::LoadColorRGBA(rendermesh_def->tint())
+                              : mathfu::kOnes4f;
 }
 
 corgi::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
-    const corgi::EntityRef& entity) const {
-  const RenderMeshData* data = GetComponentData(entity);
+    const corgi::EntityRef &entity) const {
+  const RenderMeshData *data = GetComponentData(entity);
   if (data == nullptr) return nullptr;
 
-  if (data->mesh_filename == "" || data->shader_filename == "") {
+  if (data->mesh_filename == "" || data->shader_filenames.empty()) {
     // If we don't have a mesh filename or a shader, we can't be exported;
     // we were obviously created programatically.
     return nullptr;
@@ -301,9 +334,15 @@ corgi::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
   auto source_file = (defaults || data->mesh_filename != "")
                          ? fbb.CreateString(data->mesh_filename)
                          : 0;
-  auto shader = (defaults || data->shader_filename != "")
-                    ? fbb.CreateString(data->shader_filename)
-                    : 0;
+
+  std::vector<flatbuffers::Offset<flatbuffers::String>> shaders_vector;
+  for (size_t i = 0; i < data->shader_filenames.size(); i++) {
+    shaders_vector.push_back((defaults || data->shader_filenames[i] != "")
+                                 ? fbb.CreateString(data->shader_filenames[i])
+                                 : 0);
+  }
+  auto shaders = fbb.CreateVector(shaders_vector);
+
   std::vector<unsigned char> render_pass_vec;
   for (int i = 0; i < RenderPass_Count; i++) {
     if (data->pass_mask & (1 << i)) {
@@ -321,12 +360,14 @@ corgi::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
   auto culling_mask =
       data->culling_mask ? fbb.CreateVector(culling_mask_vec) : 0;
 
+  auto tint = fplbase::Vec4ToColorRGBA(data->tint);
+
   RenderMeshDefBuilder builder(fbb);
   if (defaults || source_file.o != 0) {
     builder.add_source_file(source_file);
   }
-  if (defaults || shader.o != 0) {
-    builder.add_shader(shader);
+  if (defaults || shaders.o != 0) {
+    builder.add_shaders(shaders);
   }
   if (defaults || render_pass.o != 0) {
     builder.add_render_pass(render_pass);
@@ -336,8 +377,31 @@ corgi::ComponentInterface::RawDataUniquePtr RenderMeshComponent::ExportRawData(
     builder.add_culling(culling_mask);
   }
 
+  builder.add_tint(&tint);
+
   fbb.Finish(builder.Finish());
   return fbb.ReleaseBufferPointer();
+}
+
+void RenderMeshComponent::FinalizeRenderMeshDataIfRequired(
+    RenderMeshData *rendermesh_data) {
+  if (rendermesh_data->initialized || rendermesh_data->mesh == nullptr ||
+      rendermesh_data->mesh->num_vertices() == 0) {
+    // If this RenderMeshData is already initialized or the mesh has not been
+    // loaded yet (which is inferred from num_vertices() > 0), just return.
+    return;
+  }
+  const uint8_t num_shader_transforms =
+      static_cast<uint8_t>(rendermesh_data->mesh->num_shader_bones());
+  rendermesh_data->num_shader_transforms = num_shader_transforms;
+  if (num_shader_transforms > 0) {
+    rendermesh_data->shader_transforms =
+        new mathfu::AffineTransform[num_shader_transforms];
+    for (uint8_t i = 0; i < num_shader_transforms; ++i) {
+      rendermesh_data->shader_transforms[i] = mathfu::kAffineIdentity;
+    }
+  }
+  rendermesh_data->initialized = true;
 }
 
 }  // component_library

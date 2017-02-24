@@ -42,17 +42,17 @@ struct RenderMeshData {
   /// @brief Default constructor for RenderMeshData.
   RenderMeshData()
       : mesh(nullptr),
-        shader(nullptr),
         tint(mathfu::kOnes4f),
         mesh_filename(""),
-        shader_filename(""),
         z_depth(0),
         culling_mask(0),
         pass_mask(0),
         visible(true),
+        initialized(false),
         default_pose(false),
         num_shader_transforms(0),
-        shader_transforms(nullptr) {}
+        shader_transforms(nullptr),
+        debug_name("") {}
 
   /// @brief Destructor for RenderMeshData.
   ~RenderMeshData() {
@@ -77,27 +77,29 @@ struct RenderMeshData {
   /// data from `other`.
   RenderMeshData& operator=(RenderMeshData&& other) {
     mesh = std::move(other.mesh);
-    shader = std::move(other.shader);
+    shaders = std::move(other.shaders);
     tint = std::move(other.tint);
     mesh_filename = std::move(other.mesh_filename);
-    shader_filename = std::move(other.shader_filename);
+    shader_filenames = std::move(other.shader_filenames);
     z_depth = std::move(other.z_depth);
     culling_mask = std::move(other.culling_mask);
     pass_mask = std::move(other.pass_mask);
     visible = std::move(other.visible);
+    initialized = std::move(other.initialized);
     default_pose = std::move(other.default_pose);
     num_shader_transforms = other.num_shader_transforms;
     shader_transforms = other.shader_transforms;
     other.shader_transforms = nullptr;
     other.num_shader_transforms = 0;
+    debug_name = std::move(other.debug_name);
     return *this;
   }
 
   /// @brief The fplbase::Mesh for this Entity.
   fplbase::Mesh* mesh;
 
-  /// @brief The fplbase::Shader for this Entity.
-  fplbase::Shader* shader;
+  /// @brief A vector of fplbase::Shader for this Entity.
+  std::vector<fplbase::Shader*> shaders;
 
   /// @brief A mathfu::vec4 specifying the tinting for the Entity in RGBA.
   mathfu::vec4 tint;
@@ -105,8 +107,8 @@ struct RenderMeshData {
   /// @brief A std::string of the filename for the mesh, used for exporting.
   std::string mesh_filename;
 
-  /// @brief A std::string of the filename for the shader, used for exporting.
-  std::string shader_filename;
+  /// @brief A std::string of the filenames for the shaders, used for exporting.
+  std::vector<std::string> shader_filenames;
 
   /// @brief The z distance corresponding to the depth of where the
   /// Entity should be rendered.
@@ -123,6 +125,9 @@ struct RenderMeshData {
   /// @brief A bool determining if this Entity should be rendered.
   bool visible;
 
+  /// @brief A bool indicating if this RenderMesh is initialized.
+  bool initialized;
+
   /// @brief A bool determining if the Entity should be rendered in the
   /// default pose.
   bool default_pose;
@@ -134,6 +139,9 @@ struct RenderMeshData {
   /// @brief A mathfu::AffineTransform array that contains the shader
   /// transforms.
   mathfu::AffineTransform* shader_transforms;
+
+  /// @brief The debug name of this mesh
+  std::string debug_name;
 
  private:
   // Disallow copies. They're inefficient with the shader_transforms array.
@@ -252,11 +260,11 @@ class RenderMeshComponent : public Component<RenderMeshData> {
   /// within the field of view.
   /// @param[out] renderer A reference to the fplbase::Renderer to capture the
   /// output of the render pass.
-  /// @param[in] shader_override A fplbase::Shader to use as the mesh shader
-  /// for this render pass.
+  /// @param[in] shader_index The shader index for the fplbase::Shader to use as
+  /// the mesh shader for this render pass.
   void RenderPass(int pass_id, const CameraInterface& camera,
                   fplbase::Renderer& renderer,
-                  const fplbase::Shader* shader_override);
+                  size_t shader_index);
 
   /// @brief Goes through and renders every Entity that is visible from the
   /// camera, in pass order.
@@ -322,6 +330,11 @@ class RenderMeshComponent : public Component<RenderMeshData> {
   }
 
  private:
+  // Finalize the initialization of RenderMeshData if it's not completed yet.
+  // This function should be called right after the corresponding mesh is
+  // loaded.
+  void FinalizeRenderMeshDataIfRequired(RenderMeshData* rendermesh_data);
+
   // todo(ccornell) expand this if needed - make an array for multiple lights.
   // Also maybe make this into a full fledged struct to store things like
   // intensity, color, etc.  (Low priority - none of our shaders support

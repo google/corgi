@@ -256,6 +256,7 @@ struct PhysicsData {
   std::unique_ptr<btTriangleMesh> triangle_mesh_;
   int body_count_;
   bool enabled_;
+  float gravity_multiplier_;
 };
 
 /// @class PhysicsComponent
@@ -441,6 +442,12 @@ class PhysicsComponent : public corgi::Component<PhysicsData> {
   /// @return Returns an EntityRef to the first Entity that was hit.
   corgi::EntityRef RaycastSingle(mathfu::vec3& start, mathfu::vec3& end,
                                  short layer_mask, mathfu::vec3* hit_point);
+
+  /// @brief Get the gravity value of the given Entity.
+  ///
+  /// @param[in] entity The Entity to get the custom gravity for.
+  /// @return The gravity value of the Entity.
+  float GravityForEntity(const corgi::EntityRef& entity) const;
 
   /// @brief Render the entire physics worlds using Bullet's default
   /// debugging tools.

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "corgi_component_library/meta.h"
 #include <string.h>
 #include "corgi_component_library/common_services.h"
-#include "corgi_component_library/meta.h"
 #include "corgi_component_library/rendermesh.h"
 #include "fplbase/utilities.h"
 #include "mathfu/utilities.h"
@@ -126,11 +126,18 @@ void MetaComponent::AddEntityToDictionary(const std::string& key,
   // Check for duplicate entities so we can warn the user.
   auto i = entity_dictionary_.find(key);
   if (i != entity_dictionary_.end()) {
+    // For log, in case data->entity_id points at key.
+    const std::string original_key(key);
+    MetaData* data = GetComponentData(entity);
+    GenerateRandomEntityID(&data->entity_id);
     fplbase::LogError(
-        "Duplicate entities with entity ID '%s', check your entity data.",
-        key.c_str());
+        "Duplicate entities with entity ID '%s', randomizing to '%s'. "
+        "Check your entity data.",
+        original_key.c_str(), data->entity_id.c_str());
+    entity_dictionary_[data->entity_id] = entity;
+  } else {
+    entity_dictionary_[key] = entity;
   }
-  entity_dictionary_[key] = entity;
 }
 void MetaComponent::RemoveEntityFromDictionary(const std::string& key) {
   auto i = entity_dictionary_.find(key);

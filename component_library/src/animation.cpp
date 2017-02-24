@@ -50,7 +50,7 @@ void AnimationComponent::UpdateAllEntities(corgi::WorldTime delta_time) {
           fplbase::LogInfo(
               animation_data->motivator.CsvHeaderForDebugging().c_str());
           animation_data->debug_state = AnimationDebugState_AllChannels;
-          //fallthrough
+          FPL_FALLTHROUGH_INTENDED
 
         case AnimationDebugState_AllChannels:
           fplbase::LogInfo(
@@ -129,8 +129,7 @@ void AnimationComponent::InitializeMotivator(const EntityRef& entity) {
   // Initialize the RigMotivator to animate the `mesh` according to
   // `defining_anim`.
   auto mesh = render_data->mesh;
-  const RigInit init(defining_anim, mesh->bone_transforms(),
-                     mesh->bone_parents(),
+  const RigInit init(defining_anim, mesh->bone_parents(),
                      static_cast<motive::BoneIndex>(mesh->num_bones()));
   data->motivator.Initialize(init, &engine_);
 }

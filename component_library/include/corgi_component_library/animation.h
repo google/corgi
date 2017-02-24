@@ -22,10 +22,12 @@
 #include "motive/engine.h"
 #include "motive/motivator.h"
 
+/// @brief Namespace for Motive library.
 namespace motive {
 class RigAnim;
 }
 
+/// @brief Namespace for CORGI library.
 namespace corgi {
 namespace component_library {
 

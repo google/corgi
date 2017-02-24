@@ -38,49 +38,14 @@ set(corgi_DEBUG ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
-# Directory which contains the source for 3rd party libraries.
-if(NOT DEFINED third_party_root)
-  get_filename_component(
-    third_party_root "${CMAKE_CURRENT_LIST_DIR}/../../../../external"
-    REALPATH)
-endif()
-
-# Directory which contains source for FPL libraries.
-if(NOT DEFINED fpl_root)
-  get_filename_component(
-      fpl_root "${CMAKE_CURRENT_LIST_DIR}/../../libs" REALPATH)
-endif()
-
-# If the dependencies directory exists, assume this is the root directory for
-# all libraries required by this project.
-if(NOT DEFINED dependencies_root)
-  set(dependencies_root "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
-  if(EXISTS "${dependencies_root}")
-    set(third_party_root "${dependencies_root}")
-    set(fpl_root "${dependencies_root}")
-  endif()
-endif()
-
-set(dependencies_gtest_dir "${fpl_root}/googletest"
-    CACHE PATH "Directory containing the GoogleTest library.")
-set(dependencies_flatbuffers_dir "${fpl_root}/flatbuffers"
-    CACHE PATH "Directory containing the Flatbuffers library.")
-set(dependencies_fplutil_dir "${fpl_root}/fplutil"
-    CACHE PATH "Directory containing the fplutil library.")
-set(dependencies_breadboard_dir "${fpl_root}/breadboard"
-    CACHE PATH "Directory containing the breadboard library.")
-set(dependencies_fplbase_dir "${fpl_root}/fplbase"
-    CACHE PATH "Directory containing the FPLBase library.")
-set(dependencies_mathfu_dir "${fpl_root}/mathfu"
-    CACHE PATH "Directory containing the MathFu library.")
-set(dependencies_motive_dir "${fpl_root}/motive"
-    CACHE PATH "Directory containing the motive animation library.")
-set(dependencies_bulletphysics_distr_dir "${third_party_root}/bulletphysics"
-    CACHE PATH "Directory containing the Bullet Physics distribution.")
-# NOTE: This is only required as the breadboard module library and CORGI's
-# component library have a circular dependency.
-set(dependencies_corgi_dir "${CMAKE_CURRENT_LIST_DIR}"
-    CACHE PATH "Directory containing the CORGI library.")
+# Call fplutil to get locations of dependencies and set common build settings.
+# Extra MSVC compiler flags:
+#    /wd4244: 'conversion' conversion from 'type1' to 'type2'
+#    /wd4512: 'class' : assignment operator could not be generated
+#    /wd4800: 'type' : forcing value to bool 'true' or 'false'
+include("cmake/find_fplutil.cmake")
+include("${fplutil_dir}/buildutil/cmake_common.txt")
+set_common_build_variables("/wd4244 /wd4512 /wd4800")
 
 # Temporary files (like object files) created while compiling projects.
 set(tmp_dir ${CMAKE_CURRENT_BINARY_DIR}/obj)
@@ -100,25 +65,9 @@ set(corgi_SRCS
 # Includes for this project.
 include_directories(src include)
 
-# Detect clang
-if(${CMAKE_CXX_COMPILER_ID} STREQUAL Clang)
-  set(CMAKE_COMPILER_IS_CLANGXX 1)
+if(fplbase_debug_markers)
+  add_definitions(-DFPLBASE_ENABLE_DEBUG_MARKERS)
 endif()
-
-# Compiler flags.
-set(C_FLAGS_WARNINGS "")
-if(MSVC)
-  set(C_FLAGS_WARNINGS
-      "/W4 /WX /wd4065 /wd4355 /wd4127 /wd4244 /wd4512 /wd4800")
-elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
-       CMAKE_COMPILER_IS_CLANGXX)
-  set(CMAKE_CXX_FLAGS
-      "${CMAKE_CXX_FLAGS} -std=c++0x -Wall -pedantic -Werror -Wextra")
-endif()
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS_WARNINGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${C_FLAGS_WARNINGS}")
-set(CMAKE_CXX_FLAGS_DEFAULT "${CMAKE_CXX_FLAGS}")
-set(CMAKE_C_FLAGS_DEFAULT "${CMAKE_C_FLAGS}")
 
 # Library targets.
 add_library(corgi ${corgi_SRCS})
@@ -134,7 +83,7 @@ if (corgi_build_component_library)
   endif()
 
   set(CORGI_COMPONENT_LIBRARY_FLATBUFFERS_GENERATED_INCLUDES_DIR
-      ${CMAKE_SOURCE_DIR}/${CMAKE_FILES_DIRECTORY}/include/component_library)
+      ${CMAKE_CURRENT_BINARY_DIR}/include/component_library)
   file(GLOB_RECURSE
        CORGI_COMPONENT_LIBRARY_FLATBUFFERS_SCHEMAS
        ${CORGI_COMPONENT_LIBRARY_DIR}/schemas/*.fbs)
@@ -189,9 +138,12 @@ if (corgi_build_component_library)
       ${CORGI_COMPONENT_LIBRARY_DIR}/include/corgi_component_library)
   set(corgi_component_library_SRCS
       ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/animation.h
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/bullet_physics.h
       ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/camera_interface.h
       ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/common_services.h
       ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/component_utils.h
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/default_entity_factory.h
+      ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/default_entity_factory.inc
       ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/entity_factory.h
       ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/graph.h
       ${CORGI_COMPONENT_LIBRARY_INCLUDE_DIR}/meta.h
@@ -221,6 +173,9 @@ if (corgi_build_component_library)
   include_directories(${dependencies_fplutil_dir}/libfplutil/include)
   include_directories(${dependencies_motive_dir}/include)
   include_directories(${dependencies_mathfu_dir}/include)
+  if(WIN32)
+    include_directories(${dependencies_fplbase_dir}/external/include)
+  endif()
 
   set_compiler_flags_for_external_libraries()
   add_library(corgi_component_library ${corgi_component_library_SRCS})
@@ -249,7 +204,9 @@ option(
 if(corgi_build_tests)
   set(GUNIT_INCDIR "${dependencies_gtest_dir}/include")
   set(GTEST_LIBDIR "${dependencies_gtest_dir}")
+  set_compiler_flags_for_external_libraries()
   add_subdirectory("${dependencies_gtest_dir}" ${tmp_dir}/googletest)
+  restore_compiler_flags()
 
   include(${GTEST_LIBDIR}/cmake/internal_utils.cmake)
   config_compiler_and_linker()
@@ -259,6 +216,7 @@ if(corgi_build_tests)
 
   include_directories(${GUNIT_INCDIR}
                       ${CMAKE_CURRENT_SOURCE_DIR})
+  fpl_absolute_include_dir(${dependencies_gtest_dir})
 
   function(test_executable name libs)
     cxx_executable_with_flags(${name}_test "${cxx_default}"

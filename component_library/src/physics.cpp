@@ -74,7 +74,7 @@ static void BulletTickCallback(btDynamicsWorld* world, btScalar time_step);
 static const char* kPhysicsShader = "shaders/color";
 
 static inline btVector3 ToBtVector3(const mathfu::vec3& v) {
-  return btVector3(v.x(), v.y(), v.z());
+  return btVector3(v.x, v.y, v.z);
 }
 
 static inline btVector3 ToBtVector3(const fplbase::Vec3& v) {
@@ -92,7 +92,7 @@ static inline mathfu::vec3 BtToMathfuVec3(const btVector3& v) {
 static inline btQuaternion ToBtQuaternion(const mathfu::quat& q) {
   // Bullet assumes a right handed system, while mathfu is left, so the axes
   // need to be negated.
-  return btQuaternion(-q.vector().x(), -q.vector().y(), -q.vector().z(),
+  return btQuaternion(-q.vector().x, -q.vector().y, -q.vector().z,
                       q.scalar());
 }
 
@@ -117,7 +117,8 @@ RigidBodyData& RigidBodyData::operator=(RigidBodyData&& src) {
 }
 
 // These functions require bullet_physics.h, so define here.
-PhysicsData::PhysicsData() : body_count_(0), enabled_(false) {}
+PhysicsData::PhysicsData()
+    : body_count_(0), enabled_(false), gravity_multiplier_(1.0f) {}
 PhysicsData::~PhysicsData() {}
 PhysicsData::PhysicsData(PhysicsData&& src) { *this = std::move(src); }
 
@@ -285,7 +286,7 @@ void PhysicsComponent::AddFromRawData(corgi::EntityRef& entity,
         }
       }
       rb_data->shape->setLocalScaling(
-          btVector3(fabs(scale.x()), fabs(scale.y()), fabs(scale.z())));
+          btVector3(fabs(scale.x), fabs(scale.y), fabs(scale.z)));
       rb_data->motion_state.reset(new btDefaultMotionState());
       btScalar mass = shape_def->mass();
       btVector3 inertia(0.0f, 0.0f, 0.0f);
@@ -326,10 +327,17 @@ void PhysicsComponent::AddFromRawData(corgi::EntityRef& entity,
       bullet_world_->addRigidBody(rb_data->rigid_body.get(),
                                   rb_data->collision_type,
                                   rb_data->collides_with);
+
+      // Give any custom gravity, after adding it to the world.
+      if (physics_def->gravity_multiplier() != 1.0f) {
+        rb_data->rigid_body->setGravity(bullet_world_->getGravity() *
+                                        physics_def->gravity_multiplier());
+      }
     }
   }
 
   physics_data->enabled_ = true;
+  physics_data->gravity_multiplier_ = physics_def->gravity_multiplier();
   UpdatePhysicsFromTransform(entity);
 }
 
@@ -443,7 +451,7 @@ corgi::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
       float invMass = body.rigid_body->getInvMass();
       shape_builder.add_mass(invMass ? 1.0f / invMass : 0.0f);
       shape_builder.add_restitution(body.rigid_body->getRestitution());
-      fplbase::Vec3 offset(body.offset.x(), body.offset.y(), body.offset.z());
+      fplbase::Vec3 offset(body.offset.x, body.offset.y, body.offset.z);
       shape_builder.add_offset(&offset);
       shape_builder.add_collision_type(
           static_cast<BulletCollisionType>(body.collision_type));
@@ -462,6 +470,9 @@ corgi::ComponentInterface::RawDataUniquePtr PhysicsComponent::ExportRawData(
   PhysicsDefBuilder builder(fbb);
   builder.add_kinematic(kinematic);
   builder.add_shapes(shapes);
+  if (data->gravity_multiplier_ != 1.0f) {
+    builder.add_gravity_multiplier(data->gravity_multiplier_);
+  }
 
   fbb.Finish(builder.Finish());
   return fbb.ReleaseBufferPointer();
@@ -647,7 +658,11 @@ void PhysicsComponent::UpdatePhysicsObjectsTransform(
 
   PhysicsData* physics_data = Data<PhysicsData>(entity);
   TransformData* transform_data = Data<TransformData>(entity);
-  btQuaternion orientation = ToBtQuaternion(transform_data->orientation);
+  TransformComponent* transform_component = GetComponent<TransformComponent>();
+  mathfu::vec3 world_position = transform_component->WorldPosition(entity);
+  mathfu::quat world_orientation =
+      transform_component->WorldOrientation(entity);
+  btQuaternion orientation = ToBtQuaternion(world_orientation);
 
   for (int i = 0; i < physics_data->body_count_; i++) {
     auto rb_data = &physics_data->rigid_bodies_[i];
@@ -656,8 +671,8 @@ void PhysicsComponent::UpdatePhysicsObjectsTransform(
     }
     vec3 local_offset =
         vec3::HadamardProduct(rb_data->offset, transform_data->scale);
-    vec3 offset = transform_data->orientation.Inverse() * local_offset;
-    btVector3 position = ToBtVector3(transform_data->position + offset);
+    vec3 offset = world_orientation.Inverse() * local_offset;
+    btVector3 position = ToBtVector3(world_position + offset);
     btTransform transform(orientation, position);
     rb_data->rigid_body->setWorldTransform(transform);
     rb_data->motion_state->setWorldTransform(transform);
@@ -674,9 +689,9 @@ void PhysicsComponent::UpdatePhysicsScale(const corgi::EntityRef& entity) {
     auto rb_data = &physics_data->rigid_bodies_[i];
     const btVector3& localScale = rb_data->shape->getLocalScaling();
     // Bullet doesn't handle a negative scale, so prevent any from being set.
-    const btVector3 newScale(fabs(transform_data->scale.x()),
-                             fabs(transform_data->scale.y()),
-                             fabs(transform_data->scale.z()));
+    const btVector3 newScale(fabs(transform_data->scale.x),
+                             fabs(transform_data->scale.y),
+                             fabs(transform_data->scale.z));
     if ((localScale - newScale).length2() > FLT_EPSILON) {
       // If the scale has changed, the rigid body needs to be removed from the
       // world, updated accordingly, and added back in.
@@ -857,9 +872,9 @@ void PhysicsComponent::GenerateRaycastShape(corgi::EntityRef& entity,
   btVector3 bt_extents = ToBtVector3(extents);
   rb_data->offset = (max + min) / 2.0f;
   rb_data->shape.reset(new btBoxShape(bt_extents / 2.0f));
-  rb_data->shape->setLocalScaling(btVector3(fabs(transform_data->scale.x()),
-                                            fabs(transform_data->scale.y()),
-                                            fabs(transform_data->scale.z())));
+  rb_data->shape->setLocalScaling(btVector3(fabs(transform_data->scale.x),
+                                            fabs(transform_data->scale.y),
+                                            fabs(transform_data->scale.z)));
   vec3 local_offset =
       vec3::HadamardProduct(rb_data->offset, transform_data->scale);
   vec3 transformed_offset =
@@ -883,6 +898,12 @@ void PhysicsComponent::GenerateRaycastShape(corgi::EntityRef& entity,
   bullet_world_->addRigidBody(rb_data->rigid_body.get(),
                               rb_data->collision_type, rb_data->collides_with);
   data->enabled_ = true;
+}
+
+float PhysicsComponent::GravityForEntity(const corgi::EntityRef& entity) const {
+  auto physics_data = Data<PhysicsData>(entity);
+  assert(physics_data);
+  return physics_data->gravity_multiplier_ * gravity();
 }
 
 void PhysicsComponent::DebugDrawWorld(Renderer* renderer,
